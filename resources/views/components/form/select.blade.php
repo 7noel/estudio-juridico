@@ -3,13 +3,19 @@
     'label' => null,
     'options' => [],
     'value' => null,
-    'placeholder' => null
+    'selected' => null,
+    'placeholder' => null,
+    'required' => false
 ])
+
+@php
+$value = $selected ?? $value;
+@endphp
 
 <div class="form-group">
 
     @if($label)
-        <x-form.label :for="$name">
+        <x-form.label :for="$name" :required="$required">
             {{ $label }}
         </x-form.label>
     @endif

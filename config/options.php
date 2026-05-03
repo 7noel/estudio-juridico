@@ -10,10 +10,10 @@ return [
 
     'client_document_types' => [
 
-        '6' => 'RUC',
         '1' => 'DNI',
         '4' => 'CEX',
         '7' => 'PAS',
+        '6' => 'RUC',
         'A' => 'CÉDULA DIPLOMÁTICA',
 
     ],

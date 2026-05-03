@@ -1,0 +1,1 @@
+<a href="{{ route('users.edit',$user) }}" class="btn btn-sm btn-outline-primary"> Editar </a>

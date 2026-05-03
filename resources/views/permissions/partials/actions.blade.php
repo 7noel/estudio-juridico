@@ -1,0 +1,1 @@
+<a href="{{ route('permissions.edit',$permission) }}" class="btn btn-sm btn-outline-primary"> Editar </a>

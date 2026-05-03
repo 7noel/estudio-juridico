@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             LegalSpecialtySeeder::class,
             LegalSubjectSeeder::class,
             EmployeeSeeder::class,
-            //UserSeeder::class,
+            PermissionSeeder::class,
         ]);
         //$this->call(AdminTableSeeder::class);
         

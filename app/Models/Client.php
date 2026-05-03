@@ -41,4 +41,39 @@ class Client extends Model
         return $this->hasMany(CaseFile::class);
     }
 
+    public function ubigeo()
+    {
+        return $this->belongsTo(
+            \App\Models\Ubigeo::class,
+            'ubigeo_code',
+            'code'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ACCESORS
+    |--------------------------------------------------------------------------
+    */
+
+    public function getUbigeoTextAttribute()
+    {
+        if (!$this->ubigeo) {
+            return null;
+        }
+
+        return
+            $this->ubigeo->departamento
+            .' - '.
+            $this->ubigeo->provincia
+            .' - '.
+            $this->ubigeo->distrito;
+    }
+    
+    public function getDocumentTypeTextAttribute()
+    {
+        return config('options.client_document_types')[$this->document_type]
+            ?? $this->document_type;
+    }
+
 }

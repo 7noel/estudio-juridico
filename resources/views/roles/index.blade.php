@@ -3,31 +3,29 @@
 @section('content')
 
 <div class="card border-0 shadow-sm">
-	<div class="card-header bg-white d-flex justify-content-between">
-		<h6 class="mb-0">
-			<i class="bi bi-people"></i> Clientes
+	<div class="card-header d-flex justify-content-between">
+		<h6>
+			<i class="bi bi-shield-lock"></i> Roles
 		</h6>
-		@can('create clients')
-		<a href="{{ route('clients.create') }}" class="btn btn-outline-primary btn-sm">
+		<a href="{{ route('roles.create') }}" class="btn btn-outline-primary btn-sm">
 			<i class="bi bi-plus"></i> Nuevo
 		</a>
-		@endcan
 	</div>
 	<div class="card-body">
 		<div class="table-responsive">
-			<table id="clientsTable" class="table table-sm table-bordered table-striped">
+			<table id="rolesTable" class="table table-sm table-bordered table-striped">
 				<thead>
 					<tr>
 						<th>ID</th>
-						<th>Documento</th>
 						<th>Nombre</th>
-						<th>Celular</th>
+						<th>Permisos</th>
 						<th>Acciones</th>
 					</tr>
 				</thead>
 			</table>
 		</div>
 	</div>
+
 </div>
 
 @endsection
@@ -38,16 +36,19 @@
 <script>
 
 $(function(){
-	$('#clientsTable').DataTable({
+	$('#rolesTable').DataTable({
 		processing: true,
 		serverSide: true,
-		ajax: "{{ route('clients.index') }}",
+		ajax: "{{ route('roles.index') }}",
 		columns: [
 			{ data: 'id' },
-			{ data: 'document', name: 'document_number' },
-			{ data: 'full_name' },
-			{ data: 'mobile' },
-			{ data: 'actions', orderable: false, searchable: false }
+			{ data: 'name' },
+			{ data: 'permissions' },
+			{
+				data: 'actions',
+				orderable: false,
+				searchable: false
+			}
 		],
         scrollX: true,
         autoWidth: false,
@@ -57,5 +58,7 @@ $(function(){
 		}
 	});
 });
+
 </script>
+
 @endpush

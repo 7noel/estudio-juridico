@@ -15,22 +15,32 @@ class ClientPolicy
 
     public function view(User $user, Client $client): bool
     {
+        if ($user->hasRole('Administrador')) {
+            return true;
+        }
+
         return true;
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->hasAnyRole([
+            'Administrador',
+            'Recepcionista'
+        ]);
     }
 
     public function update(User $user, Client $client): bool
     {
-        return true;
+        return $user->hasAnyRole([
+            'Administrador',
+            'Recepcionista'
+        ]);
     }
 
     public function delete(User $user, Client $client): bool
     {
-        return true;
+        return $user->hasRole('Administrador');
     }
 
 }

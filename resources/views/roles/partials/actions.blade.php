@@ -1,0 +1,1 @@
+<a href="{{ route('roles.edit',$role) }}" class="btn btn-sm btn-outline-primary"> Editar </a>

@@ -4,13 +4,32 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Rap2hpoutre\LaravelLogViewer\LogViewerController;
 
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\CaseFileController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/session-check', function () {
+    if (auth()->check()) {
+        // Solo responder: esto ya mantiene viva la sesión
+        return response()->json([
+            'active' => true
+        ]);
+    }
+    return response()->json([
+        'active' => false
+    ]);
+})->name('session.check');
+
+Route::get('/refresh-csrf', function () {
+    return response()->json(['token' => csrf_token()]);
+})->name('refresh.csrf');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -27,22 +46,12 @@ require __DIR__.'/auth.php';
 Route::middleware(['auth'])->get('logs', [LogViewerController::class, 'index']);
 
 Route::middleware(['auth'])->group(function () {
-
-    Route::resource(
-        'clients',
-        ClientController::class
-    );
-
-    Route::resource(
-        'consultations',
-        ConsultationController::class
-    );
-
-    Route::resource(
-        'cases',
-        CaseFileController::class
-    );
-
+    Route::resource('users', UserController::class);
+    Route::resource('clients', ClientController::class);
+    Route::resource('consultations', ConsultationController::class);
+    Route::resource('cases', CaseFileController::class);
+    Route::resource('roles', RoleController::class);
+    Route::resource('permissions',PermissionController::class);
 });
 
 Route::get(

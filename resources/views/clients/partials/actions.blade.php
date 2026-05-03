@@ -1,0 +1,1 @@
+<a href="{{ route('clients.edit',$client) }}" class="btn btn-sm btn-outline-primary"> Editar </a>

@@ -15,6 +15,7 @@ use App\Models\AgendaEvent;
 use App\Models\Communication;
 use App\Models\Employee;
 use App\Models\Establishment;
+use Spatie\Permission\Models\Role;
 
 use App\Policies\CaseFilePolicy;
 use App\Policies\ConsultationPolicy;
@@ -26,6 +27,7 @@ use App\Policies\AgendaEventPolicy;
 use App\Policies\CommunicationPolicy;
 use App\Policies\EmployeePolicy;
 use App\Policies\EstablishmentPolicy;
+use App\Policies\RolePolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -46,5 +48,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Communication::class, CommunicationPolicy::class);
         Gate::policy(Employee::class, EmployeePolicy::class);
         Gate::policy(Establishment::class, EstablishmentPolicy::class);
+        Gate::policy(User::class, UserPolicy::class);
+        Gate::policy(Role::class, RolePolicy::class);
     }
 }

@@ -4,12 +4,12 @@
 
 <div class="card border-0 shadow-sm">
 	<div class="card-header bg-white">
-		<h6> Nuevo cliente </h6>
+		<h6> Nuevo usuario </h6>
 	</div>
 	<div class="card-body">
-		<form method="POST" action="{{ route('clients.store') }}">
+		<form method="POST" action="{{ route('users.store') }}">
 			@csrf
-			@include('clients._form')
+			@include('users._form')
 			<x-form.button>
 				<i class="bi bi-save"></i>Guardar
 			</x-form.button>

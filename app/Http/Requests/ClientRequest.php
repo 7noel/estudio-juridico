@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ClientRequest extends FormRequest
 {
@@ -12,7 +13,7 @@ class ClientRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +23,27 @@ class ClientRequest extends FormRequest
      */
     public function rules(): array
     {
+        $id = $this->route('client');
+
         return [
+
+            'document_type' => [
+                'required',
+                Rule::in(array_keys(config('options.client_document_types')))
+            ],
+
+            'document_number' => [
+                'required',
+                'string',
+                Rule::unique('clients')
+                    ->where(function ($query) {
+
+                        return $query
+                            ->where('document_type', request('document_type'));
+
+                    })
+                    ->ignore($id)
+            ],
 
             'full_name' => [
                 'required',
@@ -30,24 +51,13 @@ class ClientRequest extends FormRequest
                 'max:255'
             ],
 
-            'document_type' => [
+            'address' => [
+                'nullable',
+                'string'
+            ],
+
+            'ubigeo_code' => [
                 'required'
-            ],
-
-            'document_number' => [
-                'required',
-                'string',
-                'max:20'
-            ],
-
-            'mobile' => [
-                'nullable',
-                'max:20'
-            ],
-
-            'phone' => [
-                'nullable',
-                'max:20'
             ],
 
             'email' => [
@@ -55,11 +65,11 @@ class ClientRequest extends FormRequest
                 'email'
             ],
 
-            'ubigeo_code' => [
+            'mobile' => [
                 'nullable'
             ],
 
-            'address' => [
+            'phone' => [
                 'nullable'
             ],
 

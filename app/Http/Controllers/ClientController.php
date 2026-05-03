@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Http\Requests\ClientRequest;
 use App\Models\Ubigeo;
+use Illuminate\Http\Request;
 
 
 class ClientController extends Controller
@@ -12,30 +13,46 @@ class ClientController extends Controller
 
     public function __construct()
     {
-        $this->authorizeResource(
-            Client::class,
-            'client'
-        );
+        $this->authorizeResource(Client::class, 'client');
+        $this->middleware('permission:view clients')->only('index');
+        $this->middleware('permission:create clients')->only('create','store');
+        $this->middleware('permission:edit clients')->only('edit','update');
+        $this->middleware('permission:delete clients')->only('destroy');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $clients = Client::latest()
-            ->paginate(10);
+        if ($request->ajax()) {
+            $clients = Client::query();
+            return datatables()
+                ->of($clients)
+                ->addColumn('document', function ($client) {
+                    return $client->document_type_text.' '.$client->document_number;
+                })
+                ->addColumn('actions', function ($client) {
+                    return view(
+                        'clients.partials.actions',
+                        compact('client')
+                    )->render();
+                })
+                ->rawColumns(['actions'])
+                ->make(true);
+        }
 
-        return view(
-            'clients.index',
-            compact('clients')
-        );
+        return view('clients.index');
     }
 
     public function create()
     {
+        // $this->authorize('create', Client::class);
+
         return view('clients.create');
     }
 
     public function store(ClientRequest $request)
     {
+        // $this->authorize('create', Client::class);
+
         Client::create(
             $request->validated()
         );
@@ -50,6 +67,8 @@ class ClientController extends Controller
 
     public function show(Client $client)
     {
+        // $this->authorize('view', Client::class);
+
         return view(
             'clients.show',
             compact('client')
@@ -58,17 +77,18 @@ class ClientController extends Controller
 
     public function edit(Client $client)
     {
+        $client->load('ubigeo');
+
         return view(
             'clients.edit',
             compact('client')
         );
     }
 
-    public function update(
-        ClientRequest $request,
-        Client $client
-    )
+    public function update(ClientRequest $request, Client $client)
     {
+        // $this->authorize('update', $client);
+
         $client->update(
             $request->validated()
         );
@@ -83,6 +103,8 @@ class ClientController extends Controller
 
     public function destroy(Client $client)
     {
+        // $this->authorize('delete', $client);
+
         $client->delete();
 
         return redirect()
