@@ -1,12 +1,12 @@
 <div class="row mb-3">
 
     {{-- CONFIGURACIÓN --}}
-    <div class="col-md-9">
+    <div class="col-md-6">
         <div class="card border-0 bg-light p-3">
 
             <div class="row align-items-end">
 
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <x-form.input
                         name="total_amount"
                         label="Monto total"
@@ -17,10 +17,10 @@
                     />
                 </div>
 
-                <div class="col-md-3">
-                    <div class="form-check mt-4">
+                <div class="col-md-6">
+                    <div class="form-check form-switch mt-4">
                         <input class="form-check-input" type="checkbox" id="auto_installments">
-                        <label class="form-check-label">
+                        <label class="form-check-label" for="auto_installments">
                             Generar automáticamente
                         </label>
                     </div>
@@ -28,11 +28,11 @@
 
                 <div class="col-md-2">
                     <label>Cantidad</label>
-                    <input type="number" id="installments_count" class="form-control" min="1">
+                    <input type="number" id="installments_count" class="form-control form-control-sm" min="1">
                 </div>
 
                 <div class="col-md-2">
-                    <button type="button" id="generate_installments" class="btn btn-primary w-100">
+                    <button type="button" id="generate_installments" class="btn btn-sm btn-outline-primary w-100">
                         <i class="bi bi-gear"></i> Generar
                     </button>
                 </div>
@@ -92,7 +92,7 @@
             </tbody>
         </table>
 
-        <div class="mt-2">
+        <div class="mt-2 mb-3">
             <small>
                 Total cuotas: <span id="sum_installments">0</span> |
                 Diferencia: <span id="diff_installments">0</span>

@@ -329,6 +329,7 @@ $('#auto_installments').change(function(){
 
 $(function(){
     toggleInstallmentsMode(); // inicial
+    updateSummary();
 });
 
 </script>
