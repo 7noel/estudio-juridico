@@ -100,9 +100,9 @@ class ConsultationController extends Controller
         $lawyers = User::where('establishment_id', auth()->user()->establishment_id)
             ->role('Abogado')
             ->get();
-        $specialties = LegalSpecialty::pluck('name','id');
+        $specialties = LegalSpecialty::all();
 
-        $consultation->load('installments', 'specialties');
+        $consultation->load('installments');
 
         return view('consultations.edit', compact('consultation', 'lawyers', 'specialties'));
     }

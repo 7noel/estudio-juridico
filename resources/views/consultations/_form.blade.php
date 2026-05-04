@@ -69,7 +69,7 @@
         />
     </div>
 
-    <div class="col-md-3">
+    <!-- <div class="col-md-3">
         <x-form.input
             name="total_amount"
             label="Monto total"
@@ -78,7 +78,7 @@
             :value="$consultation->total_amount ?? ''"
             required
         />
-    </div>
+    </div> -->
 
 </div>
 
@@ -208,6 +208,127 @@ $('#add-installment').click(function(){
 
 $(document).on('click', '.btn-remove', function(){
     $(this).closest('tr').remove();
+});
+
+
+$('#generate_installments').click(function(){
+
+    if(!$('#auto_installments').is(':checked')){
+        alert('Activa la opción automática');
+        return;
+    }
+
+    let total = parseFloat($('#total_amount').val());
+    let count = parseInt($('#installments_count').val());
+
+    if(!total || !count){
+        alert('Completa monto y cantidad');
+        return;
+    }
+
+    let base = Math.floor((total / count) * 100) / 100;
+
+    let totalBase = base * count;
+
+    let remainder = (total - totalBase).toFixed(2);
+
+    let today = new Date();
+
+    $('#installments-table tbody').html('');
+
+    for(let i = 0; i < count; i++){
+
+        let date = new Date(today);
+        date.setMonth(date.getMonth() + i);
+
+        let yyyy = date.getFullYear();
+        let mm = String(date.getMonth() + 1).padStart(2, '0');
+        let dd = String(date.getDate()).padStart(2, '0');
+
+        let formatted = `${yyyy}-${mm}-${dd}`;
+
+        let amount = base;
+
+        // 🔥 AQUÍ ESTÁ LA MAGIA
+        if(i === count - 1){
+            amount = (base + parseFloat(remainder)).toFixed(2);
+        }
+
+        let row = `
+            <tr>
+                <td>
+                    <input name="installments[${i}][amount]" value="${amount}" class="form-control form-control-sm text-end">
+                </td>
+                <td>
+                    <input type="date" name="installments[${i}][due_date]" value="${formatted}" class="form-control form-control-sm">
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-outline-danger btn-sm btn-remove">X</button>
+                </td>
+            </tr>
+        `;
+
+        $('#installments-table tbody').append(row);
+    }
+
+    updateSummary();
+});
+
+function updateSummary(){
+
+    let total = parseFloat($('#total_amount').val()) || 0;
+
+    let sum = 0;
+
+    $('input[name*="[amount]"]').each(function(){
+        sum += parseFloat($(this).val()) || 0;
+    });
+
+    let diff = total - sum;
+
+    $('#sum_installments').text(sum.toFixed(2));
+    $('#diff_installments').text(diff.toFixed(2));
+
+    if(diff === 0){
+        $('#diff_installments').css('color','green');
+    }else{
+        $('#diff_installments').css('color','red');
+    }
+}
+
+$(document).on('input', 'input[name*="[amount]"], #total_amount', function(){
+    updateSummary();
+});
+
+$('#auto_installments').change(function(){
+    let disabled = $(this).is(':checked');
+
+    $('input[name*="[amount]"]').prop('readonly', disabled);
+});
+
+function toggleInstallmentsMode(){
+
+    let auto = $('#auto_installments').is(':checked');
+
+    $('#generate_installments').prop('disabled', !auto);
+    $('#installments_count').prop('disabled', !auto);
+
+    $('#add-installment').prop('disabled', auto);
+
+    if(auto){
+        $('#installments-table').css('opacity', '0.7');
+    }else{
+        $('#installments-table').css('opacity', '1');
+    }
+
+}
+
+$('#auto_installments').change(function(){
+    toggleInstallmentsMode();
+});
+
+$(function(){
+    toggleInstallmentsMode(); // inicial
 });
 
 </script>
