@@ -19,7 +19,7 @@ class EmployeeSeeder extends Seeder
         $adminUser = User::create([
             'name' => 'Administrador',
             'email' => 'admin@estudiojuridico.com',
-            'password' => Hash::make('12345678'),
+            'password' => Hash::make('123456'),
         ]);
 
         $adminUser->assignRole('Administrador');
@@ -42,7 +42,7 @@ class EmployeeSeeder extends Seeder
         $recepcionUser = User::create([
             'name' => 'Recepcionista',
             'email' => 'recepcion@estudiojuridico.com',
-            'password' => Hash::make('12345678'),
+            'password' => Hash::make('123456'),
         ]);
 
         $recepcionUser->assignRole('Recepcionista');
@@ -65,7 +65,7 @@ class EmployeeSeeder extends Seeder
         $lawyerUser = User::create([
             'name' => 'Abogado',
             'email' => 'abogado@estudiojuridico.com',
-            'password' => Hash::make('12345678'),
+            'password' => Hash::make('123456'),
         ]);
 
         $lawyerUser->assignRole('Abogado');
