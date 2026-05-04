@@ -39,6 +39,11 @@
 				<i class="bi bi-calendar-event"></i> Agenda
 			</a>
 		</li>
+		<li class="nav-item">
+		    <a class="nav-link text-dark" href="{{ route('legal-specialties.index') }}">
+		        <i class="bi bi-folder"></i> Especialidades
+		    </a>
+		</li>
 		{{-- ADMINISTRACIÓN --}}
 		@role('Administrador')
 		<li class="nav-item mt-3">
@@ -46,16 +51,16 @@
 				Administración
 			</small>
 		</li>
-		<li class="nav-item">
+		<!-- <li class="nav-item">
 			<a class="nav-link text-dark" href="#">
 				<i class="bi bi-building"></i> Establecimientos
 			</a>
-		</li>
-		<li class="nav-item">
+		</li> -->
+		<!-- <li class="nav-item">
 			<a class="nav-link text-dark" href="#">
 				<i class="bi bi-person-badge"></i> Empleados
 			</a>
-		</li>
+		</li> -->
 		<li class="nav-item">
 			<a class="nav-link text-dark" href="{{ route('users.index') }}">
 				<i class="bi bi-person"></i> Usuarios

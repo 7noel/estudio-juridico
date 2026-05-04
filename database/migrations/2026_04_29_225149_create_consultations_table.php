@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('service_type');
             $table->foreignId('legal_specialty_id')->constrained();
             $table->foreignId('legal_subject_id')->constrained();
-            $table->foreignId('lawyer_id')->nullable()->constrained('employees');
+            $table->foreignId('lawyer_id')->nullable()->constrained('users');
             $table->string('title');
             $table->text('description')->nullable();
             $table->decimal('total_amount', 10, 2)->nullable();

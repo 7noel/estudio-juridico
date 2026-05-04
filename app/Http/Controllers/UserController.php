@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Establishment;
 use App\Http\Requests\UserRequest;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -49,10 +50,11 @@ class UserController extends Controller
      */
     public function create()
     {
+        $establishments = Establishment::pluck('name','id');
         $roles = Role::pluck('name','name');
         $user = new User();
 
-        return view('users.create', compact('roles', 'user'));
+        return view('users.create', compact('roles', 'establishments', 'user'));
     }
 
     /**
@@ -62,6 +64,7 @@ class UserController extends Controller
     {
         $user = User::create([
             'name' => $request->name,
+            'establishment_id' => $request->establishment_id,
             'email' => $request->email,
             'password' => \Hash::make($request->password),
         ]);
@@ -86,12 +89,10 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
+        $establishments = Establishment::pluck('name','id');
         $roles = Role::pluck('name','name');
 
-        return view(
-            'users.edit',
-            compact('user','roles')
-        );
+        return view('users.edit', compact('user', 'establishments','roles'));
     }
 
     /**
@@ -101,6 +102,7 @@ class UserController extends Controller
     {
         $data = [
             'name' => $request->name,
+            'establishment_id' => $request->establishment_id,
             'email' => $request->email,
         ];
 

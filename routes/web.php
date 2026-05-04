@@ -10,6 +10,7 @@ use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\CaseFileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\LegalSpecialtyController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -46,12 +47,18 @@ require __DIR__.'/auth.php';
 Route::middleware(['auth'])->get('logs', [LogViewerController::class, 'index']);
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('clients/search', [ClientController::class, 'search'])->name('clients.search');
     Route::resource('users', UserController::class);
     Route::resource('clients', ClientController::class);
     Route::resource('consultations', ConsultationController::class);
     Route::resource('cases', CaseFileController::class);
     Route::resource('roles', RoleController::class);
     Route::resource('permissions',PermissionController::class);
+    Route::resource('consultations', ConsultationController::class);
+    Route::get('consultations-data', [ConsultationController::class, 'data'])->name('consultations.data');
+    Route::resource('legal-specialties', LegalSpecialtyController::class);
+    Route::get('legal-specialties-data', [LegalSpecialtyController::class,'data'])->name('legal-specialties.data');
+    Route::get('legal-subjects/by-specialty', [LegalSpecialtyController::class, 'bySpecialty'])->name('legal-subjects.by-specialty');
 });
 
 Route::get(

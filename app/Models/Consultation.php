@@ -70,7 +70,7 @@ class Consultation extends Model
 
     public function lawyer()
     {
-        return $this->belongsTo(Employee::class, 'lawyer_id');
+        return $this->belongsTo(User::class, 'lawyer_id');
     }
 
     public function installments()
@@ -137,6 +137,19 @@ class Consultation extends Model
         }
 
         return $query;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | SCOPES
+    |--------------------------------------------------------------------------
+    */
+    
+    public function scopeByUser($query, $user)
+    {
+        if (!$user->hasRole('Administrador')) {
+            $query->where('establishment_id', $user->establishment_id);
+        }
     }
 
 }

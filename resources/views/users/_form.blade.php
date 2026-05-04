@@ -16,6 +16,15 @@
         required
         />
     </div>
+    <div class="col-md-3">
+        <x-form.select
+        name="establishment_id"
+        label="Establecimiento"
+        :options="$establishments"
+        :selected="$user->establishment_id ?? '1'"
+        required
+        />
+    </div>
 </div>
 <div class="row mb-3">
     <div class="col-md-3">

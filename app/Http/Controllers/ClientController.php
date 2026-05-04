@@ -131,4 +131,15 @@ class ClientController extends Controller
 
     }
 
+    public function search(Request $request)
+    {
+        return Client::where('full_name', 'like', "%{$request->q}%")
+            ->limit(10)
+            ->get()
+            ->map(fn($c) => [
+                'id' => $c->id,
+                'label' => $c->full_name
+            ]);
+    }
+
 }

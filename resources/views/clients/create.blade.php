@@ -11,7 +11,7 @@
 			@csrf
 			@include('clients._form')
 			<x-form.button>
-				<i class="bi bi-save"></i>Guardar
+				<i class="bi bi-save"></i> Guardar
 			</x-form.button>
 		</form>
 	</div>

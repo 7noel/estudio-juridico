@@ -1,0 +1,1 @@
+<a href="{{ route('legal-specialties.edit',$r) }}" class="btn btn-sm btn-outline-primary"> Editar </a>
