@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
         $admin = User::create([
             'name' => 'Administrador',
             'email' => 'admin@estudiojuridico.com',
-            'password' => Hash::make('12345678'),
+            'password' => Hash::make('123456'),
             'establishment_id' => 1,
         ]);
 
@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
         $recepcion = User::create([
             'name' => 'Recepcionista',
             'email' => 'recepcion@estudiojuridico.com',
-            'password' => Hash::make('12345678'),
+            'password' => Hash::make('123456'),
             'establishment_id' => 1,
         ]);
 
@@ -34,7 +34,7 @@ class UserSeeder extends Seeder
         $abogado = User::create([
             'name' => 'Abogado',
             'email' => 'abogado@estudiojuridico.com',
-            'password' => Hash::make('12345678'),
+            'password' => Hash::make('123456'),
             'establishment_id' => 1,
         ]);
 
