@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class CaseFile extends Model
 {
@@ -12,34 +13,21 @@ class CaseFile extends Model
     protected $table = 'cases';
 
     protected $fillable = [
-
         'establishment_id',
-
         'consultation_id',
-
         'client_id',
-
         'lawyer_id',
-
         'slug',
-
         'case_number',
-
         'service_type',
-
         'legal_specialty_id',
         'legal_subject_id',
-
         'title',
         'description',
-
         'status',
-
         'opened_at',
         'closed_at',
-
         'created_by',
-
     ];
 
     protected $casts = [
@@ -48,6 +36,19 @@ class CaseFile extends Model
         'closed_at' => 'datetime',
 
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+
+            if (!$model->slug) {
+                $base = Str::slug($model->title ?: 'caso');
+                $random = bin2hex(random_bytes(12));
+                $model->slug = $base . '-' . $random;
+            }
+
+        });
+    }
 
     /*
     |--------------------------------------------------------------------------

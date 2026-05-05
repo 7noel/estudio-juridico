@@ -14,19 +14,12 @@ return new class extends Migration
         Schema::create('consultation_installments', function (Blueprint $table) {
 
             $table->id();
-
-            $table->foreignId('consultation_id')
-                ->constrained();
-
+            $table->foreignId('consultation_id')->constrained();
             $table->integer('installment_number');
-
             $table->decimal('amount', 10, 2);
-
-            $table->date('due_date')
-                ->nullable();
-
+            // $table->decimal('paid_amount', 10, 2);
+            $table->date('due_date')->nullable();
             $table->timestamps();
-
             $table->softDeletes();
 
         });

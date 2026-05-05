@@ -10,6 +10,7 @@
             label="Especialidad"
             :value="$legalSpecialty->name ?? ''"
             required
+            uppercase
         />
     </div>
 </div>
@@ -42,7 +43,7 @@
 
                             {{-- 🔥 SIN NAME --}}
                             <input
-                                class="form-control subject-input"
+                                class="form-control subject-input text-uppercase"
                                 value="{{ $s->name }}"
                                 placeholder="Nombre de la materia"
                                 required
@@ -89,7 +90,7 @@ $('#add-subject').click(function(){
                     </span>
 
                     <input
-                        class="form-control subject-input"
+                        class="form-control subject-input text-uppercase"
                         placeholder="Nombre de la materia"
                         required
                     >

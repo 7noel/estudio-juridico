@@ -10,26 +10,17 @@ class Payment extends Model
     use SoftDeletes;
 
     protected $fillable = [
-
         'consultation_id',
         'consultation_installment_id',
-
         'amount',
-
         'payment_date',
-
         'payment_method',
-
         'reference',
-
         'created_by',
-
     ];
 
     protected $casts = [
-
         'payment_date' => 'date',
-
     ];
 
     public function consultation()
@@ -39,10 +30,7 @@ class Payment extends Model
 
     public function installment()
     {
-        return $this->belongsTo(
-            ConsultationInstallment::class,
-            'consultation_installment_id'
-        );
+        return $this->belongsTo(ConsultationInstallment::class);
     }
 
     /*
@@ -58,5 +46,5 @@ class Payment extends Model
             'created_by'
         );
     }
-
+    
 }

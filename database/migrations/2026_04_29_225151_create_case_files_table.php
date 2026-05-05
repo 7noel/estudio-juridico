@@ -11,14 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payments', function (Blueprint $table) {
+        Schema::create('cases', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('establishment_id')->constrained();
             $table->foreignId('consultation_id')->constrained();
-            $table->foreignId('consultation_installment_id')->constrained();
-            $table->decimal('amount', 10, 2);
-            $table->date('payment_date');
-            $table->string('payment_method');
-            $table->string('reference')->nullable();
+            $table->foreignId('client_id')->constrained();
+            $table->foreignId('lawyer_id')->constrained('employees');
+            $table->string('slug')->unique();
+            $table->string('case_number')->nullable();
+            $table->string('service_type');
+            $table->foreignId('legal_specialty_id')->constrained();
+            $table->foreignId('legal_subject_id')->constrained();
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->string('status');
+            $table->timestamp('opened_at')->nullable();
+            $table->timestamp('closed_at')->nullable();
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();
             $table->softDeletes();

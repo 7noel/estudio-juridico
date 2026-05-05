@@ -258,7 +258,9 @@ document.addEventListener("visibilitychange", function () {
         checkSession();
     }
 });
-
+$(document).on('input', '.text-uppercase', function(){
+    this.value = this.value.toUpperCase();
+});
 </script>
 
 @stack('scripts')

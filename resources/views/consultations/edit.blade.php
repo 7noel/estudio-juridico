@@ -17,5 +17,6 @@
         </form>
     </div>
 </div>
+@include('consultations.partials.payments')
 
 @endsection

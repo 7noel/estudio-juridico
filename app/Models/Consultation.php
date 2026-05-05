@@ -10,29 +10,19 @@ class Consultation extends Model
     use SoftDeletes;
 
     protected $fillable = [
-
         'establishment_id',
         'client_id',
-
         'service_type',
-
         'legal_specialty_id',
         'legal_subject_id',
-
         'lawyer_id',
-
         'title',
         'description',
-
         'total_amount',
-
         'status',
-
         'created_by',
-
         'assigned_at',
         'evaluated_at',
-
     ];
 
     protected $casts = [
@@ -93,6 +83,34 @@ class Consultation extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    // 💰 total pagado
+    public function getPaidAmountAttribute()
+    {
+        return $this->installments->sum(function ($i) {
+            return $i->paid_amount;
+        });
+    }
+
+    // 💸 saldo total
+    public function getPendingAmountAttribute()
+    {
+        return $this->total_amount - $this->paid_amount;
+    }
+
+    // ✔ consulta pagada
+    public function getIsPaidAttribute()
+    {
+        return $this->pending_amount <= 0;
+    }
+
+    // ❌ cuotas pendientes
+    public function getHasPendingInstallmentsAttribute()
+    {
+        return $this->installments->contains(function ($i) {
+            return !$i->is_paid;
+        });
+    }
+
     /*
     |--------------------------------------------------------------------------
     | SCOPES
@@ -138,12 +156,6 @@ class Consultation extends Model
 
         return $query;
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | SCOPES
-    |--------------------------------------------------------------------------
-    */
     
     public function scopeByUser($query, $user)
     {

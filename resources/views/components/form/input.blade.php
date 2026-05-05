@@ -3,7 +3,8 @@
     'label' => null,
     'type' => 'text',
     'value' => '',
-    'required' => false
+    'required' => false,
+    'uppercase' => false
 ])
 
 <div class="form-group">
@@ -26,7 +27,7 @@
         {{ $required ? 'required' : '' }}
 
         {{ $attributes->merge([
-            'class' => 'form-control form-control-sm'
+            'class' => 'form-control form-control-sm ' . ($uppercase ? 'text-uppercase' : '')
         ]) }}
     >
 

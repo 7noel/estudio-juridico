@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             LegalSubjectSeeder::class,
             EmployeeSeeder::class,
             PermissionSeeder::class,
+            ClientSeeder::class,
         ]);
         //$this->call(AdminTableSeeder::class);
         

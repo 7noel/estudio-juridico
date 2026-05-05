@@ -55,23 +55,25 @@ return [
     */
 
     'consultation_statuses' => [
-
-        'registered' => 'Registrado',
-
-        'assigned' => 'Asignado',
-
-        'evaluated' => 'Evaluado',
-
-        'quoted' => 'Cotizado',
-
-        'accepted' => 'Aceptado',
-
-        'rejected' => 'Rechazado',
-
-        'closed' => 'Cerrado',
-
+        'new'        => 'Nueva',
+        'assigned'   => 'Asignada',
+        'evaluating' => 'En evaluación',
+        'quoted'     => 'Cotizado',
+        'accepted'   => 'Aceptado',
+        'rejected'   => 'Rechazado',
     ],
 
+    'default_consultation_status' => 'new',
+
+    'consultation_status_colors' => [
+        'new'        => 'secondary',
+        'assigned'   => 'primary',
+        'evaluating' => 'info',
+        'quoted'     => 'warning',
+        'accepted'   => 'success',
+        'rejected'   => 'danger',
+    ],
+    
     /*
     |--------------------------------------------------------------------------
     | ESTADOS CASO
@@ -79,16 +81,14 @@ return [
     */
 
     'case_statuses' => [
-
-        'active' => 'Activo',
-
+        'pending'   => 'Pendiente',
+        'active'    => 'Activo',
         'suspended' => 'Suspendido',
-
-        'closed' => 'Cerrado',
-
-        'archived' => 'Archivado',
-
+        'closed'    => 'Cerrado',
+        'archived'  => 'Archivado',
     ],
+
+    'default_case_status' => 'pending',
 
     /*
     |--------------------------------------------------------------------------

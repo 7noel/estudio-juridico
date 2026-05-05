@@ -27,6 +27,7 @@
         label="Nombre completo"
         :value="$client->full_name ?? ''"
         required
+        uppercase
         />
     </div>
 </div>

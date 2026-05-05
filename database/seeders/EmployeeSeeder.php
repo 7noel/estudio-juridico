@@ -17,6 +17,7 @@ class EmployeeSeeder extends Seeder
         */
 
         $adminUser = User::create([
+            'establishment_id' => 1,
             'name' => 'Administrador',
             'email' => 'admin@estudiojuridico.com',
             'password' => Hash::make('123456'),
@@ -40,6 +41,7 @@ class EmployeeSeeder extends Seeder
         */
 
         $recepcionUser = User::create([
+            'establishment_id' => 1,
             'name' => 'Recepcionista',
             'email' => 'recepcion@estudiojuridico.com',
             'password' => Hash::make('123456'),
@@ -59,12 +61,13 @@ class EmployeeSeeder extends Seeder
 
 
         /*
-        ABOGADO
+        ABOGADOS
         */
 
         $lawyerUser = User::create([
-            'name' => 'Abogado',
-            'email' => 'abogado@estudiojuridico.com',
+            'establishment_id' => 1,
+            'name' => 'Abogado 1',
+            'email' => 'abogado1@estudiojuridico.com',
             'password' => Hash::make('123456'),
         ]);
 
@@ -78,6 +81,20 @@ class EmployeeSeeder extends Seeder
             'document_number' => '00000003',
             'mobile' => '999111444',
             'email' => 'abogado@estudiojuridico.com',
+        ]);
+
+        User::create([
+            'establishment_id' => 1,
+            'name' => 'Abogado 2',
+            'email' => 'abogado2@estudiojuridico.com',
+            'password' => Hash::make('123456'),
+        ]);
+
+        User::create([
+            'establishment_id' => 1,
+            'name' => 'Abogado 3',
+            'email' => 'abogado3@estudiojuridico.com',
+            'password' => Hash::make('123456'),
         ]);
 
     }

@@ -1,7 +1,7 @@
 <div class="row mb-3">
 
     {{-- CONFIGURACIÓN --}}
-    <div class="col-md-6">
+    <div class="col-md-9 col-xxl-6">
         <div class="card border-0 bg-light p-3">
 
             <div class="row align-items-end">
@@ -46,7 +46,7 @@
 
 {{-- TABLA --}}
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-9 col-xxl-6">
 
         <div class="d-flex justify-content-between align-items-center mb-2">
             <h6 class="mb-0">Cuotas</h6>
@@ -61,7 +61,8 @@
                 <tr>
                     <th class="text-center">Monto</th>
                     <th class="text-center">Fecha</th>
-                    <th style="width: 5%"></th>
+                    <th class="text-center">Estado</th>
+                    <th style="width: 10%"></th>
                 </tr>
             </thead>
             <tbody>
@@ -83,7 +84,16 @@
                                     value="{{ $inst->due_date ? $inst->due_date->format('Y-m-d') : '' }}">
                             </td>
                             <td class="text-center">
-                                <button type="button" class="btn btn-sm btn-outline-danger btn-remove">X</button>
+                                @if($inst->is_paid)
+                                    <span class="badge bg-success">Pagado</span>
+                                @elseif($inst->paid_amount > 0)
+                                    <span class="badge bg-warning text-dark">Parcial</span>
+                                @else
+                                    <span class="badge bg-secondary">Pendiente</span>
+                                @endif
+                            </td>   
+                            <td class="text-center">
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-remove" title="Eliminar">X</button>
                             </td>
                         </tr>
                     @endforeach
@@ -101,3 +111,4 @@
 
     </div>
 </div>
+

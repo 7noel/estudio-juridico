@@ -66,6 +66,7 @@
             label="Título"
             :value="$consultation->title ?? ''"
             required
+            uppercase
         />
     </div>
 
@@ -261,6 +262,9 @@ $('#generate_installments').click(function(){
                 </td>
                 <td>
                     <input type="date" name="installments[${i}][due_date]" value="${formatted}" class="form-control form-control-sm">
+                </td>
+                <td class="text-center">
+                    <span class="badge bg-secondary">Pendiente</span>
                 </td>
                 <td class="text-center">
                     <button type="button" class="btn btn-outline-danger btn-sm btn-remove">X</button>
