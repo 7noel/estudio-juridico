@@ -13,7 +13,7 @@ class AgendaEvent extends Model
 
         'case_id',
 
-        'legal_activity_id',
+        'case_activity_id',
 
         'title',
 
@@ -51,8 +51,8 @@ class AgendaEvent extends Model
     public function activity()
     {
         return $this->belongsTo(
-            LegalActivity::class,
-            'legal_activity_id'
+            CaseActivity::class,
+            'case_activity_id'
         );
     }
 

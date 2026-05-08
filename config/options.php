@@ -81,14 +81,20 @@ return [
     */
 
     'case_statuses' => [
-        'pending'   => 'Pendiente',
-        'active'    => 'Activo',
-        'suspended' => 'Suspendido',
-        'closed'    => 'Cerrado',
-        'archived'  => 'Archivado',
+        'open'        => 'Abierto',
+        'in_progress' => 'En proceso',
+        'on_hold'     => 'En espera',
+        'closed'      => 'Cerrado',
     ],
 
-    'default_case_status' => 'pending',
+    'default_case_status' => 'open',
+
+    'case_status_colors' => [
+        'open'        => 'primary',
+        'in_progress' => 'warning',
+        'on_hold'     => 'secondary',
+        'closed'      => 'success',
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -110,6 +116,12 @@ return [
 
         'card' => 'Tarjeta',
 
+    ],
+
+    'activity_main_types' => [
+        'legal' => 'Actividad legal',
+        'communication' => 'Comunicación',
+        'note' => 'Nota',
     ],
 
     /*

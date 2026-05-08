@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('agenda_events', function (Blueprint $table) {
             $table->id();
             $table->foreignId('case_id')->constrained('cases');
-            $table->foreignId('legal_activity_id')->nullable()->constrained('legal_activities');
+            $table->foreignId('case_activity_id')->nullable()->constrained('legal_activities');
             $table->string('title');
             $table->text('description')->nullable();
             $table->dateTime('start_datetime');

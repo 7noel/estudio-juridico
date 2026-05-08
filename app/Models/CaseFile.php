@@ -71,30 +71,26 @@ class CaseFile extends Model
         return $this->belongsTo(Employee::class, 'lawyer_id');
     }
 
-    public function activities()
-    {
-        return $this->hasMany(LegalActivity::class, 'case_id');
-    }
+    // public function activities()
+    // {
+    //     return $this->hasMany(LegalActivity::class, 'case_id');
+    // }
 
     public function agendaEvents()
     {
-        return $this->hasMany(AgendaEvent::class);
-    }
-
-    public function communications()
-    {
-        return $this->hasMany(Communication::class);
+        return $this->hasMany(AgendaEvent::class, 'case_id');
     }
 
     public function documents()
     {
-        return $this->hasMany(Document::class);
+        return $this->hasMany(Document::class, 'case_id');
     }
 
-
-    public function latestActivity()
+    public function activities()
     {
-        return $this->hasOne(LegalActivity::class)->latestOfMany();
+        return $this->hasMany(CaseActivity::class, 'case_id')
+            ->latest('activity_at')
+            ->latest('id');
     }
 
     public function establishment()
@@ -135,10 +131,10 @@ class CaseFile extends Model
 
         return $query->where(
             'establishment_id',
-            $user->employee->establishment_id
+            $user->establishment_id
         );
     }
-    
+
     public function scopeForLawyer($query)
     {
         $user = auth()->user();

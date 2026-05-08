@@ -83,19 +83,23 @@ class EmployeeSeeder extends Seeder
             'email' => 'abogado@estudiojuridico.com',
         ]);
 
-        User::create([
+        $lawyerUser = User::create([
             'establishment_id' => 1,
             'name' => 'Abogado 2',
             'email' => 'abogado2@estudiojuridico.com',
             'password' => Hash::make('123456'),
         ]);
 
-        User::create([
+        $lawyerUser->assignRole('Abogado');
+
+        $lawyerUser = User::create([
             'establishment_id' => 1,
             'name' => 'Abogado 3',
             'email' => 'abogado3@estudiojuridico.com',
             'password' => Hash::make('123456'),
         ]);
+
+        $lawyerUser->assignRole('Abogado');
 
     }
 }

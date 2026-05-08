@@ -9,6 +9,8 @@ class Document extends Model
 {
     use SoftDeletes;
 
+    protected $appends = ['url'];
+
     protected $fillable = [
 
         'case_id',
@@ -39,6 +41,11 @@ class Document extends Model
     public function uploader()
     {
         return $this->belongsTo(User::class, 'uploaded_by');
+    }
+
+    public function getUrlAttribute()
+    {
+        return asset('storage/' . $this->file_path);
     }
 
 }

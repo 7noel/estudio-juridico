@@ -261,6 +261,13 @@ document.addEventListener("visibilitychange", function () {
 $(document).on('input', '.text-uppercase', function(){
     this.value = this.value.toUpperCase();
 });
+
+function getLocalDateTime() {
+    let now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    return now.toISOString().slice(0,16);
+}
+
 </script>
 
 @stack('scripts')

@@ -16,7 +16,8 @@ class ConsultationController extends Controller
     public function index()
     {
         $lawyers = User::role('Abogado')->get();
-        return view('consultations.index', compact('lawyers'));
+        $specialties = LegalSpecialty::all();
+        return view('consultations.index', compact('lawyers', 'specialties'));
     }
 
     public function data(Request $request)
@@ -34,6 +35,14 @@ class ConsultationController extends Controller
             $query->where('lawyer_id', $request->lawyer_id);
         }
 
+        if ($request->service_type) {
+            $query->where('service_type', $request->service_type);
+        }
+
+        if ($request->legal_specialty_id) {
+            $query->where('legal_specialty_id', $request->legal_specialty_id);
+        }
+
         if ($request->date_from) {
             $query->whereDate('created_at', '>=', $request->date_from);
         }
@@ -43,40 +52,30 @@ class ConsultationController extends Controller
         }
 
         return datatables()->of($query)
-
             ->addColumn('client', fn($r) => $r->client->full_name ?? '')
-
             ->addColumn('lawyer', fn($r) => $r->lawyer->name ?? '')
-
+            ->addColumn('service_type', fn($r) => config('options.service_types')[$r->service_type] ?? '')
+            ->addColumn('specialty', fn($r) => $r->specialty->name ?? '')
             ->addColumn('service_type', function($r){
                 return config('options.service_types')[$r->service_type] ?? '';
             })
-
             ->addColumn('specialty', fn($r) => $r->specialty->name ?? '')
-
             ->addColumn('subject', fn($r) => $r->subject->name ?? '')
-
             // 🔥 STATUS CON COLOR (SOLO UNO, eliminamos duplicado)
             ->addColumn('status', function ($row) {
-
                 $label = config('options.consultation_statuses')[$row->status] ?? $row->status;
                 $color = config('options.consultation_status_colors')[$row->status] ?? 'secondary';
-
                 return '<span class="badge bg-' . $color . '">' . $label . '</span>';
             })
-
             ->editColumn('created_at', function($r){
                 return $r->created_at
                     ? $r->created_at->timezone('America/Lima')->format('d/m/Y H:i')
                     : '';
             })
-
             ->addColumn('actions', function ($r) {
                 return view('consultations.partials.actions', compact('r'))->render();
             })
-
             ->rawColumns(['actions', 'status'])
-
             ->make(true);
     }
 
@@ -301,6 +300,14 @@ class ConsultationController extends Controller
 
         if ($request->lawyer_id) {
             $query->where('lawyer_id', $request->lawyer_id);
+        }
+        
+        if ($request->service_type) {
+            $query->where('service_type', $request->service_type);
+        }
+
+        if ($request->legal_specialty_id) {
+            $query->where('legal_specialty_id', $request->legal_specialty_id);
         }
 
         if ($request->date_from) {

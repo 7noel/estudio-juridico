@@ -2,47 +2,30 @@
 
 namespace App\Policies;
 
-use App\Models\Document;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
+use App\Models\Document;
 
 class DocumentPolicy
 {
-    public function view(User $user, Document $document): bool
+    public function view(User $user, Document $doc)
     {
-        if ($user->hasRole('Administrador')) {
-            return true;
-        }
-
-        $employee = $user->employee;
-
-        if ($user->hasRole('Abogado')) {
-
-            return $document->case->lawyer_id
-                == $employee->id;
-
-        }
-
-        if ($user->hasRole('Recepcionista')) {
-
-            return $document->case->establishment_id
-                == $employee->establishment_id;
-
-        }
-
-        return false;
+        return $user->hasRole('Administrador') ||
+            $doc->case->establishment_id == $user->employee->establishment_id;
     }
 
-    public function create(User $user): bool
+    public function create(User $user)
     {
-        return $user->hasAnyRole([
-            'Administrador',
-            'Abogado'
-        ]);
+        return $user->hasAnyRole(['Administrador', 'Abogado']);
     }
 
-    public function delete(User $user, Document $document): bool
+    public function update(User $user, Document $doc)
     {
-        return $user->hasRole('Administrador');
+        return $user->hasRole('Administrador') ||
+            $doc->uploaded_by == $user->id;
+    }
+
+    public function delete(User $user, Document $doc)
+    {
+        return $this->update($user, $doc);
     }
 }

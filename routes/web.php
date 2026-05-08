@@ -12,6 +12,9 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\LegalSpecialtyController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\CaseActivityController;
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\AgendaEventController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -51,7 +54,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('clients/search', [ClientController::class, 'search'])->name('clients.search');
     Route::resource('users', UserController::class);
     Route::resource('clients', ClientController::class);
-    Route::resource('cases', CaseFileController::class);
     Route::resource('roles', RoleController::class);
     Route::resource('permissions',PermissionController::class);
     Route::resource('legal-specialties', LegalSpecialtyController::class);
@@ -76,6 +78,25 @@ Route::middleware(['auth'])->group(function () {
     Route::post('consultations/{consultation}/status', [ConsultationController::class, 'changeStatus'])->name('consultations.change-status');
     Route::post('consultations/{consultation}/reject', [ConsultationController::class, 'reject'])->name('consultations.reject');
     Route::resource('consultations', ConsultationController::class);
+
+    Route::post('/cases/{case}/change-status', [CaseFileController::class, 'changeStatus'])->name('cases.change-status');
+    Route::get('cases/data', [CaseFileController::class, 'data'])->name('cases.data');
+    Route::get('cases/stats', [CaseFileController::class, 'stats'])->name('cases.stats');
+    Route::resource('cases', CaseFileController::class);
+
+    Route::post('/cases/{case}/activities', [CaseActivityController::class, 'store'])->name('cases.activities.store');
+    Route::put('/activities/{activity}', [CaseActivityController::class, 'update'])->name('cases.activities.update');
+    Route::delete('/activities/{activity}', [CaseActivityController::class, 'destroy'])->name('activities.destroy');
+
+    Route::post('/cases/{case}/documents', [DocumentController::class, 'store'])->name('cases.documents.store');
+    Route::put('/documents/{document}', [DocumentController::class, 'update'])->name('cases.documents.update');
+    Route::delete('/documents/{document}', [DocumentController::class, 'destroy'])->name('cases.documents.destroy');
+
+    Route::post('/cases/{case}/agenda', [AgendaEventController::class, 'store'])->name('cases.agenda.store');
+    Route::put('/agenda/{event}', [AgendaEventController::class, 'update'])->name('cases.agenda.store');
+    Route::delete('/agenda/{event}', [AgendaEventController::class, 'destroy'])->name('cases.agenda.store');
+    Route::get('/cases/{case}/agenda/events', [AgendaEventController::class, 'events']);
+
 });
 
 Route::get(

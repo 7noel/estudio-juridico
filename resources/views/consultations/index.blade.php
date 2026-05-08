@@ -18,7 +18,7 @@
 <div class="row mb-3 mt-3">
 
     {{-- Estado --}}
-    <div class="col-md-3">
+    <div class="col-md-2">
         <label>Estado</label>
         <select id="filter_status" class="form-control form-control-sm">
             <option value="">Todos</option>
@@ -29,12 +29,34 @@
     </div>
 
     {{-- Abogado --}}
-    <div class="col-md-3">
+    <div class="col-md-2">
         <label>Abogado</label>
         <select id="filter_lawyer" class="form-control form-control-sm">
             <option value="">Todos</option>
             @foreach($lawyers as $lawyer)
                 <option value="{{ $lawyer->id }}">{{ $lawyer->name }}</option>
+            @endforeach
+        </select>
+    </div>
+
+    {{-- Tipo de servicio --}}
+    <div class="col-md-2">
+        <label>Tipo de servicio</label>
+        <select id="filter_service_type" class="form-control form-control-sm">
+            <option value="">Todos</option>
+            @foreach(config('options.service_types') as $key => $value)
+                <option value="{{ $key }}">{{ $value }}</option>
+            @endforeach
+        </select>
+    </div>
+
+    {{-- Especialidad --}}
+    <div class="col-md-2">
+        <label>Especialidad</label>
+        <select id="filter_specialty" class="form-control form-control-sm">
+            <option value="">Todas</option>
+            @foreach($specialties as $sp)
+                <option value="{{ $sp->id }}">{{ $sp->name }}</option>
             @endforeach
         </select>
     </div>
@@ -60,7 +82,7 @@
 
 </div>
 
-<div class="mb-3 d-flex gap-2">
+<div class="mb-3 d-flex flex-wrap gap-2">
 
     <span class="badge bg-secondary filter-quick p-2" data-status="">
         Todas: <span id="stat_all">0</span>
@@ -127,6 +149,8 @@ $(function(){
                 d.lawyer_id = $('#filter_lawyer').val();
                 d.date_from = $('#filter_from').val();
                 d.date_to = $('#filter_to').val();
+                d.service_type = $('#filter_service_type').val();
+                d.legal_specialty_id = $('#filter_specialty').val();
             }
         },
 
@@ -215,7 +239,7 @@ $(document).on('click', '.btn-generate-case', function(){
 });
 
 // cambio en filtros
-$('#filter_status, #filter_lawyer, #filter_from, #filter_to').change(function(){
+$('#filter_status, #filter_lawyer, #filter_service_type, #filter_specialty, #filter_from, #filter_to').change(function(){
     table.ajax.reload();
     loadStats();
 });
@@ -226,6 +250,8 @@ $('#btn-clear-filters').click(function(){
     $('#filter_lawyer').val('');
     $('#filter_from').val('');
     $('#filter_to').val('');
+    $('#filter_service_type').val('');
+    $('#filter_specialty').val('');
 
     table.ajax.reload();
 });
