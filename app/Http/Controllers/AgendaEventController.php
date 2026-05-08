@@ -36,6 +36,23 @@ class AgendaEventController extends Controller
     {
         $this->authorize('update', $event->case);
 
+        // 🔥 SI SOLO VIENE FECHA (drag/drop)
+        if ($request->has('start_datetime') && !$request->has('title')) {
+
+            $request->validate([
+                'start_datetime' => 'required|date',
+                'end_datetime' => 'nullable|date|after_or_equal:start_datetime',
+            ]);
+
+            $event->update([
+                'start_datetime' => $request->start_datetime,
+                'end_datetime' => $request->end_datetime,
+            ]);
+
+            return response()->json(['success' => true]);
+        }
+        
+        // 🔥 UPDATE COMPLETO (modal)
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -86,6 +103,10 @@ class AgendaEventController extends Controller
                 'start' => $event->start_datetime,
                 'end' => $event->end_datetime,
                 'color' => $color,
+                'extendedProps' => [
+                    'description' => $event->description,
+                    'location' => $event->location,
+                ],
             ];
         });
     }

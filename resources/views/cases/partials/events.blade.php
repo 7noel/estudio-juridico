@@ -92,15 +92,41 @@
                         <textarea id="event_description" class="form-control"></textarea>
                     </div>
 
-                    <div class="mb-2">
-                        <label>Inicio</label>
-                        <input type="datetime-local" id="event_start" class="form-control">
-                    </div>
+<div class="row">
 
-                    <div class="mb-2">
-                        <label>Fin</label>
-                        <input type="datetime-local" id="event_end" class="form-control">
-                    </div>
+    <div class="col-md-6 mb-2">
+        <label>Fecha inicio</label>
+        <input type="date"
+               id="event_start_date"
+               class="form-control">
+    </div>
+
+    <div class="col-md-6 mb-2">
+        <label>Hora inicio</label>
+        <select id="event_start_time"
+                class="form-select">
+        </select>
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="col-md-6 mb-2">
+        <label>Fecha fin</label>
+        <input type="date"
+               id="event_end_date"
+               class="form-control">
+    </div>
+
+    <div class="col-md-6 mb-2">
+        <label>Hora fin</label>
+        <select id="event_end_time"
+                class="form-select">
+        </select>
+    </div>
+
+</div>
 
                     <div class="mb-2">
                         <label>Lugar</label>

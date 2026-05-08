@@ -462,6 +462,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         editable: true,
 
+        slotDuration: '00:15:00',
+        snapDuration: '00:15:00',
+
         // 🔥 CLICK EN DÍA (crear evento)
         dateClick: function(info) {
 
@@ -483,9 +486,28 @@ document.addEventListener('DOMContentLoaded', function () {
             eventMode = 'edit';
             eventId = event.id;
 
+            // 🔥 FUNCIÓN PARA FORMATEAR
+            function formatDate(date) {
+                if (!date) return '';
+                
+                const d = new Date(date);
+                
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                const hours = String(d.getHours()).padStart(2, '0');
+                const minutes = String(d.getMinutes()).padStart(2, '0');
+
+                return `${year}-${month}-${day}T${hours}:${minutes}`;
+            }
+
             $('#event_title').val(event.title);
-            $('#event_start').val(event.startStr);
-            $('#event_end').val(event.endStr);
+            $('#event_description').val(event.extendedProps.description ?? '');
+            $('#event_location').val(event.extendedProps.location ?? '');
+
+            // 🔥 AQUÍ ESTÁ LA SOLUCIÓN
+            $('#event_start').val(formatDate(event.start));
+            $('#event_end').val(formatDate(event.end));
 
             $('#modalEvent').modal('show');
         },
@@ -498,6 +520,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     _token: '{{ csrf_token() }}',
                     start_datetime: info.event.startStr,
                     end_datetime: info.event.endStr
+                },
+                error: function() {
+                    alert('Error al actualizar evento');
+                    info.revert(); // 🔥 vuelve al estado anterior
                 }
             });
         },
@@ -518,6 +544,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
 
+        },
+
+        eventDidMount: function(info) {
+            if (info.event.extendedProps.description) {
+                $(info.el).tooltip({
+                    title: info.event.extendedProps.description,
+                    placement: 'top',
+                    trigger: 'hover',
+                    container: 'body'
+                });
+            }
         }
 
     });
@@ -525,6 +562,8 @@ document.addEventListener('DOMContentLoaded', function () {
     calendar.render();
 
 });
+
+
 
 
 </script>
