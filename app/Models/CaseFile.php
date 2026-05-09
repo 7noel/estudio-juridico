@@ -81,6 +81,7 @@ class CaseFile extends Model
         return $this->hasMany(AgendaEvent::class, 'case_id');
     }
 
+    
     public function documents()
     {
         return $this->hasMany(Document::class, 'case_id');

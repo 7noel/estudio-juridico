@@ -188,6 +188,9 @@ color: white !important;
 <!-- Dropzone -->
 <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
 
+<!-- Chart Js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
 <script>
 
 $(function(){

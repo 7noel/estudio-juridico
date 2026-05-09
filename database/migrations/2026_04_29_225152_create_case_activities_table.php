@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('case_id')->constrained('cases')->cascadeOnDelete();
 
             // Tipo principal
-            $table->enum('type', ['legal', 'communication', 'note']);
+            $table->string('type');
 
             // Subtipo (usa tus config)
             $table->string('subtype')->nullable();

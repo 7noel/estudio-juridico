@@ -122,7 +122,7 @@ class CaseFileController extends Controller
 
     public function show(CaseFile $case)
     {
-        $case->load(['client', 'lawyer', 'specialty', 'subject']);
+        $case->load(['client', 'lawyer', 'specialty', 'subject', 'activities.agendaEvent', 'documents', 'agendaEvents']);
 
         return view('cases.show', compact('case'));
     }

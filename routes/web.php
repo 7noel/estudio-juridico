@@ -15,6 +15,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\CaseActivityController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\AgendaEventController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -36,9 +37,9 @@ Route::get('/refresh-csrf', function () {
     return response()->json(['token' => csrf_token()]);
 })->name('refresh.csrf');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -51,6 +52,9 @@ require __DIR__.'/auth.php';
 Route::middleware(['auth'])->get('logs', [LogViewerController::class, 'index']);
 
 Route::middleware(['auth'])->group(function () {
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
     Route::get('clients/search', [ClientController::class, 'search'])->name('clients.search');
     Route::resource('users', UserController::class);
     Route::resource('clients', ClientController::class);

@@ -1,10 +1,12 @@
+@if(1==1)
 <div class="card mt-3">
     <div class="card-header d-flex justify-content-between">
         <strong>Agenda</strong>
-
+        @if($canManageCaseContent)
         <button class="btn btn-sm btn-outline-primary" id="btnAddEvent">
             <i class="bi bi-plus"></i>  Agregar
         </button>
+        @endif
     </div>
 
     <div class="card-body">
@@ -30,6 +32,7 @@
                         {{ $event->description }}
                     </div>
 
+                    @if($canManageCaseContent)
                     <div class="text-end mt-2">
                         <button class="btn btn-sm btn-outline-primary btn-edit-event"
                             data-id="{{ $event->id }}"
@@ -46,6 +49,7 @@
                             <i class="bi bi-trash"></i> Eliminar
                         </button>
                     </div>
+                    @endif
 
                 </div>
             @empty
@@ -56,6 +60,7 @@
 
     </div>
 </div>
+@endif
 
 <div class="card mt-3">
     <div class="card-header">
@@ -84,7 +89,7 @@
 
                     <div class="mb-2">
                         <label>Título</label>
-                        <input type="text" id="event_title" class="form-control">
+                        <input type="text" id="event_title" class="form-control text-uppercase">
                     </div>
 
                     <div class="mb-2">
@@ -144,3 +149,631 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+// =====================================================
+// AGENDA
+// =====================================================
+
+let eventMode = 'create';
+let eventId = null;
+
+// =====================================================
+// ELIMINA ERROR EN CONSOLA POR EL FOCUS
+// =====================================================
+
+$('#modalEvent').on('hidden.bs.modal', function () {
+
+    document.activeElement.blur();
+
+});
+$('#modalDocument').on('hidden.bs.modal', function () {
+
+    document.activeElement.blur();
+
+});
+
+// =====================================================
+// GENERAR HORAS CADA 15 MIN
+// =====================================================
+
+function generateTimeOptions(selector) {
+
+    let html = '';
+
+    // desde 7am hasta 10pm
+    for(let h = 7; h <= 22; h++) {
+
+        for(let m = 0; m < 60; m += 15) {
+
+            // 🔥 VALOR REAL QUE SE GUARDA
+            let hour24 = String(h).padStart(2, '0');
+            let minute = String(m).padStart(2, '0');
+
+            let value = `${hour24}:${minute}`;
+
+            // 🔥 TEXTO VISUAL AM/PM
+            let period = h >= 12 ? 'p. m.' : 'a. m.';
+
+            let hour12 = h % 12;
+
+            if(hour12 === 0){
+                hour12 = 12;
+            }
+
+            let label = `${hour12}:${minute} ${period}`;
+
+            html += `
+                <option value="${value}">
+                    ${label}
+                </option>
+            `;
+        }
+    }
+
+    $(selector).html(html);
+}
+
+generateTimeOptions('#event_start_time');
+generateTimeOptions('#event_end_time');
+        generateTimeOptions('#activity_event_start_time');
+        generateTimeOptions('#activity_event_end_time');
+
+
+
+// =====================================================
+// CUANDO CAMBIA HORA INICIO
+// =====================================================
+
+$('#event_start_time').change(function(){
+
+    let startTime = $(this).val();
+
+    let endTime = add60Minutes(startTime);
+
+    $('#event_end_time').val(endTime);
+
+});
+
+// =====================================================
+// ABRIR NUEVO EVENTO
+// =====================================================
+
+$('#btnAddEvent').click(function(){
+
+    eventMode = 'create';
+    eventId = null;
+
+    $('#eventForm')[0].reset();
+
+    let now = roundToNext15Minutes(new Date());
+    let date = formatDate(now);
+    let time = formatTime(now);
+
+    $('#event_start_date').val(date);
+    $('#event_end_date').val(date);
+
+    $('#event_start_time').val(time);
+
+    $('#event_end_time').val(add60Minutes(time));
+
+    $('#modalEvent').modal('show');
+
+});
+
+// =====================================================
+// EDITAR EVENTO
+// =====================================================
+
+$(document).on('click', '.btn-edit-event', function(){
+
+    eventMode = 'edit';
+
+    eventId = $(this).data('id');
+
+    $('#event_title').val($(this).data('title'));
+
+    $('#event_description').val($(this).data('description'));
+
+    $('#event_location').val($(this).data('location'));
+
+    let start = $(this).data('start');
+    let end = $(this).data('end');
+
+    if(start){
+
+        let s = new Date(start);
+
+        $('#event_start_date').val(formatDate(s));
+        $('#event_start_time').val(formatTime(s));
+    }
+
+    if(end){
+
+        let e = new Date(end);
+
+        $('#event_end_date').val(formatDate(e));
+        $('#event_end_time').val(formatTime(e));
+    }
+
+    $('#modalEvent').modal('show');
+
+});
+
+// =====================================================
+// GUARDAR EVENTO
+// =====================================================
+
+$('#saveEvent').click(function(){
+
+    let start_datetime =
+        $('#event_start_date').val()
+        + ' ' +
+        $('#event_start_time').val()
+        + ':00';
+
+    let end_datetime =
+        $('#event_end_date').val()
+        + ' ' +
+        $('#event_end_time').val()
+        + ':00';
+
+    let url = eventMode === 'create'
+        ? `/cases/${caseId}/agenda`
+        : `/agenda/${eventId}`;
+
+    let method = eventMode === 'create'
+        ? 'POST'
+        : 'PUT';
+
+    $.ajax({
+
+        url: url,
+
+        method: method,
+
+        data: {
+
+            _token: '{{ csrf_token() }}',
+
+            title: $('#event_title').val(),
+
+            description: $('#event_description').val(),
+
+            start_datetime: start_datetime,
+
+            end_datetime: end_datetime,
+
+            location: $('#event_location').val(),
+
+        },
+
+        success: function(){
+
+            location.reload();
+
+        },
+
+        error: function(xhr){
+
+            console.log(xhr.responseText);
+
+            alert('Error al guardar');
+
+        }
+
+    });
+
+});
+
+// =====================================================
+// ELIMINAR EVENTO
+// =====================================================
+
+$(document).on('click', '.btn-delete-event', function(){
+
+    if(!confirm('¿Eliminar evento?')) return;
+
+    let id = $(this).data('id');
+
+    $.ajax({
+
+        url: `/agenda/${id}`,
+
+        type: 'DELETE',
+
+        data: {
+
+            _token: '{{ csrf_token() }}'
+
+        },
+
+        success: function(){
+
+            location.reload();
+
+        }
+
+    });
+
+});
+
+
+// ==========================================
+// EVENTO EN ACTIVIDAD
+// ==========================================
+
+// $('#modalActivity').on('shown.bs.modal', function(){
+
+//     // 🔥 llenar horas
+//     generateTimeOptions('#activity_event_start_time');
+
+//     generateTimeOptions('#activity_event_end_time');
+
+// });
+
+// 🔥 mostrar / ocultar agenda
+$(document).on('change', '#create_agenda_event', function(){
+
+    $('#activityAgendaFields').toggle(
+        $(this).is(':checked')
+    );
+
+});
+
+// 🔥 cambiar hora fin automática
+$(document).on('change', '#activity_event_start_time', function(){
+
+    let startTime = $(this).val();
+
+    $('#activity_event_end_time').val(
+        add60Minutes(startTime)
+    );
+
+});
+
+// =====================================================
+// FULL CALENDAR
+// =====================================================
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const calendarEl = document.getElementById('calendar');
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+
+        initialView: 'dayGridMonth',
+
+        locale: 'es',
+
+        height: 650,
+
+        // selectable: true,
+        selectable: canManageCaseContent,
+
+        // editable: true,
+        editable: canManageCaseContent,
+
+
+        slotDuration: '00:15:00',
+
+        snapDuration: '00:15:00',
+
+        events: `/cases/{{ $case->id }}/agenda/events`,
+
+        buttonText: {
+
+            today: 'Hoy',
+            month: 'Mes',
+            week: 'Semana',
+            day: 'día',
+
+        },
+        headerToolbar: {
+
+            left: 'prev,next today',
+
+            center: 'title',
+
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+
+        },
+        slotMinTime: '07:00:00',
+        slotMaxTime: '22:00:00',
+
+        // ==========================================
+        // CLICK EN DÍA
+        // ==========================================
+
+        dateClick: function(info){
+            if(!canManageCaseContent){
+                return;
+            }
+            eventMode = 'create';
+            eventId = null;
+
+            $('#eventForm')[0].reset();
+
+            $('#event_start_date').val(info.dateStr);
+            $('#event_end_date').val(info.dateStr);
+
+            $('#event_start_time').val('08:00');
+            $('#event_end_time').val('08:15');
+
+            $('#modalEvent').modal('show');
+
+        },
+
+        // ==========================================
+        // CLICK EVENTO
+        // ==========================================
+
+        eventClick: function(info){
+
+            if(!canManageCaseContent){
+                return;
+            }
+
+            const event = info.event;
+
+            eventMode = 'edit';
+
+            eventId = event.id;
+
+            $('#event_title').val(event.title);
+
+            $('#event_description').val(
+                event.extendedProps.description ?? ''
+            );
+
+            $('#event_location').val(
+                event.extendedProps.location ?? ''
+            );
+
+            if(event.start){
+
+                $('#event_start_date').val(
+                    formatDate(event.start)
+                );
+
+                $('#event_start_time').val(
+                    formatTime(event.start)
+                );
+
+            }
+
+            if(event.end){
+
+                $('#event_end_date').val(
+                    formatDate(event.end)
+                );
+
+                $('#event_end_time').val(
+                    formatTime(event.end)
+                );
+
+            }
+
+            $('#modalEvent').modal('show');
+
+        },
+
+        // ==========================================
+        // MOVER EVENTO
+        // ==========================================
+
+        eventDrop: function(info){
+
+            $.ajax({
+
+                url: `/agenda/${info.event.id}`,
+
+                method: 'PUT',
+
+                data: {
+
+                    _token: '{{ csrf_token() }}',
+
+                    start_datetime: info.event.startStr,
+
+                    end_datetime: info.event.endStr,
+
+                    title: info.event.title
+
+                },
+
+                error: function(){
+
+                    alert('Error al mover evento');
+
+                    info.revert();
+
+                }
+
+            });
+
+        },
+
+        // ==========================================
+        // REDIMENSIONAR EVENTO
+        // ==========================================
+
+        eventResize: function(info){
+
+            $.ajax({
+
+                url: `/agenda/${info.event.id}`,
+
+                method: 'PUT',
+
+                data: {
+
+                    _token: '{{ csrf_token() }}',
+
+                    start_datetime: info.event.startStr,
+
+                    end_datetime: info.event.endStr,
+
+                    title: info.event.title
+
+                },
+
+                error: function(){
+
+                    alert('Error al cambiar duración');
+
+                    info.revert();
+
+                }
+
+            });
+
+        },
+
+        // ==========================================
+        // TOOLTIPS
+        // ==========================================
+
+        eventDidMount: function(info){
+
+            let description =
+                info.event.extendedProps.description ?? '';
+
+            let location =
+                info.event.extendedProps.location ?? '';
+
+            let start =
+                info.event.start
+                    ? info.event.start.toLocaleString()
+                    : '';
+
+            let end =
+                info.event.end
+                    ? info.event.end.toLocaleString()
+                    : '';
+
+            let html = `
+                <div class="text-start">
+
+                    <strong>
+                        ${info.event.title}
+                    </strong>
+
+                    <hr class="my-1">
+
+                    <div>
+                        ${description}
+                    </div>
+
+                    <div class="mt-1">
+                        📍 ${location}
+                    </div>
+
+                    <div class="mt-1">
+                        🕒 ${start}
+                    </div>
+
+                </div>
+            `;
+
+            $(info.el).tooltip({
+
+                title: html,
+
+                html: true,
+
+                placement: 'top',
+
+                trigger: 'hover',
+
+                container: 'body'
+
+            });
+
+        },
+
+    });
+
+    calendar.render();
+
+});
+
+</script>
+@endpush
+
+@push('styles')
+
+<style>
+.fc {
+
+    font-size: 14px;
+
+}
+
+.fc .fc-toolbar-title {
+
+    font-size: 1.3rem;
+    font-weight: 600;
+
+}
+
+.fc .fc-button {
+
+    border-radius: 8px !important;
+    padding: 6px 12px !important;
+
+}
+
+.fc .fc-daygrid-day {
+
+    transition: background-color .2s;
+
+}
+
+.fc .fc-daygrid-day:hover {
+
+    background: #f8f9fa;
+
+}
+
+.fc .fc-event {
+
+    border: none !important;
+
+    border-radius: 8px !important;
+
+    padding: 2px 6px;
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+    box-shadow: 0 1px 2px rgba(0,0,0,.15);
+
+}
+
+.fc .fc-day-today {
+
+    background: #eef4ff !important;
+
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+
+    border-color: #ebeef2;
+
+}
+
+.fc-scrollgrid {
+
+    border-radius: 12px;
+    overflow: hidden;
+
+}
+
+</style>
+@endpush

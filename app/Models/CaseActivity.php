@@ -32,4 +32,12 @@ class CaseActivity extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+    
+    public function agendaEvent()
+    {
+        return $this->hasOne(
+            AgendaEvent::class,
+            'case_activity_id'
+        );
+    }
 }

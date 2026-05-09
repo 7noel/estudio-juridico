@@ -1,12 +1,13 @@
 <div class="card mt-3">
     <div class="card-header d-flex justify-content-between align-items-center">
         <strong>Documentos</strong>
-
+        @if($canManageCaseContent)
         <button class="btn btn-sm btn-outline-primary" id="btnAddDocument"
                 data-bs-toggle="modal"
                 data-bs-target="#modalDocument">
             <i class="bi bi-cloud-arrow-up"></i> Subir
         </button>
+        @endif
     </div>
 
     <div class="card-body">
@@ -25,6 +26,7 @@
                         </a>
                     </div>
 
+                    @if($canManageCaseContent)
                     <div class="text-end">
 
                         <button class="btn btn-sm btn-outline-success btn-edit-doc"
@@ -42,6 +44,7 @@
                         </button>
 
                     </div>
+                    @endif
 
                 </div>
 
@@ -78,7 +81,7 @@
 
                     <div class="mb-2">
                         <label>Título</label>
-                        <input type="text" name="title" class="form-control mb-2" placeholder="">
+                        <input type="text" name="title" class="form-control mb-2 text-uppercase" placeholder="">
                     </div>
 
                     <div class="mb-2" id="fileInputWrapper">
@@ -103,3 +106,113 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+// let caseId = {{ $case->id }};
+let mode = 'create'; // create | edit
+let currentDocumentId = null;
+
+// =================
+// CREAR / EDITAR
+// =================
+$('#form-document').submit(function(e){
+    e.preventDefault();
+
+    let id = $('#doc_id').val();
+
+    let formData = new FormData(this);
+
+    let url = id
+        ? `/documents/${id}`
+        : `/cases/${caseId}/documents`;
+
+    let method = id ? 'POST' : 'POST';
+
+    if(id){
+        formData.append('_method', 'PUT');
+    }
+
+    $.ajax({
+        url: url,
+        method: method,
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(){
+            location.reload();
+        }
+    });
+});
+
+// =================
+// EDITAR
+// =================
+$(document).on('click', '.btn-edit-doc', function(){
+    mode = 'edit';
+
+    const id = $(this).data('id');
+    currentDocumentId = id;
+
+    const title = $(this).data('title');
+    const type = $(this).data('type');
+    const file = $(this).data('file'); // IMPORTANTE
+    const file_name = $(this).data('file_name'); // IMPORTANTE
+
+    $('#doc_id').val(currentDocumentId);
+    $('[name="title"]').val(title);
+    $('[name="document_type"]').val(type);
+
+    // 🔥 OCULTAR INPUT FILE
+    $('#fileInputWrapper').hide();
+
+    // 🔥 MOSTRAR LINK ACTUAL
+    $('#currentFileWrapper').removeClass('d-none');
+    $('#currentFileLink').attr('href', '/storage/' + file);
+    $('#currentFileLink').text('Ver: ' + file_name);
+
+
+    $('#docModalTitle').text('Editar documento');
+
+    $('#modalDocument').modal('show');
+});
+
+// =================
+// NUEVO
+// =================
+$('#btnAddDocument').click(function(){
+    mode = 'create';
+    currentDocumentId = null;
+
+    $('#doc_id').val('');
+    $('#form-document')[0].reset();
+    $('#docModalTitle').text('Subir documento');
+
+    // 🔥 MOSTRAR INPUT FILE
+    $('#fileInputWrapper').show();
+
+    // 🔥 OCULTAR LINK
+    $('#currentFileWrapper').addClass('d-none');
+});
+
+// =================
+// ELIMINAR
+// =================
+$(document).on('click', '.btn-delete-doc', function(){
+
+    if(!confirm('¿Eliminar documento?')) return;
+
+    let id = $(this).data('id');
+
+    $.ajax({
+        url: `/documents/${id}`,
+        type: 'DELETE',
+        data: {_token: '{{ csrf_token() }}'},
+        success: function(){
+            location.reload();
+        }
+    });
+});
+
+</script>
+@endpush
