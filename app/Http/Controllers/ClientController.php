@@ -52,11 +52,28 @@ class ClientController extends Controller
     public function store(ClientRequest $request)
     {
         // $this->authorize('create', Client::class);
-
-        Client::create(
+        $client = Client::create(
             $request->validated()
         );
 
+        // =====================================
+        // AJAX
+        // =====================================
+
+        if($request->ajax()){
+            return response()->json([
+                'success' => true,
+                'client' => [
+                    'id' => $client->id,
+                    'full_name' => $client->full_name,
+                ]
+            ]);
+        }
+
+        // =====================================
+        // NORMAL
+        // =====================================
+        
         return redirect()
             ->route('clients.index')
             ->with(

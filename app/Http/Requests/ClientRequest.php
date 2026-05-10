@@ -56,9 +56,9 @@ class ClientRequest extends FormRequest
                 'string'
             ],
 
-            'ubigeo_code' => [
-                'required'
-            ],
+            // 'ubigeo_code' => [
+            //     'string'
+            // ],
 
             'email' => [
                 'nullable',
@@ -66,7 +66,8 @@ class ClientRequest extends FormRequest
             ],
 
             'mobile' => [
-                'nullable'
+                'required',
+                'regex:/^9\d{8}$/'
             ],
 
             'phone' => [
@@ -75,4 +76,15 @@ class ClientRequest extends FormRequest
 
         ];
     }
+
+    public function messages()
+    {
+        return [
+
+            'phone.regex' =>
+                'El celular debe tener 9 dígitos y comenzar con 9.',
+
+        ];
+    }
+
 }

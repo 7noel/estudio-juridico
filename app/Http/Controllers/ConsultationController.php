@@ -22,7 +22,7 @@ class ConsultationController extends Controller
 
     public function data(Request $request)
     {
-        $query = Consultation::with(['client', 'lawyer', 'specialty', 'subject'])
+        $query = Consultation::with(['client', 'lawyer', 'specialty', 'subject', 'case'])
             ->byUser(auth()->user());
 
         // 🔥 FILTROS
@@ -72,10 +72,22 @@ class ConsultationController extends Controller
                     ? $r->created_at->timezone('America/Lima')->format('d/m/Y H:i')
                     : '';
             })
+            ->addColumn('case_link', function($row){
+                if(!$row->case){
+                    return '
+                        <span class="badge bg-secondary"> Sin caso </span>
+                    ';
+                }
+                return '
+                    <a href="'.route('cases.show', $row->case->id).'" class="badge bg-primary text-decoration-none">
+                       Caso #'.$row->case->id.' <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                ';
+            })
             ->addColumn('actions', function ($r) {
                 return view('consultations.partials.actions', compact('r'))->render();
             })
-            ->rawColumns(['actions', 'status'])
+            ->rawColumns(['actions', 'status', 'case_link'])
             ->make(true);
     }
 

@@ -114,6 +114,7 @@
                         <th>Tipo</th>
                         <th>Especialidad</th>
                         <th>Materia</th>
+                        <th>Consulta</th>
                         <th>Estado</th>
                         <th>Fecha</th>
                         <th>Acciones</th>
@@ -153,12 +154,13 @@ $(function(){
             { data: 'service_type' },
             { data: 'specialty' },
             { data: 'subject' },
+            { data: 'consultation_link', name: 'consultation.id' },
             { data: 'status' },
             { data: 'opened_at' },
             { data: 'actions', orderable: false, searchable: false }
         ],
         columnDefs: [
-            { className: "text-center", targets: [0,6,8] },
+            { className: "text-center", targets: [0,3,4,5,6,7,8,9] },
         ],
         scrollX: true,
         pageLength: 50,

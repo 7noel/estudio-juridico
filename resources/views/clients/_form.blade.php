@@ -1,7 +1,7 @@
 {{-- Documento --}}
 
 <div class="row mb-3">
-    <div class="col-md-2">
+    <div class="col-md-3">
         <x-form.select
         name="document_type"
         label="Tipo documento"
@@ -10,7 +10,7 @@
         required
         />
     </div>
-    <div class="col-md-2">
+    <div class="col-md-3">
         <x-form.input
         name="document_number"
         label="Número documento"
@@ -21,7 +21,7 @@
 
 {{-- Nombre completo --}}
 
-    <div class="col-md-4">
+    <div class="col-md-6">
         <x-form.input
         name="full_name"
         label="Nombre completo"
@@ -35,14 +35,14 @@
 {{-- Contacto --}}
 
 <div class="row mb-3">
-    <div class="col-md-2">
+    <div class="col-md-3">
         <x-form.input
         name="mobile"
         label="Celular"
         :value="$client->mobile ?? ''"
         />
     </div>
-    <div class="col-md-2">
+    <div class="col-md-3">
         <x-form.input
         name="phone"
         label="Teléfono fijo"
@@ -63,7 +63,7 @@
 {{-- Dirección --}}
 
 <div class="row mb-3">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <x-form.input
         name="address"
         label="Dirección"
@@ -71,7 +71,7 @@
         />
     </div>
 
-    <div class="col-md-3">
+    <div class="col-md-6">
         <x-form.autocomplete
         name="ubigeo_code"
         label="Distrito"

@@ -20,7 +20,7 @@ class CaseFileController extends Controller
 
     public function data(Request $request)
     {
-        $query = CaseFile::with(['client', 'lawyer', 'specialty', 'subject'])
+        $query = CaseFile::with(['client', 'lawyer', 'specialty', 'subject', 'consultation'])
             ->forCurrentUser();
 
         // filtros
@@ -63,8 +63,8 @@ class CaseFileController extends Controller
             ->addColumn('status', function ($row) {
                 $label = config('options.case_statuses')[$row->status] ?? $row->status;
                 $color = config('options.case_status_colors')[$row->status] ?? 'secondary';
-
-                return '<span class="badge bg-' . $color . '">' . $label . '</span>';
+                $text_color = ($row->status == 'in_progress') ? 'text-dark' : '' ;
+                return '<span class="badge bg-' . $color . ' ' . $text_color .'">' . $label . '</span>';
             })
 
             ->editColumn('opened_at', function ($r) {
@@ -73,11 +73,23 @@ class CaseFileController extends Controller
                     : '';
             })
 
+            ->addColumn('consultation_link', function($row){
+                if(!$row->consultation){
+                    return '
+                        <span class="badge bg-secondary"> Sin consulta </span>
+                    ';
+                }
+                return '
+                    <a href="'.route('consultations.show', $row->consultation->id).'" class="badge bg-primary text-decoration-none">
+                        Consulta #'.$row->consultation->id.' <i class="bi bi-box-arrow-up-right"></i> 
+                    </a>
+                ';
+            })
             ->addColumn('actions', function ($r) {
                 return view('cases.partials.actions', compact('r'))->render();
             })
 
-            ->rawColumns(['status', 'actions'])
+            ->rawColumns(['status', 'actions', 'consultation_link'])
             ->make(true);
     }
 

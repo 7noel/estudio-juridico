@@ -39,9 +39,16 @@
         <x-form.autocomplete
             name="client_id"
             label="Cliente"
+
             :value="$consultation->client_id ?? ''"
+
             :text="$consultation->client->full_name ?? ''"
-            required
+
+            :required="true"
+
+            :createButton="true"
+
+            createButtonId="btnQuickClient"
         />
     </div>
 
@@ -103,6 +110,84 @@
 @push('scripts')
 
 <script>
+$('#btnQuickClient').click(function(){
+
+    $('#modalQuickClient').modal('show');
+
+});
+
+$('#btnSaveQuickClient').click(function(){
+
+    $.ajax({
+
+        url: '/clients',
+
+        method: 'POST',
+
+        data: $('#quickClientForm').serialize(),
+
+        success: function(response){
+
+            // =================================
+            // ASIGNAR CLIENTE
+            // =================================
+
+            $('#client_id').val(
+                response.client.id
+            );
+
+            $('#client_id_search').val(
+                response.client.full_name
+            );
+
+            // =================================
+            // CERRAR MODAL
+            // =================================
+
+            $('#modalQuickClient').modal('hide');
+
+        },
+
+        error: function(xhr){
+
+            // =====================================
+            // LIMPIAR ERRORES ANTERIORES
+            // =====================================
+
+            $('.invalid-feedback').remove();
+
+            $('.is-invalid').removeClass('is-invalid');
+
+            // =====================================
+            // VALIDACIÓN
+            // =====================================
+
+            if(xhr.status === 422){
+
+                let errors = xhr.responseJSON.errors;
+
+                $.each(errors, function(field, messages){
+
+                    let input = $('[name="' + field + '"]');
+
+                    input.addClass('is-invalid');
+
+                    input.after(`
+                        <div class="invalid-feedback">
+                            ${messages[0]}
+                        </div>
+                    `);
+
+                });
+
+            }
+
+        }
+
+    });
+
+});
+
 
 function loadSubjects(specialtyId, selected = null){
 

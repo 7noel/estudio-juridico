@@ -18,7 +18,7 @@
     <div class="row mb-3 mt-3">
 
         {{-- Estado --}}
-        <div class="col-md-2">
+        <div class="col-md">
             <label>Estado</label>
             <select id="filter_status" class="form-control form-control-sm">
                 <option value="">Todos</option>
@@ -29,7 +29,7 @@
         </div>
 
         {{-- Abogado --}}
-        <div class="col-md-2">
+        <div class="col-md">
             <label>Abogado</label>
             <select id="filter_lawyer" class="form-control form-control-sm">
                 <option value="">Todos</option>
@@ -40,7 +40,7 @@
         </div>
 
         {{-- Tipo de servicio --}}
-        <div class="col-md-2">
+        <div class="col-md">
             <label>Tipo de servicio</label>
             <select id="filter_service_type" class="form-control form-control-sm">
                 <option value="">Todos</option>
@@ -51,7 +51,7 @@
         </div>
 
         {{-- Especialidad --}}
-        <div class="col-md-2">
+        <div class="col-md">
             <label>Especialidad</label>
             <select id="filter_specialty" class="form-control form-control-sm">
                 <option value="">Todas</option>
@@ -62,19 +62,19 @@
         </div>
 
         {{-- Fecha desde --}}
-        <div class="col-md-2">
+        <div class="col-md">
             <label>Desde</label>
             <input type="date" id="filter_from" class="form-control form-control-sm">
         </div>
 
         {{-- Fecha hasta --}}
-        <div class="col-md-2">
+        <div class="col-md">
             <label>Hasta</label>
             <input type="date" id="filter_to" class="form-control form-control-sm">
         </div>
 
         {{-- Botón limpiar --}}
-        <div class="col-md-2 d-flex align-items-end">
+        <div class="col-md d-flex align-items-end">
             <button id="btn-clear-filters" class="btn btn-outline-secondary btn-sm w-100">
                 Limpiar
             </button>
@@ -117,6 +117,7 @@
                         <th class="text-center">Especialidad</th>
                         <th class="text-center">Materia</th>
                         <th class="text-center">Estado</th>
+                        <th class="text-center">Caso</th>
                         <th class="text-center">Monto</th>
                         <th class="text-center">Fecha</th>
                         <th class="text-center">Acciones</th>
@@ -162,14 +163,15 @@ $(function(){
             { data: 'specialty', name: 'specialty.name' },
             { data: 'subject', name: 'subject.name' },
             { data: 'status' },
+            { data: 'case_link', name: 'case.id' },
             { data: 'total_amount' },
             { data: 'created_at' },
             { data: 'actions', orderable: false, searchable: false }
         ],
 
         columnDefs: [
-            { className: "text-center", targets: [0, 6, 8, 9] }, // ID, Estado, Fecha, Acciones
-            { className: "text-end", targets: [7] }, // Monto
+            { className: "text-center", targets: [0, 3, 4, 5, 6, 7, 9,10] }, // ID, Estado, Fecha, Acciones
+            { className: "text-end", targets: [8] }, // Monto
         ],
 
         scrollX: true,

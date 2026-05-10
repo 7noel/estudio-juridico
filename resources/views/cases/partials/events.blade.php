@@ -1,4 +1,4 @@
-@if(1==1)
+@if(1==0)
 <div class="card mt-3">
     <div class="card-header d-flex justify-content-between">
         <strong>Agenda</strong>

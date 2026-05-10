@@ -22,7 +22,6 @@
         </h6>
         <div class="d-flex gap-2">
 
-
             @if($case->status == 'in_progress')
             <button class="btn btn-sm btn-outline-secondary left" id="btnEditCase">
                 <i class="bi bi-pencil"></i> Editar
@@ -64,62 +63,72 @@
     <div class="card-body">
 
         {{-- INFO PRINCIPAL --}}
-        <div class="card mb-3">
-            <div class="card-header">Información del caso</div>
+        <div class="card shadow-sm mb-3">
+            <div class="card-header">
+                <strong> Información del caso</strong>
+            </div>
 
-            <div class="card-body row">
+            <div class="card-body">
+                <div class="row mb-2">
+                    <div class="col-md-3">
+                        <strong>Tipo de servicio:</strong><br>
+                        {{ config('options.service_types')[$case->service_type] ?? '-' }}
+                    </div>
 
-                <div class="col-md-3">
-                    <strong>Cliente:</strong><br>
-                    {{ $case->client->full_name ?? '-' }}
+                    <div class="col-md-3">
+                        <strong>Especialidad:</strong><br>
+                        {{ $case->specialty->name ?? '-' }}
+                    </div>
+
+                    <div class="col-md-3">
+                        <strong>Materia:</strong><br>
+                        {{ $case->subject->name ?? '-' }}
+                    </div>
+
+                    <div class="col-md-3">
+                        <strong>Abogado:</strong><br>
+                        <span id="case-lawyer">
+                            {{ $case->lawyer->name ?? '-' }}
+                        </span>
+                    </div>
                 </div>
 
-                <div class="col-md-3">
-                    <strong>Abogado:</strong><br>
-                    <span id="case-lawyer">
-                        {{ $case->lawyer->name ?? '-' }}
-                    </span>
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <strong>Cliente:</strong><br>
+                        {{ $case->client->full_name ?? '-' }}
+                    </div>
+
+                    <div class="col-md-3">
+                        <strong>Expediente:</strong><br>
+                        <span id="case-case-number">
+                            {{ $case->file_number ?? '-' }}
+                        </span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <strong>Estado:</strong><br>
+                        <span class="badge bg-{{ config('options.case_status_colors')[$case->status] }}">
+                            {{ config('options.case_statuses')[$case->status] }}
+                        </span>
+                    </div>
                 </div>
 
-                <div class="col-md-3">
-                    <strong>Tipo:</strong><br>
-                    {{ config('options.service_types')[$case->service_type] ?? '-' }}
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <strong>Título:</strong><br>
+                        <span id="case-title">
+                            {{ $case->title }}
+                        </span>
+                    </div>
                 </div>
-
-                <div class="col-md-3">
-                    <strong>Estado:</strong><br>
-                    <span class="badge bg-{{ config('options.case_status_colors')[$case->status] }}">
-                        {{ config('options.case_statuses')[$case->status] }}
-                    </span>
-                </div>
-
-                <div class="col-md-6 mt-3">
-                    <strong>Especialidad:</strong><br>
-                    {{ $case->specialty->name ?? '-' }}
-                </div>
-
-                <div class="col-md-6 mt-3">
-                    <strong>Materia:</strong><br>
-                    {{ $case->subject->name ?? '-' }}
-                </div>
-
-                <div class="col-md-6 mt-3">
-                    <strong>Título:</strong><br>
-                    <span id="case-title">
-                        {{ $case->title }}
-                    </span>
-                </div>
-                <div class="col-md-6 mt-3">
-                    <strong>Expediente:</strong><br>
-                    <span id="case-case-number">
-                        {{ $case->file_number ?? '-' }}
-                    </span>
-                </div>
-                <div class="col-md-12 mt-3">
-                    <strong>Descripción:</strong><br>
-                    <span id="case-description">
-                        {{ $case->description ?? 'Sin descripción' }}
-                    </span>
+                <div class="row mb-2">
+                    <div class="col-md-12">
+                        <strong>Descripción:</strong><br>
+                        <span id="case-description">
+                            {{ $case->description ?? 'Sin descripción' }}
+                        </span>
+                    </div>
                 </div>
 
             </div>

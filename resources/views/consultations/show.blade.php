@@ -12,15 +12,6 @@
 	            Consulta #{{ $consultation->id }}
 	        </h6>
 
-	        @php
-	            $status = $consultation->status;
-	            $label = config('options.consultation_statuses')[$status] ?? $status;
-	            $color = config('options.consultation_status_colors')[$status] ?? 'secondary';
-	        @endphp
-
-	        <span class="badge bg-{{ $color }}">
-	            {{ $label }}
-	        </span>
 	    </div>
 
 	    {{-- DERECHA --}}
@@ -79,44 +70,52 @@
 
 		        <div class="row mb-2">
 		            <div class="col-md-3">
-		                <small class="text-muted">Tipo de servicio</small><br>
-		                <strong>{{ config('options.service_types')[$consultation->service_type] ?? '-' }}</strong>
+		                <strong>Tipo de servicio:</strong><br>
+		                <span>{{ config('options.service_types')[$consultation->service_type] ?? '-' }}</span>
 		            </div>
 
 		            <div class="col-md-3">
-		                <small class="text-muted">Especialidad</small><br>
-		                <strong>{{ $consultation->specialty->name ?? '-' }}</strong>
+		                <strong>Especialidad:</strong><br>
+		                <span>{{ $consultation->specialty->name ?? '-' }}</span>
 		            </div>
 
 		            <div class="col-md-3">
-		                <small class="text-muted">Materia</small><br>
-		                <strong>{{ $consultation->subject->name ?? '-' }}</strong>
+		                <strong>Materia:</strong><br>
+		                <span>{{ $consultation->subject->name ?? '-' }}</span>
 		            </div>
 
 		            <div class="col-md-3">
-		                <small class="text-muted">Abogado</small><br>
-		                <strong>{{ $consultation->lawyer->name ?? '-' }}</strong>
+		                <strong>Abogado:</strong><br>
+		                <span>{{ $consultation->lawyer->name ?? '-' }}</span>
 		            </div>
 		        </div>
 
 		        <div class="row mb-2">
 		            <div class="col-md-6">
-		                <small class="text-muted">Cliente</small><br>
-		                <strong>{{ $consultation->client->full_name }}</strong>
+		                <strong>Cliente:</strong><br>
+		                <span>{{ $consultation->client->full_name }}</span>
+		            </div>
+		            <div class="col-md-3">
+		                <strong>Estado:</strong><br>
+		                <span class="badge bg-{{ config('options.consultation_status_colors')[$consultation->status] }}">
+		                	{{ config('options.consultation_statuses')[$consultation->status] }}
+		                </span>
 		            </div>
 
-		            <div class="col-md-6">
-		                <small class="text-muted">Título</small><br>
-		                <strong>{{ $consultation->title }}</strong>
-		            </div>
 		        </div>
 
 		        <div class="row">
 		            <div class="col-md-12">
-		                <small class="text-muted">Descripción</small><br>
-		                <div class="border rounded p-2 bg-light">
+		                <strong>Título:</strong><br>
+		                <span>{{ $consultation->title }}</span>
+		            </div>
+		        </div>
+		        <div class="row">
+		            <div class="col-md-12">
+		                <strong>Descripción:</strong><br>
+		                <span>
 		                    {{ $consultation->description ?: 'Sin descripción' }}
-		                </div>
+		                </span>
 		            </div>
 		        </div>
 
