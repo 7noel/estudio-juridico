@@ -18,7 +18,10 @@ use App\Http\Controllers\AgendaEventController;
 use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
-    return view('welcome');
+    if(auth()->check()){
+        return redirect()->route('dashboard');
+    }
+    return redirect()->route('login');
 });
 
 Route::get('/session-check', function () {

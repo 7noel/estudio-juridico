@@ -33,6 +33,7 @@ type="email"
 label="Correo electrónico"
 :value="old('email', $user->email)"
 required
+disabled
 />
 
 <x-form.button>
