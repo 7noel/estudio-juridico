@@ -36,7 +36,7 @@ required
 disabled
 />
 
-<x-form.button>
+<x-form.button class="mt-3">
 
 <i class="bi bi-save"></i>
 

@@ -42,7 +42,7 @@ required
 />
 
 <x-form.button
-class="btn-outline-warning">
+class="btn-outline-warning mt-3">
 
 <i class="bi bi-shield-lock"></i>
 
