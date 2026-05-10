@@ -100,6 +100,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/agenda/{event}', [AgendaEventController::class, 'update'])->name('cases.agenda.store');
     Route::delete('/agenda/{event}', [AgendaEventController::class, 'destroy'])->name('cases.agenda.store');
     Route::get('/cases/{case}/agenda/events', [AgendaEventController::class, 'events']);
+    Route::put('/cases/{case}/quick-update', [CaseFileController::class, 'quickUpdate'])->name('cases.quick-update');
 
 });
 

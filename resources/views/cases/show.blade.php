@@ -20,8 +20,14 @@
         <h6 class="mb-0">
             Caso #{{ $case->id }}
         </h6>
-
         <div class="d-flex gap-2">
+
+
+            @if($case->status == 'in_progress')
+            <button class="btn btn-sm btn-outline-secondary left" id="btnEditCase">
+                <i class="bi bi-pencil"></i> Editar
+            </button>
+            @endif
 
             {{-- BOTONES SEGÚN ESTADO --}}
             @if($case->status == 'open')
@@ -70,7 +76,9 @@
 
                 <div class="col-md-3">
                     <strong>Abogado:</strong><br>
-                    {{ $case->lawyer->name ?? '-' }}
+                    <span id="case-lawyer">
+                        {{ $case->lawyer->name ?? '-' }}
+                    </span>
                 </div>
 
                 <div class="col-md-3">
@@ -95,14 +103,23 @@
                     {{ $case->subject->name ?? '-' }}
                 </div>
 
-                <div class="col-md-12 mt-3">
+                <div class="col-md-6 mt-3">
                     <strong>Título:</strong><br>
-                    {{ $case->title }}
+                    <span id="case-title">
+                        {{ $case->title }}
+                    </span>
                 </div>
-
+                <div class="col-md-6 mt-3">
+                    <strong>Expediente:</strong><br>
+                    <span id="case-case-number">
+                        {{ $case->file_number ?? '-' }}
+                    </span>
+                </div>
                 <div class="col-md-12 mt-3">
                     <strong>Descripción:</strong><br>
-                    {{ $case->description ?? 'Sin descripción' }}
+                    <span id="case-description">
+                        {{ $case->description ?? 'Sin descripción' }}
+                    </span>
                 </div>
 
             </div>
@@ -123,12 +140,224 @@
 
 </div>
 
+<div class="modal fade" id="modalEditCase">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    Editar caso
+                </h5>
+
+                <button
+                    class="btn-close"
+                    data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <form id="formEditCase">
+
+                    <div class="mb-3">
+
+                        <label>
+                            Número expediente
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="edit_case_number"
+                            value="{{ $case->case_number }}">
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label>
+                            Título
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="edit_title"
+                            value="{{ $case->title }}">
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label>
+                            Descripción
+                        </label>
+
+                        <textarea
+                            class="form-control"
+                            id="edit_description"
+                            rows="4">{{ $case->description }}</textarea>
+
+                    </div>
+
+                    @if(auth()->user()->hasRole('Administrador'))
+
+                        <div class="mb-3">
+
+                            <label>
+                                Abogado
+                            </label>
+
+                            <select
+                                class="form-select"
+                                id="edit_lawyer_id">
+
+                                @foreach($lawyers as $lawyer)
+
+                                    <option
+                                        value="{{ $lawyer->id }}"
+                                        @selected(
+                                            $case->lawyer_id == $lawyer->id
+                                        )>
+
+                                        {{ $lawyer->name }}
+
+                                    </option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+                    @endif
+
+                </form>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    class="btn btn-primary"
+                    id="btnSaveCase">
+
+                    Guardar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 @endsection
 
 
 @push('scripts')
 <script>
+
+// ==========================================
+// ABRIR MODAL EDITAR CASO
+// ==========================================
+
+$('#btnEditCase').click(function(){
+
+    $('#modalEditCase').modal('show');
+
+});
+
+// ==========================================
+// GUARDAR EDICIÓN CASO
+// ==========================================
+
+$('#btnSaveCase').click(function(){
+
+    $.ajax({
+
+        url: `/cases/${caseId}/quick-update`,
+
+        method: 'PUT',
+
+        data: {
+
+            _token: '{{ csrf_token() }}',
+
+            case_number:
+                $('#edit_case_number').val(),
+
+            title:
+                $('#edit_title').val(),
+
+            description:
+                $('#edit_description').val(),
+
+            lawyer_id:
+                $('#edit_lawyer_id').val(),
+
+        },
+
+        success: function(){
+
+            // ====================================
+            // ACTUALIZAR DOM
+            // ====================================
+
+            $('#case-case-number').text(
+                $('#edit_case_number').val() || '-'
+            );
+
+            $('#case-title').text(
+                $('#edit_title').val()
+            );
+
+            $('#case-description').text(
+                $('#edit_description').val()
+                || 'Sin descripción'
+            );
+
+            // ====================================
+            // ABOGADO
+            // ====================================
+
+            let lawyerText = $('#edit_lawyer_id option:selected').text();
+
+            if(lawyerText){
+
+                $('#case-lawyer').text(
+                    lawyerText
+                );
+
+            }
+
+            // ====================================
+            // CERRAR MODAL
+            // ====================================
+
+            $('#modalEditCase').modal('hide');
+
+        },
+
+        error: function(xhr){
+
+            console.log(xhr.responseText);
+
+            alert('Error al actualizar');
+
+        }
+
+    });
+
+});
+
+
 let canManageCaseContent = @json($canManageCaseContent);
 let caseId = {{ $case->id }};
 

@@ -498,8 +498,23 @@ document.addEventListener('DOMContentLoaded', function () {
             $('#event_start_date').val(info.dateStr);
             $('#event_end_date').val(info.dateStr);
 
-            $('#event_start_time').val('08:00');
-            $('#event_end_time').val('08:15');
+            // ==========================================
+            // HORA ACTUAL PERÚ
+            // ==========================================
+
+            let now = new Date(
+                new Date().toLocaleString(
+                    'en-US',
+                    {
+                        timeZone: 'America/Lima'
+                    }
+                )
+            );
+            now = roundToNext15Minutes(now);
+            let startTime = formatTime(now);
+            let endTime = add60Minutes(startTime);
+            $('#event_start_time').val(startTime);
+            $('#event_end_time').val(endTime);
 
             $('#modalEvent').modal('show');
 
@@ -565,6 +580,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         eventDrop: function(info){
 
+            if(!canManageCaseContent){
+                info.revert();
+                return;
+            }
             $.ajax({
 
                 url: `/agenda/${info.event.id}`,
@@ -601,6 +620,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         eventResize: function(info){
 
+            if(!canManageCaseContent){
+                info.revert();
+                return;
+            }
             $.ajax({
 
                 url: `/agenda/${info.event.id}`,

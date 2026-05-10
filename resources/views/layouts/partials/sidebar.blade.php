@@ -23,8 +23,7 @@
 		{{-- CONSULTAS --}}
 		<li class="nav-item">
 			<a class="nav-link text-dark" href="{{ route('consultations.index') }}">
-				<i class="bi bi-chat-left-text"></i>
-				Consultas
+				<i class="bi bi-chat-left-text"></i> Consultas
 			</a>
 		</li>
 		{{-- CASOS --}}
@@ -34,14 +33,14 @@
 			</a>
 		</li>
 		{{-- AGENDA --}}
-		<li class="nav-item">
+		<!-- <li class="nav-item">
 			<a class="nav-link text-dark" href="#">
 				<i class="bi bi-calendar-event"></i> Agenda
-			</a>
+			</a> -->
 		</li>
 		<li class="nav-item">
 		    <a class="nav-link text-dark" href="{{ route('legal-specialties.index') }}">
-		        <i class="bi bi-folder"></i> Especialidades
+		        <i class="bi-bookmarks"></i> Especialidades
 		    </a>
 		</li>
 		{{-- ADMINISTRACIÓN --}}

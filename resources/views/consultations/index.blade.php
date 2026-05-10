@@ -5,7 +5,7 @@
 <div class="card border-0 shadow-sm">
     <div class="card-header bg-white d-flex justify-content-between">
         <h6 class="mb-0">
-            <i class="bi bi-journal-text"></i> Consultas
+            <i class="bi bi-chat-left-text"></i> Consultas
         </h6>
 
         @can('create', App\Models\Consultation::class)
@@ -15,95 +15,95 @@
         @endcan
     </div>
 
-<div class="row mb-3 mt-3">
+    <div class="row mb-3 mt-3">
 
-    {{-- Estado --}}
-    <div class="col-md-2">
-        <label>Estado</label>
-        <select id="filter_status" class="form-control form-control-sm">
-            <option value="">Todos</option>
-            @foreach(config('options.consultation_statuses') as $key => $label)
-                <option value="{{ $key }}">{{ $label }}</option>
-            @endforeach
-        </select>
+        {{-- Estado --}}
+        <div class="col-md-2">
+            <label>Estado</label>
+            <select id="filter_status" class="form-control form-control-sm">
+                <option value="">Todos</option>
+                @foreach(config('options.consultation_statuses') as $key => $label)
+                    <option value="{{ $key }}">{{ $label }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        {{-- Abogado --}}
+        <div class="col-md-2">
+            <label>Abogado</label>
+            <select id="filter_lawyer" class="form-control form-control-sm">
+                <option value="">Todos</option>
+                @foreach($lawyers as $lawyer)
+                    <option value="{{ $lawyer->id }}">{{ $lawyer->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        {{-- Tipo de servicio --}}
+        <div class="col-md-2">
+            <label>Tipo de servicio</label>
+            <select id="filter_service_type" class="form-control form-control-sm">
+                <option value="">Todos</option>
+                @foreach(config('options.service_types') as $key => $value)
+                    <option value="{{ $key }}">{{ $value }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        {{-- Especialidad --}}
+        <div class="col-md-2">
+            <label>Especialidad</label>
+            <select id="filter_specialty" class="form-control form-control-sm">
+                <option value="">Todas</option>
+                @foreach($specialties as $sp)
+                    <option value="{{ $sp->id }}">{{ $sp->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        {{-- Fecha desde --}}
+        <div class="col-md-2">
+            <label>Desde</label>
+            <input type="date" id="filter_from" class="form-control form-control-sm">
+        </div>
+
+        {{-- Fecha hasta --}}
+        <div class="col-md-2">
+            <label>Hasta</label>
+            <input type="date" id="filter_to" class="form-control form-control-sm">
+        </div>
+
+        {{-- Botón limpiar --}}
+        <div class="col-md-2 d-flex align-items-end">
+            <button id="btn-clear-filters" class="btn btn-outline-secondary btn-sm w-100">
+                Limpiar
+            </button>
+        </div>
+
     </div>
 
-    {{-- Abogado --}}
-    <div class="col-md-2">
-        <label>Abogado</label>
-        <select id="filter_lawyer" class="form-control form-control-sm">
-            <option value="">Todos</option>
-            @foreach($lawyers as $lawyer)
-                <option value="{{ $lawyer->id }}">{{ $lawyer->name }}</option>
-            @endforeach
-        </select>
+    <div class="mb-3 d-flex flex-wrap gap-2">
+
+        <span class="badge bg-secondary filter-quick p-2" data-status="">
+            Todas: <span id="stat_all">0</span>
+        </span>
+        <span class="badge bg-primary filter-quick p-2" data-status="">
+            Asignados: <span id="stat_assigned">0</span>
+        </span>
+
+        <span class="badge bg-warning text-dark filter-quick p-2" data-status="quoted">
+            Cotizados: <span id="stat_quoted">0</span>
+        </span>
+
+        <span class="badge bg-success filter-quick p-2" data-status="accepted">
+            Aceptados: <span id="stat_accepted">0</span>
+        </span>
+
+        <span class="badge bg-danger filter-quick p-2" data-status="rejected">
+            Rechazados: <span id="stat_rejected">0</span>
+        </span>
+
     </div>
-
-    {{-- Tipo de servicio --}}
-    <div class="col-md-2">
-        <label>Tipo de servicio</label>
-        <select id="filter_service_type" class="form-control form-control-sm">
-            <option value="">Todos</option>
-            @foreach(config('options.service_types') as $key => $value)
-                <option value="{{ $key }}">{{ $value }}</option>
-            @endforeach
-        </select>
-    </div>
-
-    {{-- Especialidad --}}
-    <div class="col-md-2">
-        <label>Especialidad</label>
-        <select id="filter_specialty" class="form-control form-control-sm">
-            <option value="">Todas</option>
-            @foreach($specialties as $sp)
-                <option value="{{ $sp->id }}">{{ $sp->name }}</option>
-            @endforeach
-        </select>
-    </div>
-
-    {{-- Fecha desde --}}
-    <div class="col-md-2">
-        <label>Desde</label>
-        <input type="date" id="filter_from" class="form-control form-control-sm">
-    </div>
-
-    {{-- Fecha hasta --}}
-    <div class="col-md-2">
-        <label>Hasta</label>
-        <input type="date" id="filter_to" class="form-control form-control-sm">
-    </div>
-
-    {{-- Botón limpiar --}}
-    <div class="col-md-2 d-flex align-items-end">
-        <button id="btn-clear-filters" class="btn btn-outline-secondary btn-sm w-100">
-            Limpiar
-        </button>
-    </div>
-
-</div>
-
-<div class="mb-3 d-flex flex-wrap gap-2">
-
-    <span class="badge bg-secondary filter-quick p-2" data-status="">
-        Todas: <span id="stat_all">0</span>
-    </span>
-    <span class="badge bg-primary filter-quick p-2" data-status="">
-        Asignados: <span id="stat_assigned">0</span>
-    </span>
-
-    <span class="badge bg-warning text-dark filter-quick p-2" data-status="quoted">
-        Cotizados: <span id="stat_quoted">0</span>
-    </span>
-
-    <span class="badge bg-success filter-quick p-2" data-status="accepted">
-        Aceptados: <span id="stat_accepted">0</span>
-    </span>
-
-    <span class="badge bg-danger filter-quick p-2" data-status="rejected">
-        Rechazados: <span id="stat_rejected">0</span>
-    </span>
-
-</div>
 
     <div class="card-body">
         <div class="table-responsive">

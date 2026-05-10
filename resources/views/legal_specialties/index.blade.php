@@ -5,7 +5,7 @@
 <div class="card border-0 shadow-sm">
     <div class="card-header bg-white d-flex justify-content-between">
         <h6 class="mb-0">
-            <i class="bi bi-journal-text"></i> Especialidades
+            <i class="bi-bookmarks"></i> Especialidades
         </h6>
 
         <a href="{{ route('legal-specialties.create') }}" class="btn btn-outline-primary btn-sm">

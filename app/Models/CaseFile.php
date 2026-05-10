@@ -68,7 +68,7 @@ class CaseFile extends Model
 
     public function lawyer()
     {
-        return $this->belongsTo(Employee::class, 'lawyer_id');
+        return $this->belongsTo(User::class, 'lawyer_id');
     }
 
     // public function activities()

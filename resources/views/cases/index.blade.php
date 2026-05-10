@@ -2,85 +2,79 @@
 
 @section('content')
 
-<div class="container-fluid">
-
-    {{-- HEADER --}}
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="mb-0">Casos</h5>
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between">
+        <h6 class="mb-2">
+            <i class="bi bi-folder"></i> Casos
+        </h6>
     </div>
 
     {{-- FILTROS --}}
-    <div class="card mb-3">
-        <div class="card-body">
+    <div class="row mb-3 mt-3">
 
-            <div class="row g-2">
-
-                {{-- ESTADO --}}
-                <div class="col-md-2">
-                    <label>Estado</label>
-                    <select id="filter_status" class="form-control form-control-sm">
-                        <option value="">Todos</option>
-                        @foreach(config('options.case_statuses') as $key => $value)
-                            <option value="{{ $key }}">{{ $value }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                {{-- ABOGADO --}}
-                <div class="col-md-2">
-                    <label>Abogado</label>
-                    <select id="filter_lawyer" class="form-control form-control-sm">
-                        <option value="">Todos</option>
-                        @foreach($lawyers as $lawyer)
-                            <option value="{{ $lawyer->id }}">{{ $lawyer->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                {{-- TIPO SERVICIO --}}
-                <div class="col-md-2">
-                    <label>Tipo servicio</label>
-                    <select id="filter_service_type" class="form-control form-control-sm">
-                        <option value="">Todos</option>
-                        @foreach(config('options.service_types') as $key => $value)
-                            <option value="{{ $key }}">{{ $value }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                {{-- ESPECIALIDAD --}}
-                <div class="col-md-2">
-                    <label>Especialidad</label>
-                    <select id="filter_specialty" class="form-control form-control-sm">
-                        <option value="">Todas</option>
-                        @foreach($specialties as $sp)
-                            <option value="{{ $sp->id }}">{{ $sp->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                {{-- FECHA DESDE --}}
-                <div class="col-md-2">
-                    <label>Desde</label>
-                    <input type="date" id="filter_date_from" class="form-control form-control-sm">
-                </div>
-
-                {{-- FECHA HASTA --}}
-                <div class="col-md-2">
-                    <label>Hasta</label>
-                    <input type="date" id="filter_date_to" class="form-control form-control-sm">
-                </div>
-
-                {{-- LIMPIAR --}}
-                <div class="col-md-2 d-flex align-items-end">
-                    <button id="btn-clear" class="btn btn-outline-secondary btn-sm w-100">
-                        Limpiar
-                    </button>
-                </div>
-
-            </div>
-
+        {{-- ESTADO --}}
+        <div class="col-md">
+            <label>Estado</label>
+            <select id="filter_status" class="form-control form-control-sm">
+                <option value="">Todos</option>
+                @foreach(config('options.case_statuses') as $key => $value)
+                    <option value="{{ $key }}">{{ $value }}</option>
+                @endforeach
+            </select>
         </div>
+
+        {{-- ABOGADO --}}
+        <div class="col-md">
+            <label>Abogado</label>
+            <select id="filter_lawyer" class="form-control form-control-sm">
+                <option value="">Todos</option>
+                @foreach($lawyers as $lawyer)
+                    <option value="{{ $lawyer->id }}">{{ $lawyer->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        {{-- TIPO SERVICIO --}}
+        <div class="col-md">
+            <label>Tipo servicio</label>
+            <select id="filter_service_type" class="form-control form-control-sm">
+                <option value="">Todos</option>
+                @foreach(config('options.service_types') as $key => $value)
+                    <option value="{{ $key }}">{{ $value }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        {{-- ESPECIALIDAD --}}
+        <div class="col-md">
+            <label>Especialidad</label>
+            <select id="filter_specialty" class="form-control form-control-sm">
+                <option value="">Todas</option>
+                @foreach($specialties as $sp)
+                    <option value="{{ $sp->id }}">{{ $sp->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        {{-- FECHA DESDE --}}
+        <div class="col-md">
+            <label>Desde</label>
+            <input type="date" id="filter_date_from" class="form-control form-control-sm">
+        </div>
+
+        {{-- FECHA HASTA --}}
+        <div class="col-md">
+            <label>Hasta</label>
+            <input type="date" id="filter_date_to" class="form-control form-control-sm">
+        </div>
+
+        {{-- LIMPIAR --}}
+        <div class="col-md d-flex align-items-end">
+            <button id="btn-clear" class="btn btn-outline-secondary btn-sm w-100">
+                Limpiar
+            </button>
+        </div>
+
     </div>
 
     {{-- STATS --}}
@@ -109,27 +103,23 @@
     </div>
 
     {{-- TABLA --}}
-    <div class="card">
-        <div class="card-body">
-
-            <div class="table-responsive">
-                <table id="casesTable" class="table table-bordered table-sm w-100">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Cliente</th>
-                            <th>Abogado</th>
-                            <th>Tipo</th>
-                            <th>Especialidad</th>
-                            <th>Materia</th>
-                            <th>Estado</th>
-                            <th>Fecha</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
-
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="casesTable" class="table table-sm table-bordered table-striped w-100">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Abogado</th>
+                        <th>Tipo</th>
+                        <th>Especialidad</th>
+                        <th>Materia</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
     </div>
 

@@ -5,7 +5,7 @@
 <div class="card border-0 shadow-sm">
 	<div class="card-header bg-white d-flex justify-content-between">
 		<h6 class="mb-0">
-			<i class="bi bi-shield-lock"></i> Permisos
+			<i class="bi bi-key"></i> Permisos
 		</h6>
 		<a href="{{ route('permissions.create') }}" class="btn btn-outline-primary btn-sm">
 			<i class="bi bi-plus"></i> Nuevo

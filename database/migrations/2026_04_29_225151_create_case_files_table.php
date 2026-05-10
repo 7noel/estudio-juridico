@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('establishment_id')->constrained();
             $table->foreignId('consultation_id')->constrained();
             $table->foreignId('client_id')->constrained();
-            $table->foreignId('lawyer_id')->constrained('employees');
+            $table->foreignId('lawyer_id')->constrained('users');
             $table->string('slug')->unique();
             $table->string('case_number')->nullable();
             $table->string('service_type');

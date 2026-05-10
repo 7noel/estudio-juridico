@@ -122,9 +122,10 @@ class CaseFileController extends Controller
 
     public function show(CaseFile $case)
     {
+        $lawyers = User::role('Abogado')->orderBy('name')->get();
         $case->load(['client', 'lawyer', 'specialty', 'subject', 'activities.agendaEvent', 'documents', 'agendaEvents']);
 
-        return view('cases.show', compact('case'));
+        return view('cases.show', compact('case', 'lawyers'));
     }
 
     public function changeStatus(Request $request, CaseFile $case)
@@ -140,6 +141,57 @@ class CaseFileController extends Controller
         ]);
 
         return response()->json(['success' => true]);
+    }
+
+    public function quickUpdate(Request $request, CaseFile $case)
+    {
+        $this->authorize('update', $case);
+
+        $request->validate([
+
+            'case_number' =>
+                'nullable|string|max:255',
+
+            'title' =>
+                'required|string|max:255',
+
+            'description' =>
+                'nullable|string',
+
+            'lawyer_id' =>
+                'nullable|exists:users,id',
+
+        ]);
+
+        $data = [
+
+            'case_number' =>
+                $request->case_number,
+
+            'title' =>
+                $request->title,
+
+            'description' =>
+                $request->description,
+
+        ];
+
+        // =====================================
+        // SOLO ADMIN PUEDE CAMBIAR ABOGADO
+        // =====================================
+
+        if(auth()->user()->hasRole('Administrador')){
+
+            $data['lawyer_id'] =
+                $request->lawyer_id;
+
+        }
+
+        $case->update($data);
+
+        return response()->json([
+            'success' => true
+        ]);
     }
 
 }

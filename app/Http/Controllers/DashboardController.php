@@ -7,6 +7,7 @@ use App\Models\Consultation;
 use App\Models\AgendaEvent;
 use App\Models\CaseActivity;
 use App\Models\Document;
+use App\Models\Payment;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -100,7 +101,61 @@ class DashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $pendingPayments = 0;
+        $consultationsPaymentsQuery =
+            Consultation::query();
+
+        if(!$isAdmin){
+
+            $consultationsPaymentsQuery->where(
+                'assigned_lawyer_id',
+                $user->id
+            );
+
+        }
+
+        $totalConsultations =
+            $consultationsPaymentsQuery
+                ->sum('total_amount');
+
+        /*
+        |--------------------------------------------------------------------------
+        | PAGOS REALIZADOS
+        |--------------------------------------------------------------------------
+        */
+
+        $paymentsQuery = Payment::query()
+            ->whereHas('consultation');
+
+        if(!$isAdmin){
+
+            $paymentsQuery->whereHas(
+                'consultation',
+                function($q) use ($user){
+
+                    $q->where(
+                        'assigned_lawyer_id',
+                        $user->id
+                    );
+
+                }
+            );
+
+        }
+
+        $totalPaid =
+            $paymentsQuery->sum('amount');
+
+        /*
+        |--------------------------------------------------------------------------
+        | PENDIENTE
+        |--------------------------------------------------------------------------
+        */
+
+        $pendingPayments =
+            max(
+                $totalConsultations - $totalPaid,
+                0
+            );
 
         /*
         |--------------------------------------------------------------------------
