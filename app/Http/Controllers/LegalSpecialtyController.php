@@ -7,6 +7,7 @@ use App\Models\LegalSpecialty;
 use App\Models\LegalSubject;
 use App\Http\Requests\LegalSpecialtyRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LegalSpecialtyController extends Controller
 {
@@ -31,23 +32,30 @@ class LegalSpecialtyController extends Controller
 
     public function store(LegalSpecialtyRequest $request)
     {
-        $legalSpecialty = LegalSpecialty::create([
-            'name' => $request->name
-        ]);
-
-        $subjects = collect($request->subjects)
-            ->filter(fn($s) => !empty($s['name']))
-            ->values(); // 🔥 REINDEXA
-
-        $legalSpecialty->subjects()->delete();
-
-        foreach ($subjects as $s) {
-            $legalSpecialty->subjects()->create([
-                'name' => $s['name']
+        DB::beginTransaction();
+        try {
+            $legalSpecialty = LegalSpecialty::create([
+                'name' => $request->name
             ]);
-        }
 
-        return redirect()->route('legal-specialties.index');
+            $subjects = collect($request->subjects)
+                ->filter(fn($s) => !empty($s['name']))
+                ->values(); // 🔥 REINDEXA
+
+            $legalSpecialty->subjects()->delete();
+
+            foreach ($subjects as $s) {
+                $legalSpecialty->subjects()->create([
+                    'name' => $s['name']
+                ]);
+            }
+            DB::commit();
+
+            return redirect()->route('legal-specialties.index');
+        } catch (\Exception $e){
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     public function edit(LegalSpecialty $legalSpecialty)
@@ -58,24 +66,48 @@ class LegalSpecialtyController extends Controller
 
     public function update(LegalSpecialtyRequest $request, LegalSpecialty $legalSpecialty)
     {
-        //dd($request->all());
-        $legalSpecialty->update([
-            'name' => $request->name
-        ]);
+        DB::beginTransaction();
+        try {
+            $legalSpecialty->update(['name' => $request->name]);
+            $subjects = collect($request->subjects)->filter(fn($s) => !empty($s['name']))->values();
 
-        $subjects = collect($request->subjects)
-            ->filter(fn($s) => !empty($s['name']))
-            ->values(); // 🔥 REINDEXA
+            // IDS RECIBIDOS
+            $receivedIds = $subjects->pluck('id')->filter()->values();
 
-        $legalSpecialty->subjects()->delete();
+            // ELIMINAR SOLO LOS QUE YA NO EXISTEN
+            $subjectsToDelete = $legalSpecialty->subjects()->whereNotIn('id', $receivedIds)->get();
+            foreach($subjectsToDelete as $subject){
 
-        foreach ($subjects as $s) {
-            $legalSpecialty->subjects()->create([
-                'name' => $s['name']
-            ]);
+                // NO ELIMINAR SI YA TIENE CONSULTAS
+                if($subject->consultations()->exists()){
+                    continue;
+                }
+                $subject->delete();
+            }
+            // CREAR / ACTUALIZAR
+            foreach ($subjects as $s) {
+
+                // UPDATE
+                if(!empty($s['id'])){
+                    $subject = $legalSpecialty->subjects()->where('id', $s['id'])->first();
+                    if($subject){
+                        $subject->update(['name' => $s['name']]);
+                    }
+                }
+
+                // CREATE
+                else {
+                    $legalSpecialty->subjects()->create(['name' => $s['name']]);
+                }
+            }
+            DB::commit();
+
+            return redirect()->route('legal-specialties.index');
+
+        } catch (\Exception $e){
+            DB::rollBack();
+            throw $e;
         }
-
-        return redirect()->route('legal-specialties.index');
     }
 
     public function destroy(LegalSpecialty $legalSpecialty)

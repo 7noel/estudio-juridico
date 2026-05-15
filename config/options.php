@@ -192,4 +192,54 @@ return [
 
     ],
 
+    'agenda_event_types' => [
+
+        'hearing' => 'Audiencia',
+
+        'deadline' => 'Vencimiento',
+
+        'meeting' => 'Reunión',
+
+        'task' => 'Tarea',
+
+        'call' => 'Llamada',
+
+        'other' => 'Otro',
+
+    ],
+
+    'agenda_event_colors' => [
+
+        'hearing' => [
+            'background' => '#dc3545',
+            'text' => '#ffffff',
+        ],
+
+        'deadline' => [
+            'background' => '#ffc107',
+            'text' => '#000000',
+        ],
+
+        'meeting' => [
+            'background' => '#0d6efd',
+            'text' => '#ffffff',
+        ],
+
+        'task' => [
+            'background' => '#198754',
+            'text' => '#ffffff',
+        ],
+
+        'call' => [
+            'background' => '#0dcaf0',
+            'text' => '#000000',
+        ],
+
+        'other' => [
+            'background' => '#6c757d',
+            'text' => '#ffffff',
+        ],
+
+    ],
+
 ];

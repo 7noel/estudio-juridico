@@ -1,1 +1,1 @@
-<a href="{{ route('permissions.edit',$permission) }}" class="btn btn-sm btn-outline-primary"> Editar </a>
+<a href="{{ route('permissions.edit',$permission) }}" class="btn btn-sm btn-outline-primary"> <i class="bi bi-pencil"></i> Editar </a>

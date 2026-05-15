@@ -73,9 +73,11 @@ class CaseActivityController extends Controller
 
                     'case_activity_id' => $activity->id,
 
-                    'title' => $activity->title,
+                    'type' => $request->agenda_type,
 
-                    'description' => $request->description,
+                    'title' => $request->agenda_title,
+
+                    'description' => $request->agenda_description,
 
                     'start_datetime' =>
                         $request->agenda_start_datetime,
@@ -124,6 +126,8 @@ class CaseActivityController extends Controller
 
             // agenda
             'create_agenda_event' => 'nullable',
+
+            'agenda_type' => 'nullable|string',
 
             'agenda_title' => 'nullable|string|max:255',
 
@@ -175,6 +179,8 @@ class CaseActivityController extends Controller
 
                 $event->update([
 
+                    'type' => $request->agenda_type,
+
                     'title' =>
                         $request->agenda_title,
 
@@ -205,6 +211,8 @@ class CaseActivityController extends Controller
 
                     'case_activity_id' =>
                         $activity->id,
+
+                    'type' => $request->agenda_type,
 
                     'title' =>
                         $request->agenda_title,

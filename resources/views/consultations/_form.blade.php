@@ -283,7 +283,12 @@ $('#add-installment').click(function(){
                 <input type="date" name="installments[${i}][due_date]" class="form-control form-control-sm">
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-sm btn-outline-danger btn-remove">X</button>
+                <span class="badge bg-secondary">
+                    Pendiente
+                </span>
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-outline-danger btn-remove"> <i class="bi bi-trash"></i> </button>
             </td>
         </tr>
     `;
@@ -352,7 +357,13 @@ $('#generate_installments').click(function(){
                     <span class="badge bg-secondary">Pendiente</span>
                 </td>
                 <td class="text-center">
-                    <button type="button" class="btn btn-outline-danger btn-sm btn-remove">X</button>
+                    <span class="badge bg-secondary">
+                        Pendiente
+                    </span>
+                </td>
+
+                <td class="text-center">
+                    <button type="button" class="btn btn-outline-danger btn-sm btn-remove"> <i class="bi bi-trash"></i> </button>
                 </td>
             </tr>
         `;

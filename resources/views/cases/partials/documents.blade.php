@@ -59,34 +59,30 @@
 <div class="modal fade" id="modalDocument">
     <div class="modal-dialog">
         <div class="modal-content">
-
             <form id="form-document">
                 @csrf
                 <input type="hidden" id="doc_id">
-
                 <div class="modal-header">
                     <h6 id="docModalTitle">Subir documento</h6>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-
                 <div class="modal-body">
                     <div class="mb-2">
                         <label>Tipo</label>
-                        <select name="document_type" class="form-control mb-2">
+                        <select name="document_type" class="form-control form-control-sm mb-2">
+                            <option value=""> Seleccionar </option>
                             @foreach(config('options.document_types') as $k => $v)
                                 <option value="{{ $k }}">{{ $v }}</option>
                             @endforeach
                         </select>
                     </div>
-
                     <div class="mb-2">
                         <label>Título</label>
-                        <input type="text" name="title" class="form-control mb-2 text-uppercase" placeholder="">
+                        <input type="text" name="title" class="form-control form-control-sm mb-2 text-uppercase" placeholder="">
                     </div>
-
                     <div class="mb-2" id="fileInputWrapper">
                         <label>Documento</label>
-                        <input type="file" name="file" class="form-control">
+                        <input type="file" name="file" class="form-control form-control-sm">
                     </div>
                     <div class="mb-3 d-none" id="currentFileWrapper">
                         <label>Documento actual</label><br>
@@ -94,11 +90,9 @@
                             Ver archivo actual
                         </a>
                     </div>
-
                 </div>
-
                 <div class="modal-footer">
-                    <button class="btn btn-primary">Guardar</button>
+                    <button class="btn btn-sm btn-outline-primary"> <i class="bi bi-save"></i> Guardar</button>
                 </div>
 
             </form>

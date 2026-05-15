@@ -15,6 +15,8 @@ class AgendaEvent extends Model
 
         'case_activity_id',
 
+        'type',
+
         'title',
 
         'description',

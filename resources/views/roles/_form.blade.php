@@ -5,7 +5,7 @@
 	<input
 	type="text"
 	name="name"
-	class="form-control"
+	class="form-control form-control-sm"
 	value="{{ $role->name ?? '' }}"
 	required>
 </div>

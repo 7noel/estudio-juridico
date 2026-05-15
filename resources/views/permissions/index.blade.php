@@ -13,15 +13,7 @@
 	</div>
 	<div class="card-body">
 		<div class="table-responsive">
-			<table id="permissionsTable" class="table table-sm table-bordered table-striped">
-				<thead>
-					<tr>
-						<th>ID</th>
-						<th>Nombre</th>
-						<th>Acciones</th>
-					</tr>
-				</thead>
-			</table>
+			<table id="permissionsTable" class="table table-sm table-bordered table-striped"></table>
 		</div>
 	</div>
 
@@ -40,14 +32,13 @@ $(function(){
 		serverSide: true,
 		ajax: "{{ route('permissions.index') }}",
 		columns: [
-			{ data: 'id' },
-			{ data: 'name' },
-			{
-				data: 'actions',
-				orderable: false,
-				searchable: false
-			}
+			{ data: 'id', title: 'ID' },
+			{ data: 'name', title: 'Nombre' },
+			{ data: 'actions', title: 'Acciones', orderable: false, searchable: false }
 		],
+        columnDefs: [
+            { className: "text-center", targets: [0, 1, 2] },
+        ],
         scrollX: true,
         autoWidth: false,
 		pageLength: 50,

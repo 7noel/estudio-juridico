@@ -71,10 +71,15 @@
                     @foreach($consultation->installments as $index => $inst)
                         <tr>
                             <td>
+                                <input type="hidden"
+                                    name="installments[{{ $index }}][id]"
+                                    value="{{ $inst->id }}">
+
                                 <input type="number"
                                     name="installments[{{ $index }}][amount]"
                                     class="form-control form-control-sm text-end"
                                     value="{{ $inst->amount }}"
+                                    @if($inst->paid_amount > 0) readonly @endif
                                     required>
                             </td>
                             <td>
@@ -93,7 +98,7 @@
                                 @endif
                             </td>   
                             <td class="text-center">
-                                <button type="button" class="btn btn-sm btn-outline-danger btn-remove" title="Eliminar">X</button>
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-remove" @if($inst->paid_amount > 0) disabled @endif title="Eliminar"> <i class="bi bi-trash"></i> </button>
                             </td>
                         </tr>
                     @endforeach

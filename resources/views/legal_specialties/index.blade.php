@@ -32,6 +32,9 @@ $('#table').DataTable({
         {data:'subjects_count', title:'Materias'},
         {data:'actions', title:'Acciones'}
     ],
+    columnDefs: [
+        { className: "text-center", targets: [0, 1, 2, 3] },
+    ],
     scrollX: true,
     autoWidth: false,
     pageLength: 50,

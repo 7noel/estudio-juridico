@@ -117,6 +117,7 @@ class PaymentController extends Controller
                     'amount' => number_format($p->amount,2),
                     'date' => $p->payment_date->format('d/m/Y'),
                     'method' => config('options.payment_methods')[$p->payment_method] ?? '',
+                    'reference' => $p->reference ? '- '.$p->reference : '',
                 ];
             }),
             'has_case' => $inst->consultation->case ? true : false

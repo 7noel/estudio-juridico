@@ -12,7 +12,7 @@
 			@method('PUT')
 			@include('permissions._form')
 			<button class="btn btn-primary">
-				Actualizar
+				<i class="bi bi-save"></i> Actualizar
 			</button>
 		</form>
 	</div>

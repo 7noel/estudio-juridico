@@ -39,6 +39,8 @@
         <x-form.input
         name="mobile"
         label="Celular"
+        maxlength="9"
+        inputmode="numeric"
         :value="$client->mobile ?? ''"
         />
     </div>
@@ -84,6 +86,13 @@
 @push('scripts')
 
 <script>
+$(document).on('input', '[name="phone"]', function(){
+
+    this.value = this.value
+        .replace(/\D/g, '')
+        .slice(0, 9);
+
+});
 
 $(function(){
     $('#ubigeo_code_search').autocomplete({

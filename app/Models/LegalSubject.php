@@ -21,4 +21,9 @@ class LegalSubject extends Model
         return $this->belongsTo(LegalSpecialty::class);
     }
 
+    public function consultations()
+    {
+        return $this->hasMany(Consultation::class, 'legal_subject_id');
+    }
+
 }

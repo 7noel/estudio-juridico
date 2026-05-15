@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('case_id')->constrained('cases');
             $table->foreignId('case_activity_id')->nullable()->constrained('case_activities');
+            $table->string('type');
             $table->string('title');
             $table->text('description')->nullable();
             $table->dateTime('start_datetime');

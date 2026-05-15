@@ -107,23 +107,7 @@
 
     <div class="card-body">
         <div class="table-responsive">
-            <table id="consultationsTable" class="table table-sm table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Cliente</th>
-                        <th>Abogado</th>
-                        <th class="text-center">Tipo Servicio</th>
-                        <th class="text-center">Especialidad</th>
-                        <th class="text-center">Materia</th>
-                        <th class="text-center">Estado</th>
-                        <th class="text-center">Caso</th>
-                        <th class="text-center">Monto</th>
-                        <th class="text-center">Fecha</th>
-                        <th class="text-center">Acciones</th>
-                    </tr>
-                </thead>
-            </table>
+            <table id="consultationsTable" class="table table-sm table-bordered table-striped"></table>
         </div>
     </div>
 </div>
@@ -156,22 +140,22 @@ $(function(){
         },
 
         columns: [
-            { data: 'id' },
-            { data: 'client', name: 'client.full_name' },
-            { data: 'lawyer', name: 'lawyer.name' },
-            { data: 'service_type' },
-            { data: 'specialty', name: 'specialty.name' },
-            { data: 'subject', name: 'subject.name' },
-            { data: 'status' },
-            { data: 'case_link', name: 'case.id' },
-            { data: 'total_amount' },
-            { data: 'created_at' },
-            { data: 'actions', orderable: false, searchable: false }
+            { data: 'id', title: 'ID' },
+            { data: 'client', name: 'client.full_name', title: 'Cliente' },
+            { data: 'lawyer', name: 'lawyer.name', title: 'Abogado' },
+            { data: 'service_type', title: 'Tipo Servicio' },
+            { data: 'specialty', name: 'specialty.name', title: 'Especialidad' },
+            { data: 'subject', name: 'subject.name', title: 'Materia' },
+            { data: 'status', title: 'Estado' },
+            { data: 'case_link', name: 'case.id', title: 'Caso' },
+            { data: 'total_amount', title: 'Monto' },
+            { data: 'created_at', title: 'Fecha' },
+            { data: 'actions', title: 'Acciones', orderable: false, searchable: false }
         ],
 
         columnDefs: [
-            { className: "text-center", targets: [0, 3, 4, 5, 6, 7, 9,10] }, // ID, Estado, Fecha, Acciones
-            { className: "text-end", targets: [8] }, // Monto
+            { className: "text-center", targets: [0, 3, 4, 5, 6, 7, 9, 10] },
+            { className: "text-end", targets: [8] },
         ],
 
         scrollX: true,

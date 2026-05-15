@@ -17,11 +17,17 @@
                 <div class="border rounded p-2 mb-2">
 
                     <div class="d-flex justify-content-between">
-                        <strong>{{ $event->title }}</strong>
-
-                        <small>
-                            {{ $event->start_datetime->format('d/m/Y H:i') }}
-                        </small>
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary">
+                                    {{ config('options.agenda_event_types')[$event->type] ?? $event->type }}
+                                </span>
+                                <strong>{{ $event->title }}</strong>
+                            </div>
+                            <small>
+                                {{ $event->start_datetime->format('d/m/Y H:i') }}
+                            </small>
+                        </div>
                     </div>
 
                     <div class="text-muted">
@@ -36,6 +42,7 @@
                     <div class="text-end mt-2">
                         <button class="btn btn-sm btn-outline-primary btn-edit-event"
                             data-id="{{ $event->id }}"
+                            data-type="{{ $event->type }}"
                             data-title="{{ $event->title }}"
                             data-description="{{ $event->description }}"
                             data-start="{{ $event->start_datetime->format('Y-m-d\TH:i') }}"
@@ -84,66 +91,53 @@
             <div class="modal-body">
 
                 <form id="eventForm">
-
                     <input type="hidden" id="event_id">
-
+                    <div class="mb-2">
+                        <label>Tipo</label>
+                        <select id="event_type" class="form-select form-control-sm">
+                            <option value=""> Seleccionar </option>
+                            @foreach(config('options.agenda_event_types') as $key => $label)
+                                <option value="{{ $key }}"> {{ $label }} </option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="mb-2">
                         <label>Título</label>
-                        <input type="text" id="event_title" class="form-control text-uppercase">
+                        <input type="text" id="event_title" class="form-control form-control-sm text-uppercase">
                     </div>
-
                     <div class="mb-2">
                         <label>Descripción</label>
-                        <textarea id="event_description" class="form-control"></textarea>
+                        <textarea id="event_description" class="form-control form-control-sm"></textarea>
                     </div>
-
-<div class="row">
-
-    <div class="col-md-6 mb-2">
-        <label>Fecha inicio</label>
-        <input type="date"
-               id="event_start_date"
-               class="form-control">
-    </div>
-
-    <div class="col-md-6 mb-2">
-        <label>Hora inicio</label>
-        <select id="event_start_time"
-                class="form-select">
-        </select>
-    </div>
-
-</div>
-
-<div class="row">
-
-    <div class="col-md-6 mb-2">
-        <label>Fecha fin</label>
-        <input type="date"
-               id="event_end_date"
-               class="form-control">
-    </div>
-
-    <div class="col-md-6 mb-2">
-        <label>Hora fin</label>
-        <select id="event_end_time"
-                class="form-select">
-        </select>
-    </div>
-
-</div>
-
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label>Fecha inicio</label>
+                            <input type="date" id="event_start_date" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label>Hora inicio</label>
+                            <select id="event_start_time" class="form-select form-control-sm"> </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label>Fecha fin</label>
+                            <input type="date" id="event_end_date" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label>Hora fin</label>
+                            <select id="event_end_time" class="form-select form-control-sm"> </select>
+                        </div>
+                    </div>
                     <div class="mb-2">
                         <label>Lugar</label>
-                        <input type="text" id="event_location" class="form-control">
+                        <input type="text" id="event_location" class="form-control form-control-sm">
                     </div>
-
                 </form>
-
             </div>
 
             <div class="modal-footer">
-                <button class="btn btn-primary" id="saveEvent">Guardar</button>
+                <button class="btn btn-sm btn-outline-primary" id="saveEvent"> <i class="bi bi-save"></i> Guardar</button>
             </div>
 
         </div>
@@ -272,6 +266,8 @@ $(document).on('click', '.btn-edit-event', function(){
 
     eventId = $(this).data('id');
 
+    $('#event_type').val($(this).data('type'));
+
     $('#event_title').val($(this).data('title'));
 
     $('#event_description').val($(this).data('description'));
@@ -336,6 +332,8 @@ $('#saveEvent').click(function(){
         data: {
 
             _token: '{{ csrf_token() }}',
+
+            type: $('#event_type').val(),
 
             title: $('#event_title').val(),
 
@@ -536,6 +534,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             eventId = event.id;
 
+            $('#event_type').val(event.extendedProps.type);
+
             $('#event_title').val(event.title);
 
             $('#event_description').val(
@@ -598,7 +598,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     end_datetime: info.event.endStr,
 
-                    title: info.event.title
+                    title: info.event.title,
 
                 },
 
@@ -638,7 +638,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     end_datetime: info.event.endStr,
 
-                    title: info.event.title
+                    title: info.event.title,
+
+                    type: info.event.type
 
                 },
 
@@ -660,6 +662,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         eventDidMount: function(info){
 
+            let type =
+                info.event.extendedProps.type_label ?? '';
+
             let description =
                 info.event.extendedProps.description ?? '';
 
@@ -680,7 +685,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="text-start">
 
                     <strong>
-                        ${info.event.title}
+                        ${type} - ${info.event.title}
                     </strong>
 
                     <hr class="my-1">
@@ -762,7 +767,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 .fc .fc-event {
 
-    border: none !important;
+    /*border: none !important;*/
 
     border-radius: 8px !important;
 
@@ -775,6 +780,22 @@ document.addEventListener('DOMContentLoaded', function () {
     cursor: pointer;
 
     box-shadow: 0 1px 2px rgba(0,0,0,.15);
+
+}
+
+.fc .fc-event:hover {
+
+    transform: translateY(-1px);
+
+    transition: .15s;
+
+}
+
+.fc-event-title {
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
 }
 

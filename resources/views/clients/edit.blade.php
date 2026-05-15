@@ -12,7 +12,7 @@
 			@method('PUT')
 			@include('clients._form')
 			<x-form.button>
-				Actualizar
+				<i class="bi bi-save"></i> Actualizar
 			</x-form.button>
 		</form>
 	</div>

@@ -53,17 +53,17 @@
 
                         <div class="col-md-3">
                             <label>Monto</label>
-                            <input type="number" step="0.01" name="amount" id="payment_amount" class="form-control" required>
+                            <input type="number" step="0.01" name="amount" id="payment_amount" class="form-control form-control-sm text-end" required>
                         </div>
 
                         <div class="col-md-3">
                             <label>Fecha</label>
-                            <input type="date" name="payment_date" id="payment_date" class="form-control" required>
+                            <input type="date" name="payment_date" id="payment_date" class="form-control form-control-sm" required>
                         </div>
 
                         <div class="col-md-3">
                             <label>Medio</label>
-                            <select name="payment_method" class="form-control">
+                            <select name="payment_method" class="form-control form-control-sm">
                                 @foreach(config('options.payment_methods') as $k => $v)
                                     <option value="{{ $k }}">{{ $v }}</option>
                                 @endforeach
@@ -72,7 +72,7 @@
 
                         <div class="col-md-3">
                             <label>Referencia</label>
-                            <input type="text" name="reference" class="form-control">
+                            <input type="text" name="reference" class="form-control form-control-sm">
                         </div>
 
                     </div>
@@ -88,8 +88,8 @@
                     </div>
 
                     <div class="mt-3 text-end">
-                        <button class="btn btn-primary btn-sm">
-                            Guardar pago
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-save"></i> Guardar pago
                         </button>
                     </div>
 
@@ -138,12 +138,12 @@ $(document).on('click', '.btn-pay', function(){
             html += `
                 <div class="border rounded p-2 mb-1 d-flex justify-content-between align-items-center">
                     <div>
-                        <strong>S/ ${p.amount}</strong><br>
-                        <small>${p.date} - ${p.method}</small>
+                        <strong>S/ ${p.amount}</strong> - 
+                        <small>${p.date} - ${p.method} ${p.reference}</small>
                     </div>
                     <div>
                         <button class="btn btn-sm btn-outline-danger btn-delete-payment" data-id="${p.id}">
-                            X
+                            <i class="bi bi-trash"></i>
                         </button>
                     </div>
                 </div>

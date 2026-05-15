@@ -10,7 +10,6 @@
             label="Especialidad"
             :value="$legalSpecialty->name ?? ''"
             required
-            uppercase
         />
     </div>
 </div>
@@ -43,7 +42,13 @@
 
                             {{-- 🔥 SIN NAME --}}
                             <input
-                                class="form-control subject-input text-uppercase"
+                                type="hidden"
+                                class="subject-id"
+                                value="{{ $s->id }}"
+                            >
+
+                            <input
+                                class="form-control subject-input"
                                 value="{{ $s->name }}"
                                 placeholder="Nombre de la materia"
                                 required
@@ -53,7 +58,7 @@
 
                     <td style="width: 60px;" class="text-center">
                         <button type="button" class="btn btn-outline-danger btn-sm btn-remove">
-                            <i class="bi bi-x"></i>
+                            <i class="bi bi-trash"></i>
                         </button>
                     </td>
                 </tr>
@@ -90,7 +95,7 @@ $('#add-subject').click(function(){
                     </span>
 
                     <input
-                        class="form-control subject-input text-uppercase"
+                        class="form-control subject-input"
                         placeholder="Nombre de la materia"
                         required
                     >
@@ -99,7 +104,7 @@ $('#add-subject').click(function(){
 
             <td style="width: 60px;" class="text-center">
                 <button type="button" class="btn btn-outline-danger btn-sm btn-remove">
-                    <i class="bi bi-x"></i>
+                    <i class="bi bi-trash"></i>
                 </button>
             </td>
         </tr>
@@ -140,15 +145,29 @@ $('form').on('submit', function(){
 
         let input = $(this).find('.subject-input');
 
+        let idInput = $(this).find('.subject-id');
+
         let value = input.val().trim();
 
         if(value !== ''){
 
-            // 🔥 eliminar cualquier name previo
-            input.removeAttr('name');
+            input.attr(
+                'name',
+                `subjects[${index}][name]`
+            );
 
-            // 🔥 asignar nuevo name limpio
-            input.attr('name', `subjects[${index}][name]`);
+            // ====================================
+            // ID
+            // ====================================
+
+            if(idInput.length){
+
+                idInput.attr(
+                    'name',
+                    `subjects[${index}][id]`
+                );
+
+            }
 
             index++;
         }

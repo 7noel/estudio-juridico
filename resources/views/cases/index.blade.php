@@ -105,22 +105,7 @@
     {{-- TABLA --}}
     <div class="card-body">
         <div class="table-responsive">
-            <table id="casesTable" class="table table-sm table-bordered table-striped w-100">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Cliente</th>
-                        <th>Abogado</th>
-                        <th>Tipo</th>
-                        <th>Especialidad</th>
-                        <th>Materia</th>
-                        <th>Consulta</th>
-                        <th>Estado</th>
-                        <th>Fecha</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-            </table>
+            <table id="casesTable" class="table table-sm table-bordered table-striped w-100"></table>
         </div>
     </div>
 
@@ -148,16 +133,16 @@ $(function(){
             }
         },
         columns: [
-            { data: 'id' },
-            { data: 'client' },
-            { data: 'lawyer' },
-            { data: 'service_type' },
-            { data: 'specialty' },
-            { data: 'subject' },
-            { data: 'consultation_link', name: 'consultation.id' },
-            { data: 'status' },
-            { data: 'opened_at' },
-            { data: 'actions', orderable: false, searchable: false }
+            { data: 'id', title: 'ID' },
+            { data: 'client', title: 'Cliente' },
+            { data: 'lawyer', title: 'Abogado' },
+            { data: 'service_type', title: 'Tipo Servicio' },
+            { data: 'specialty', title: 'Especialidad' },
+            { data: 'subject', title: 'Materia' },
+            { data: 'consultation_link', name: 'consultation.id', title: 'Consulta' },
+            { data: 'status', title: 'Estado' },
+            { data: 'opened_at', title: 'Fecha' },
+            { data: 'actions', title: 'Acciones', orderable: false, searchable: false }
         ],
         columnDefs: [
             { className: "text-center", targets: [0,3,4,5,6,7,8,9] },

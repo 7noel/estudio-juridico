@@ -13,6 +13,7 @@ class AgendaEventController extends Controller
         $this->authorize('update', $case);
 
         $request->validate([
+            'type' => 'required|string',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'start_datetime' => 'required|date',
@@ -21,6 +22,7 @@ class AgendaEventController extends Controller
         ]);
 
         $case->agendaEvents()->create([
+            'type' => $request->type,
             'title' => $request->title,
             'description' => $request->description,
             'start_datetime' => $request->start_datetime,
@@ -54,6 +56,7 @@ class AgendaEventController extends Controller
         
         // 🔥 UPDATE COMPLETO (modal)
         $request->validate([
+            'type' => 'required|string',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'start_datetime' => 'required|date',
@@ -62,6 +65,7 @@ class AgendaEventController extends Controller
         ]);
 
         $event->update($request->only([
+            'type',
             'title',
             'description',
             'start_datetime',
@@ -85,25 +89,28 @@ class AgendaEventController extends Controller
     {
         $this->authorize('view', $case);
 
-        return $case->agendaEvents->map(function ($event) {
+        $colors = config('options.agenda_event_colors');
 
-            $colors = [
-                'hearing' => '#dc3545',
-                'meeting' => '#0d6efd',
-                'call' => '#0dcaf0',
-                'document' => '#6c757d',
+        return $case->agendaEvents->map(function ($event) use ($colors) {
+
+            $style = $colors[$event->type] ?? [
+
+                'background' => '#6c757d',
+                'text' => '#ffffff',
+
             ];
-
-            // puedes usar subtype si luego lo agregas
-            $color = $colors['default'] ?? '#198754';
 
             return [
                 'id' => $event->id,
                 'title' => $event->title,
                 'start' => $event->start_datetime,
                 'end' => $event->end_datetime,
-                'color' => $color,
+                'backgroundColor' => $style['background'],
+                'borderColor' => $style['background'],
+                'textColor' => $style['text'],
                 'extendedProps' => [
+                    'type' => $event->type,
+                    'type_label' => config('options.agenda_event_types')[$event->type] ?? 'Otro',
                     'description' => $event->description,
                     'location' => $event->location,
                 ],

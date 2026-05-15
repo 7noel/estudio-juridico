@@ -15,17 +15,7 @@
 	</div>
 	<div class="card-body">
 		<div class="table-responsive">
-			<table id="usersTable" class="table table-sm table-bordered table-striped">
-				<thead>
-					<tr>
-						<th>ID</th>
-						<th>Nombre</th>
-						<th>Email</th>
-						<th>Rol</th>
-						<th>Acciones</th>
-					</tr>
-				</thead>
-			</table>
+			<table id="usersTable" class="table table-sm table-bordered table-striped"></table>
 		</div>
 	</div>
 </div>
@@ -45,16 +35,15 @@ $(function(){
 		serverSide: true,
 		ajax: "{{ route('users.index') }}",
 		columns: [
-			{ data: 'id' },
-			{ data: 'name' },
-			{ data: 'email' },
-			{ data: 'role' },
-			{
-				data: 'actions',
-				orderable: false,
-				searchable: false
-			}
+			{ data: 'id', title: 'ID' },
+			{ data: 'name', title: 'Nombre' },
+			{ data: 'email', title: 'Correo' },
+			{ data: 'role', title: 'Rol' },
+			{ data: 'actions', title: 'Acciones', orderable: false, searchable: false }
 		],
+        columnDefs: [
+            { className: "text-center", targets: [0, 2, 3, 4] },
+        ],
         scrollX: true,
         autoWidth: false,
 		pageLength: 50,

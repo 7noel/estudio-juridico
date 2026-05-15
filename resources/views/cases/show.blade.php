@@ -51,7 +51,7 @@
                 </button>
 
                 <button class="btn btn-sm btn-success btn-change-status" data-status="closed">
-                    <i class="bi bi-check-circle-fill"></i> Cerrar Caso
+                    <i class="bi bi-check-circle-fill"></i> Finalizar Caso
                 </button>
             @endif
 

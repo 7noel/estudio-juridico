@@ -5,7 +5,6 @@
         label="Nombre"
         :value="$user->name ?? ''"
         required
-        uppercase
         />
     </div>
     <div class="col-md-3">

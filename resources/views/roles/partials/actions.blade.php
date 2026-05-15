@@ -1,1 +1,1 @@
-<a href="{{ route('roles.edit',$role) }}" class="btn btn-sm btn-outline-primary"> Editar </a>
+<a href="{{ route('roles.edit',$role) }}" class="btn btn-sm btn-outline-primary"> <i class="bi bi-pencil"></i> Editar </a>
