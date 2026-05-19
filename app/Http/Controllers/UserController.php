@@ -65,6 +65,7 @@ class UserController extends Controller
         $user = User::create([
             'name' => $request->name,
             'establishment_id' => $request->establishment_id,
+            'mobile' => $request->mobile,
             'email' => $request->email,
             'password' => \Hash::make($request->password),
         ]);
@@ -103,6 +104,7 @@ class UserController extends Controller
         $data = [
             'name' => $request->name,
             'establishment_id' => $request->establishment_id,
+            'mobile' => $request->mobile,
             'email' => $request->email,
         ];
 

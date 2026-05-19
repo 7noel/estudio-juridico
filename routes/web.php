@@ -16,6 +16,23 @@ use App\Http\Controllers\CaseActivityController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\AgendaEventController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\NotificationSettingController;
+
+use App\Services\WhatsAppService;
+
+Route::get('/test-whatsapp', function () {
+
+    $service = app(WhatsAppService::class);
+
+    return $service->sendText(
+
+        '51945641484',
+
+        'Hola, prueba desde Laravel 12'
+
+    );
+
+});
 
 Route::get('/', function () {
     if(auth()->check()){
@@ -111,3 +128,31 @@ Route::get(
     'ubigeos/search',
     [ClientController::class,'searchUbigeo']
 )->name('ubigeos.search');
+
+Route::middleware(['auth'])
+    ->prefix('notification-settings')
+    ->name('notification-settings.')
+    ->group(function () {
+
+        Route::get('/', [NotificationSettingController::class, 'index'])
+            ->name('index');
+
+        Route::get('/create', [NotificationSettingController::class, 'create'])
+            ->name('create');
+
+        Route::post('/', [NotificationSettingController::class, 'store'])
+            ->name('store');
+
+        Route::get('/{notificationSetting}/edit', [NotificationSettingController::class, 'edit'])
+            ->name('edit');
+
+        Route::put('/{notificationSetting}', [NotificationSettingController::class, 'update'])
+            ->name('update');
+
+        Route::delete('/{notificationSetting}', [NotificationSettingController::class, 'destroy'])
+            ->name('destroy');
+
+        Route::get('/datatable/data', [NotificationSettingController::class, 'datatable'])
+            ->name('datatable');
+
+    });

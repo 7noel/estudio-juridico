@@ -27,7 +27,10 @@ return new class extends Migration
             $table->string('status');
             $table->timestamp('opened_at')->nullable();
             $table->timestamp('closed_at')->nullable();
+
+            $table->index(['status', 'opened_at']);
             $table->foreignId('created_by')->constrained('users');
+            
             $table->timestamps();
             $table->softDeletes();
         });

@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             EmployeeSeeder::class,
             PermissionSeeder::class,
             ClientSeeder::class,
+            NotificationSettingSeeder::class,
         ]);
         //$this->call(AdminTableSeeder::class);
         

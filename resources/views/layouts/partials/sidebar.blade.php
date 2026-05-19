@@ -75,6 +75,11 @@
 		        <i class="bi bi-key"></i> Permisos
 		    </a>
 		</li>
+		<li class="nav-item">
+		    <a class="nav-link text-dark" href="{{ route('notification-settings.index') }}">
+		        <i class="bi bi-bell"></i> Notificaciones
+		    </a>
+		</li>
 		@endrole
 	</ul>
 </div>

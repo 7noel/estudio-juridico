@@ -31,6 +31,11 @@ class UserRequest extends FormRequest
                     ->ignore($userId)
             ],
 
+            'mobile' => [
+                'nullable',
+                'regex:/^9\d{8}$/'
+            ],
+            
             'role' => [
                 'required',
                 'string'

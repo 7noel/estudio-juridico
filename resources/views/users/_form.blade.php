@@ -29,6 +29,15 @@
 <div class="row mb-3">
     <div class="col-md-3">
         <x-form.input
+        name="mobile"
+        label="Celular"
+        maxlength="9"
+        inputmode="numeric"
+        :value="$user->mobile ?? ''"
+        />
+    </div>
+    <div class="col-md-3">
+        <x-form.input
         name="email"
         label="Email"
         type="email"

@@ -748,8 +748,39 @@ document.addEventListener('DOMContentLoaded', function () {
 
 .fc .fc-button {
 
-    border-radius: 8px !important;
-    padding: 6px 12px !important;
+    background: #ffffff !important;
+    border: 1px solid #dbe2ea !important;
+    color: #334155 !important;
+
+    border-radius: 10px !important;
+    padding: 6px 14px !important;
+
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(0,0,0,.04);
+
+    transition: all .2s ease;
+
+}
+
+.fc .fc-button:hover {
+
+    background: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+
+}
+
+.fc .fc-button.fc-button-active {
+
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+    color: #fff !important;
+
+}
+
+.fc .fc-button:focus {
+
+    box-shadow: 0 0 0 .2rem rgba(37,99,235,.15) !important;
 
 }
 
@@ -767,19 +798,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
 .fc .fc-event {
 
-    /*border: none !important;*/
+    background: #3b82f6;
+    border: none !important;
+
+    color: white;
 
     border-radius: 8px !important;
 
-    padding: 2px 6px;
+    padding: 3px 7px;
 
     font-size: 12px;
-
     font-weight: 500;
 
-    cursor: pointer;
-
-    box-shadow: 0 1px 2px rgba(0,0,0,.15);
+    box-shadow: 0 1px 2px rgba(0,0,0,.10);
 
 }
 
@@ -801,7 +832,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
 .fc .fc-day-today {
 
-    background: #eef4ff !important;
+    background: #eff6ff !important;
+    position: relative;
+
+}
+
+.fc .fc-day-today::after {
+
+    content: '';
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 4px;
+    height: 100%;
+
+    background: #2563eb;
 
 }
 

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('agenda_events', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('case_id')->constrained('cases');
+            $table->foreignId('case_id')->nullable()->constrained('cases');
             $table->foreignId('case_activity_id')->nullable()->constrained('case_activities');
             $table->string('type');
             $table->string('title');
@@ -24,6 +24,9 @@ return new class extends Migration
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();
             $table->softDeletes();
+            $table->index('start_datetime');
+            $table->index('case_id');
+            $table->index(['case_id', 'start_datetime']);
         });
     }
 

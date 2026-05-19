@@ -196,14 +196,106 @@ class ConsultationController extends Controller
                 'total_amount'
             ));
 
-            $consultation->installments()->delete();
+            /*
+            |--------------------------------------------------------------------------
+            | CUOTAS
+            |--------------------------------------------------------------------------
+            */
 
-            foreach ($request->installments ?? [] as $i => $item) {
-                $consultation->installments()->create([
-                    'installment_number' => $i + 1,
-                    'amount' => $item['amount'],
-                    'due_date' => $item['due_date'],
-                ]);
+            $installments = collect($request->installments ?? [])
+                ->values();
+
+            /*
+            |--------------------------------------------------------------------------
+            | IDS RECIBIDOS
+            |--------------------------------------------------------------------------
+            */
+
+            $receivedIds = $installments
+                ->pluck('id')
+                ->filter()
+                ->values();
+
+            /*
+            |--------------------------------------------------------------------------
+            | ELIMINAR SOLO LOS QUE YA NO EXISTEN
+            |--------------------------------------------------------------------------
+            */
+
+            $installmentsToDelete = $consultation
+                ->installments()
+                ->whereNotIn('id', $receivedIds)
+                ->get();
+
+            foreach($installmentsToDelete as $installment){
+
+                // ======================================
+                // NO ELIMINAR SI YA TIENE PAGOS
+                // ======================================
+
+                if($installment->payments()->exists()){
+
+                    continue;
+
+                }
+
+                $installment->delete();
+
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | CREAR / ACTUALIZAR
+            |--------------------------------------------------------------------------
+            */
+
+            foreach ($installments as $i => $item) {
+
+                // ======================================
+                // UPDATE
+                // ======================================
+
+                if(!empty($item['id'])){
+
+                    $installment = $consultation
+                        ->installments()
+                        ->where('id', $item['id'])
+                        ->first();
+
+                    if($installment){
+
+                        $installment->update([
+
+                            'installment_number' => $i + 1,
+
+                            'amount' => $item['amount'],
+
+                            'due_date' => $item['due_date'],
+
+                        ]);
+
+                    }
+
+                }
+
+                // ======================================
+                // CREATE
+                // ======================================
+
+                else {
+
+                    $consultation->installments()->create([
+
+                        'installment_number' => $i + 1,
+
+                        'amount' => $item['amount'],
+
+                        'due_date' => $item['due_date'],
+
+                    ]);
+
+                }
+
             }
 
             if (!in_array($consultation->status, ['accepted', 'rejected'])) {
