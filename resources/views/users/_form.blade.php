@@ -50,6 +50,7 @@
         name="password"
         label="Contraseña"
         type="password"
+        togglePassword="true"
         />
     </div>
 </div>

@@ -17,6 +17,16 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\AgendaEventController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationSettingController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\Reports\FinancialReportController;
+use App\Http\Controllers\Reports\CollectionReportController;
+use App\Http\Controllers\Reports\ProfitabilityReportController;
+use App\Http\Controllers\Reports\OperationalReportController;
+use App\Http\Controllers\Reports\LawyerReportController;
+use App\Http\Controllers\Reports\ClientReportController;
+use App\Http\Controllers\Reports\AgendaReportController;
+use App\Http\Controllers\Reports\CashReportController;
+use App\Http\Controllers\DashboardAgendaController;
 
 use App\Services\WhatsAppService;
 
@@ -122,37 +132,48 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/cases/{case}/agenda/events', [AgendaEventController::class, 'events']);
     Route::put('/cases/{case}/quick-update', [CaseFileController::class, 'quickUpdate'])->name('cases.quick-update');
 
+    Route::post('expenses', [ExpenseController::class, 'store'])->name('expenses.store');
+    Route::put('expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
+    Route::delete('expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
 });
 
-Route::get(
-    'ubigeos/search',
-    [ClientController::class,'searchUbigeo']
-)->name('ubigeos.search');
+Route::get('ubigeos/search', [ClientController::class,'searchUbigeo'])->name('ubigeos.search');
 
-Route::middleware(['auth'])
-    ->prefix('notification-settings')
-    ->name('notification-settings.')
-    ->group(function () {
+Route::middleware(['auth'])->prefix('notification-settings')->name('notification-settings.')->group(function () {
+    Route::get('/', [NotificationSettingController::class, 'index'])->name('index');
+    Route::get('/create', [NotificationSettingController::class, 'create'])->name('create');
+    Route::post('/', [NotificationSettingController::class, 'store'])->name('store');
+    Route::get('/{notificationSetting}/edit', [NotificationSettingController::class, 'edit'])->name('edit');
+    Route::put('/{notificationSetting}', [NotificationSettingController::class, 'update'])->name('update');
+    Route::delete('/{notificationSetting}', [NotificationSettingController::class, 'destroy'])->name('destroy');
+    Route::get('/datatable/data', [NotificationSettingController::class, 'datatable'])->name('datatable');
+});
 
-        Route::get('/', [NotificationSettingController::class, 'index'])
-            ->name('index');
 
-        Route::get('/create', [NotificationSettingController::class, 'create'])
-            ->name('create');
+Route::prefix('reports')->name('reports.')->group(function () {
+    Route::get( 'collection', [CollectionReportController::class, 'index'])->name('collection');
+    Route::get( 'collection/datatable', [CollectionReportController::class, 'datatable'])->name('collection.datatable');
+    Route::get( 'financial', [FinancialReportController::class, 'index'])->name('financial');
+    Route::get( 'financial/datatable', [FinancialReportController::class, 'datatable'])->name('financial.datatable');
+    Route::get( 'profitability', [ProfitabilityReportController::class, 'index'])->name('profitability');
+    Route::get( 'profitability/datatable', [ProfitabilityReportController::class, 'datatable'])->name('profitability.datatable');
+    Route::get( 'operational', [OperationalReportController::class, 'index'])->name('operational');
+    Route::get( 'operational/datatable', [OperationalReportController::class, 'datatable'])->name('operational.datatable');
+    Route::get( 'lawyers', [LawyerReportController::class, 'index'])->name('lawyers');
+    Route::get( 'lawyers/datatable', [LawyerReportController::class, 'datatable'])->name('lawyers.datatable');
+    Route::get( 'clients', [ClientReportController::class, 'index'])->name('clients');
+    Route::get( 'clients/datatable', [ClientReportController::class, 'datatable'])->name('clients.datatable');
+    Route::get( 'agenda', [AgendaReportController::class, 'index'])->name('agenda');
+    Route::get( 'agenda/datatable', [AgendaReportController::class, 'datatable'])->name('agenda.datatable');
+    Route::get( 'cash', [CashReportController::class, 'index'])->name('cash');
+    Route::get( 'cash/datatable', [CashReportController::class, 'datatable'])->name('cash.datatable');
+});
 
-        Route::post('/', [NotificationSettingController::class, 'store'])
-            ->name('store');
+Route::prefix('dashboard/agenda')->name('dashboard.agenda.')->group(function () {
+    Route::get('events', [DashboardAgendaController::class, 'events'])->name('events');
+    Route::post('/', [DashboardAgendaController::class, 'store'])->name('store');
+    Route::put('/{event}', [DashboardAgendaController::class, 'update'])->name('update');
+    Route::delete('/{event}', [DashboardAgendaController::class, 'destroy'])->name('destroy');
+});
 
-        Route::get('/{notificationSetting}/edit', [NotificationSettingController::class, 'edit'])
-            ->name('edit');
-
-        Route::put('/{notificationSetting}', [NotificationSettingController::class, 'update'])
-            ->name('update');
-
-        Route::delete('/{notificationSetting}', [NotificationSettingController::class, 'destroy'])
-            ->name('destroy');
-
-        Route::get('/datatable/data', [NotificationSettingController::class, 'datatable'])
-            ->name('datatable');
-
-    });
+Route::get('dashboard/legal-events', [DashboardController::class, 'calendarEvents'])->name('dashboard.legal-events');

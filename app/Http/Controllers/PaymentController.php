@@ -31,18 +31,48 @@ class PaymentController extends Controller
             ], 422);
         }
 
+        $consultation = $installment->consultation;
+
+        $description = null;
+
+        if ($consultation) {
+            $case = $consultation->case;
+            if ($case) {
+                $description = 'Caso ' . optional($case)->id . ' - Consulta ' . optional($consultation)->id . ' - Cuota ' . $installment->installment_number;
+            } else {
+                $description = 'Consulta ' . optional($consultation)->id . ' - Cuota ' . $installment->installment_number;
+            }
+        } elseif ($request->description) {
+            $description = $request->description;
+        }
+
         // 🔥 CREAR PAGO
         $payment = Payment::create([
+            'establishment_id' => $consultation->establishment_id,
             'consultation_id' => $request->consultation_id,
             'consultation_installment_id' => $installment->id,
             'amount' => $request->amount,
             'payment_date' => $request->payment_date,
             'payment_method' => $request->payment_method,
+            'reference' => $request->reference,
+            'description' => $description,
             'generate_case' => $request->generate_case ? 1 : 0,
             'created_by' => auth()->user()->id,
         ]);
 
-        $consultation = $installment->consultation;
+        /*
+        |--------------------------------------------------------------------------
+        | Actualizar paid_amount
+        |--------------------------------------------------------------------------
+        */
+
+        $installment->update([
+
+            'paid_amount' => $installment
+                ->payments()
+                ->sum('amount')
+
+        ]);
 
         // 🔥 GENERAR CASO SOLO SI NO EXISTE
         if ($request->generate_case && !$consultation->case) {
@@ -126,9 +156,35 @@ class PaymentController extends Controller
 
     public function delete(Request $request)
     {
-        Payment::findOrFail($request->id)->delete();
+        $payment = Payment::findOrFail($request->id);
 
-        return response()->json(['ok'=>true]);
+        $installment = $payment->installment;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Eliminar pago
+        |--------------------------------------------------------------------------
+        */
+
+        $payment->delete();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Actualizar paid_amount
+        |--------------------------------------------------------------------------
+        */
+
+        $installment->update([
+
+            'paid_amount' => $installment
+                ->payments()
+                ->sum('amount')
+
+        ]);
+
+        return response()->json([
+            'ok' => true
+        ]);
     }
 
 }

@@ -26,6 +26,9 @@ return new class extends Migration
             $table->foreignId('created_by')->constrained('users');
             $table->timestamp('assigned_at')->nullable();
             $table->timestamp('evaluated_at')->nullable();
+            $table->timestamp('quoted_at')->nullable();
+            $table->timestamp('accepted_at')->nullable();
+            $table->timestamp('rejected_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

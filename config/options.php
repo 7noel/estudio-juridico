@@ -242,4 +242,32 @@ return [
 
     ],
 
+    'expense_categories' => [
+
+        'judicial_fee' => 'Tasa judicial',
+
+        'transport' => 'Movilidad',
+
+        'copies' => 'Copias e impresiones',
+
+        'sunarp' => 'SUNARP',
+
+        'notary' => 'Notaría',
+
+        'expertise' => 'Peritaje',
+
+        'travel' => 'Viáticos',
+
+        'office' => 'Gastos de oficina',
+
+        'services' => 'Servicios',
+
+        'marketing' => 'Marketing',
+
+        'taxes' => 'Impuestos',
+
+        'other' => 'Otros',
+
+    ],
+
 ];

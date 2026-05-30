@@ -28,6 +28,7 @@ class CaseFile extends Model
         'opened_at',
         'closed_at',
         'created_by',
+        'result',
     ];
 
     protected $casts = [
@@ -114,9 +115,14 @@ class CaseFile extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function expenses()
+    {
+        return $this->hasMany(Expense::class, 'case_id');
+    }
+
     /*
     |--------------------------------------------------------------------------
-    | RELATIONS
+    | SCOPES
     |--------------------------------------------------------------------------
     */
 

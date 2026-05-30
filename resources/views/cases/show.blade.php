@@ -137,11 +137,12 @@
         @if($canViewCaseContent)
             @include('cases.partials.activities')
             @include('cases.partials.documents')
+            @include('cases.partials.expenses')
             @include('cases.partials.events')
         @else
             <div class="alert alert-warning">
                 Debes iniciar el caso para registrar
-                actividades, documentos y agenda.
+                actividades, documentos, gastos y agenda.
             </div>
         @endif
 

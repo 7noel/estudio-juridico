@@ -11,9 +11,9 @@
     {{-- Email --}}
     <x-form.input name="email" type="email" label="Correo electrónico" required/>
     {{-- Password --}}
-    <x-form.input name="password" type="password" label="Contraseña" required/>
+    <x-form.input name="password" type="password" label="Contraseña" togglePassword="true" required/>
     {{-- Remember --}}
-    <div class="form-check mb-3">
+    <div class="form-check mt-2 mb-2">
         <input type="checkbox" name="remember" class="form-check-input" id="remember">
         <label class="form-check-label" for="remember"> Recordarme </label>
     </div>
@@ -43,6 +43,25 @@ $('#loginForm').on('submit', function (e) {
         $('input[name="_token"]').val(data.token);
         $('#loginForm')[0].submit();
     });
+});
+
+$(document).on('click', '.toggle-password', function () {
+    let button = $(this);
+    let input = button.closest('.input-group').find('input');
+
+    if (input.attr('type') === 'password') {
+
+        input.attr('type', 'text');
+
+        button.html('<i class="bi bi-eye-slash"></i>');
+
+    } else {
+
+        input.attr('type', 'password');
+
+        button.html('<i class="bi bi-eye"></i>');
+    }
+
 });
 </script>
 

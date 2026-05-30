@@ -4,7 +4,8 @@
     'type' => 'text',
     'value' => '',
     'required' => false,
-    'uppercase' => false
+    'uppercase' => false,
+    'togglePassword' => false
 ])
 
 <div class="form-group">
@@ -18,18 +19,48 @@
         </x-form.label>
     @endif
 
-    <input
-        type="{{ $type }}"
-        name="{{ $name }}"
-        id="{{ $name }}"
-        value="{{ old($name, $value) }}"
+    @if($togglePassword && $type === 'password')
 
-        {{ $required ? 'required' : '' }}
+        <div class="input-group">
 
-        {{ $attributes->merge([
-            'class' => 'form-control form-control-sm ' . ($uppercase ? 'text-uppercase' : '')
-        ]) }}
-    >
+            <input
+                type="password"
+                name="{{ $name }}"
+                id="{{ $name }}"
+                value="{{ old($name, $value) }}"
+
+                {{ $required ? 'required' : '' }}
+
+                {{ $attributes->merge([
+                    'class' => 'form-control form-control-sm password-input ' . ($uppercase ? 'text-uppercase' : '')
+                ]) }}
+            >
+
+            <button
+                class="btn btn-sm btn-outline-secondary toggle-password"
+                type="button"
+            >
+                <i class="bi bi-eye"></i>
+            </button>
+
+        </div>
+
+    @else
+
+        <input
+            type="{{ $type }}"
+            name="{{ $name }}"
+            id="{{ $name }}"
+            value="{{ old($name, $value) }}"
+
+            {{ $required ? 'required' : '' }}
+
+            {{ $attributes->merge([
+                'class' => 'form-control form-control-sm ' . ($uppercase ? 'text-uppercase' : '')
+            ]) }}
+        >
+
+    @endif
 
     <x-form.error :name="$name" />
 

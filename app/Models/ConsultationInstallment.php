@@ -9,10 +9,11 @@ class ConsultationInstallment extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['consultation_id', 'installment_number', 'amount', 'due_date'];
+    protected $fillable = ['establishment_id', 'consultation_id', 'installment_number', 'amount', 'due_date', 'paid_at', 'paid_amount'];
 
     protected $casts = [
         'due_date' => 'date',
+        'paid_at' => 'datetime',
     ];
 
     /*
@@ -32,15 +33,15 @@ class ConsultationInstallment extends Model
     }
 
     // 💰 total pagado
-    public function getPaidAmountAttribute()
-    {
-        return $this->payments()->sum('amount');
-    }
+    // public function getPaidAmountAttribute()
+    // {
+    //     return $this->payments()->sum('amount');
+    // }
 
     // 💸 saldo pendiente
     public function getPendingAmountAttribute()
     {
-        return $this->amount - $this->paid_amount;
+        return round($this->amount - $this->paid_amount, 2);
     }
 
     // ✔ pagado completamente

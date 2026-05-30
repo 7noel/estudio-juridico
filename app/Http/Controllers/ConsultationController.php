@@ -134,6 +134,7 @@ class ConsultationController extends Controller
 
             foreach ($request->installments ?? [] as $i => $item) {
                 $consult->installments()->create([
+                    'establishment_id' => $consult->establishment_id,
                     'installment_number' => $i + 1,
                     'amount' => $item['amount'],
                     'due_date' => $item['due_date'],

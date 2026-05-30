@@ -70,4 +70,14 @@ class AgendaEvent extends Model
             : null;
     }
 
+    public function getIsOverdueAttribute()
+    {
+        return $this->start_datetime < now();
+    }
+
+    public function getIsTodayAttribute()
+    {
+        return $this->start_datetime->isToday();
+    }
+
 }

@@ -10,12 +10,14 @@ class Payment extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'establishment_id',
         'consultation_id',
         'consultation_installment_id',
         'amount',
         'payment_date',
         'payment_method',
         'reference',
+        'description',
         'created_by',
     ];
 
@@ -23,6 +25,12 @@ class Payment extends Model
         'payment_date' => 'date',
     ];
 
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONS
+    |--------------------------------------------------------------------------
+    */
+    
     public function consultation()
     {
         return $this->belongsTo(Consultation::class);
@@ -30,15 +38,9 @@ class Payment extends Model
 
     public function installment()
     {
-        return $this->belongsTo(ConsultationInstallment::class);
+        return $this->belongsTo(ConsultationInstallment::class, 'consultation_installment_id');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | RELATIONS
-    |--------------------------------------------------------------------------
-    */
-    
     public function creator()
     {
         return $this->belongsTo(

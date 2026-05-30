@@ -135,7 +135,7 @@ class CaseFileController extends Controller
     public function show(CaseFile $case)
     {
         $lawyers = User::role('Abogado')->orderBy('name')->get();
-        $case->load(['client', 'lawyer', 'specialty', 'subject', 'activities.agendaEvent', 'documents', 'agendaEvents']);
+        $case->load(['client', 'lawyer', 'specialty', 'subject', 'activities.agendaEvent', 'documents', 'agendaEvents','expenses.user',]);
 
         return view('cases.show', compact('case', 'lawyers'));
     }

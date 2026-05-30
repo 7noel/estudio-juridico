@@ -8,6 +8,7 @@ use App\Models\AgendaEvent;
 use App\Models\CaseActivity;
 use App\Models\Document;
 use App\Models\Payment;
+use App\Models\Expense;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -17,9 +18,29 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        $isAdmin =
-            $user->hasRole('Administrador')
-            || $user->hasRole('Recepcionista');
+        /*
+        |--------------------------------------------------------------------------
+        | Roles
+        |--------------------------------------------------------------------------
+        */
+
+        $isAdmin = $user->hasRole('Administrador');
+
+        $isReceptionist = $user->hasRole('Recepcionista');
+
+        $isLawyer = $user->hasRole('Abogado');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Sedes
+        |--------------------------------------------------------------------------
+        */
+
+        $canViewAllEstablishments =
+
+            $isAdmin
+            ||
+            $isReceptionist;
 
         /*
         |--------------------------------------------------------------------------
@@ -35,8 +56,13 @@ class DashboardController extends Controller
                 'quoted'
             ]);
 
-        if(!$isAdmin){
-
+        if($isLawyer)
+        {
+            /*
+            |--------------------------------------------------------------------------
+            | Dashboard Personal
+            |--------------------------------------------------------------------------
+            */
             $consultationsQuery->where(
                 'assigned_lawyer_id',
                 $user->id
@@ -58,8 +84,13 @@ class DashboardController extends Controller
                 'in_progress'
             ]);
 
-        if(!$isAdmin){
-
+        if($isLawyer)
+        {
+            /*
+            |--------------------------------------------------------------------------
+            | Dashboard Personal
+            |--------------------------------------------------------------------------
+            */
             $casesQuery->where(
                 'lawyer_id',
                 $user->id
@@ -80,8 +111,13 @@ class DashboardController extends Controller
                 Carbon::today()
             );
 
-        if(!$isAdmin){
-
+        if($isLawyer)
+        {
+            /*
+            |--------------------------------------------------------------------------
+            | Dashboard Personal
+            |--------------------------------------------------------------------------
+            */
             $eventsQuery->whereHas('case', function($q) use ($user){
 
                 $q->where(
@@ -90,10 +126,176 @@ class DashboardController extends Controller
                 );
 
             });
-
         }
 
         $todayEvents = $eventsQuery->count();
+
+        $upcomingDeadlinesQuery = AgendaEvent::query()
+
+            ->where('type', 'deadline')
+
+            ->whereBetween(
+
+                'start_datetime',
+
+                [
+                    now(),
+                    now()->copy()->addDays(7)
+                ]
+
+            );
+
+        if($isLawyer)
+        {
+            $upcomingDeadlinesQuery->whereHas(
+
+                'case',
+
+                function($q) use ($user){
+
+                    $q->where(
+                        'lawyer_id',
+                        $user->id
+                    );
+
+                }
+
+            );
+        }
+
+        $upcomingDeadlines =
+            $upcomingDeadlinesQuery->count();
+
+        $recentInactiveCasesQuery = CaseFile::query()
+
+            ->whereIn('status', [
+
+                'open',
+
+                'in_progress'
+
+            ])
+
+            ->whereDoesntHave(
+
+                'activities',
+
+                function($q){
+
+                    $q->where(
+
+                        'activity_at',
+
+                        '>=',
+
+                        now()->subDays(15)
+
+                    );
+
+                }
+
+            );
+
+        if($isLawyer)
+        {
+            $recentInactiveCasesQuery->where(
+                'lawyer_id',
+                $user->id
+            );
+        }
+
+        $inactiveCases =
+            $recentInactiveCasesQuery->count();
+
+        /*
+        |--------------------------------------------------------------------------
+        | INGRESOS DEL MES
+        |--------------------------------------------------------------------------
+        */
+
+        $monthlyIncomeQuery = Payment::query()
+
+            ->whereMonth(
+                'payment_date',
+                now()->month
+            )
+
+            ->whereYear(
+                'payment_date',
+                now()->year
+            );
+
+        if($isLawyer)
+        {
+            $monthlyIncomeQuery->whereHas(
+
+                'consultation',
+
+                function($q) use ($user){
+
+                    $q->where(
+                        'assigned_lawyer_id',
+                        $user->id
+                    );
+
+                }
+
+            );
+        }
+
+        $monthlyIncome =
+            $monthlyIncomeQuery->sum('amount');
+
+        /*
+        |--------------------------------------------------------------------------
+        | GASTOS DEL MES
+        |--------------------------------------------------------------------------
+        */
+
+        $monthlyExpenseQuery = Expense::query()
+
+            ->whereMonth(
+                'expense_date',
+                now()->month
+            )
+
+            ->whereYear(
+                'expense_date',
+                now()->year
+            );
+
+        if($isLawyer)
+        {
+            $monthlyExpenseQuery->whereHas(
+
+                'case',
+
+                function($q) use ($user){
+
+                    $q->where(
+                        'lawyer_id',
+                        $user->id
+                    );
+
+                }
+
+            );
+        }
+
+        $monthlyExpense =
+            $monthlyExpenseQuery->sum('amount');
+
+        /*
+        |--------------------------------------------------------------------------
+        | UTILIDAD
+        |--------------------------------------------------------------------------
+        */
+
+        $monthlyProfit =
+
+            $monthlyIncome
+            -
+            $monthlyExpense;
 
         /*
         |--------------------------------------------------------------------------
@@ -104,13 +306,17 @@ class DashboardController extends Controller
         $consultationsPaymentsQuery =
             Consultation::query();
 
-        if(!$isAdmin){
-
+        if($isLawyer)
+        {
+            /*
+            |--------------------------------------------------------------------------
+            | Dashboard Personal
+            |--------------------------------------------------------------------------
+            */
             $consultationsPaymentsQuery->where(
                 'assigned_lawyer_id',
                 $user->id
             );
-
         }
 
         $totalConsultations =
@@ -126,8 +332,13 @@ class DashboardController extends Controller
         $paymentsQuery = Payment::query()
             ->whereHas('consultation');
 
-        if(!$isAdmin){
-
+        if($isLawyer)
+        {
+            /*
+            |--------------------------------------------------------------------------
+            | Dashboard Personal
+            |--------------------------------------------------------------------------
+            */
             $paymentsQuery->whereHas(
                 'consultation',
                 function($q) use ($user){
@@ -139,7 +350,6 @@ class DashboardController extends Controller
 
                 }
             );
-
         }
 
         $totalPaid =
@@ -164,23 +374,15 @@ class DashboardController extends Controller
         */
 
         $recentActivities = CaseActivity::query()
-            ->with('case')
-            ->latest()
-            ->limit(10)
-            ->get();
 
-        /*
-        |--------------------------------------------------------------------------
-        | EVENTOS CALENDARIO
-        |--------------------------------------------------------------------------
-        */
+            ->with('case');
 
-        $calendarEventsQuery = AgendaEvent::query();
+        if($isLawyer)
+        {
+            $recentActivities->whereHas(
 
-        if(!$isAdmin){
-
-            $calendarEventsQuery->whereHas(
                 'case',
+
                 function($q) use ($user){
 
                     $q->where(
@@ -189,40 +391,19 @@ class DashboardController extends Controller
                     );
 
                 }
-            );
 
+            );
         }
 
-        $calendarEvents = $calendarEventsQuery
-            ->get()
-            ->map(function($event){
+        $recentActivities =
 
-                return [
+            $recentActivities
 
-                    'title' => $event->title,
+                ->latest('activity_at')
 
-                    'start' => $event->start_datetime,
+                ->limit(10)
 
-                    'end' => $event->end_datetime,
-
-                    'backgroundColor' => '#2563eb',
-
-                    'borderColor' => '#2563eb',
-
-                    'textColor' => '#ffffff',
-
-                    // 🔥 EXTRA
-                    'extendedProps' => [
-
-                        'description' => $event->description,
-
-                        'location' => $event->location,
-
-                    ]
-
-                ];
-
-            });
+                ->get();
 
         /*
         |--------------------------------------------------------------------------
@@ -237,13 +418,17 @@ class DashboardController extends Controller
             )
             ->groupBy('status');
 
-        if(!$isAdmin){
-
+        if($isLawyer)
+        {
+            /*
+            |--------------------------------------------------------------------------
+            | Dashboard Personal
+            |--------------------------------------------------------------------------
+            */
             $casesByStatusQuery->where(
                 'lawyer_id',
                 $user->id
             );
-
         }
 
         $casesByStatus =
@@ -271,13 +456,17 @@ class DashboardController extends Controller
             )
             ->groupBy('legal_specialties.name');
 
-        if(!$isAdmin){
-
+        if($isLawyer)
+        {
+            /*
+            |--------------------------------------------------------------------------
+            | Dashboard Personal
+            |--------------------------------------------------------------------------
+            */
             $casesBySpecialtyQuery->where(
                 'cases.lawyer_id',
                 $user->id
             );
-
         }
 
         $casesBySpecialty =
@@ -303,15 +492,173 @@ class DashboardController extends Controller
             'recentActivities' =>
                 $recentActivities,
 
-            'calendarEvents' =>
-                $calendarEvents,
-
             'casesByStatus' =>
                 $casesByStatus,
 
             'casesBySpecialty' =>
                 $casesBySpecialty,
 
+            'isAdmin' => $isAdmin,
+
+            'isReceptionist' => $isReceptionist,
+
+            'isLawyer' => $isLawyer,
+
+            'canViewAllEstablishments'
+                => $canViewAllEstablishments,
+
+            'upcomingDeadlines' =>
+                $upcomingDeadlines,
+
+            'inactiveCases' =>
+                $inactiveCases,
+
+            'monthlyIncome' =>
+                $monthlyIncome,
+
+            'monthlyExpense' =>
+                $monthlyExpense,
+
+            'monthlyProfit' =>
+                $monthlyProfit,
         ]);
     }
+
+
+    public function calendarEvents()
+    {
+        $user = auth()->user();
+
+        $colors =
+            config(
+                'options.agenda_event_colors'
+            );
+
+        $query = AgendaEvent::query()
+
+            ->with([
+                'case.client',
+                'case.lawyer'
+            ])
+
+            ->whereNotNull('case_id');
+
+        /*
+        |--------------------------------------------------------------------------
+        | ABOGADO
+        |--------------------------------------------------------------------------
+        */
+
+        if($user->hasRole('Abogado'))
+        {
+            $query->whereHas(
+
+                'case',
+
+                function($q) use ($user){
+
+                    $q->where(
+                        'lawyer_id',
+                        $user->id
+                    );
+
+                }
+
+            );
+        }
+
+        return $query
+            ->get()
+            ->map(function($event) use ($colors){
+
+                $style =
+
+                    $colors[$event->type]
+
+                    ??
+
+                    [
+
+                        'background' => '#6c757d',
+
+                        'text' => '#ffffff'
+
+                    ];
+
+                return [
+
+                    'id' => $event->id,
+
+                    'title' => $event->title,
+
+                    'start' => $event->start_datetime,
+
+                    'end' => $event->end_datetime,
+
+                    'backgroundColor' =>
+                        $style['background'],
+
+                    'borderColor' =>
+                        $style['background'],
+
+                    'textColor' =>
+                        $style['text'],
+
+                    'editable' => false,
+
+                    'extendedProps' => [
+
+                        'type' =>
+                            $event->type,
+
+                        'type_label' =>
+                            config(
+                                'options.agenda_event_types'
+                            )[$event->type]
+
+                            ??
+
+                            'Otro',
+
+                        'description' =>
+                            $event->description,
+
+                        'location' =>
+                            $event->location,
+
+                        'case_id' =>
+                            $event->case_id,
+
+                        'case_url' => route(
+                            'cases.show',
+                            $event->case_id
+                        ),
+
+                        'client_name' =>
+                            optional(
+                                optional($event->case)->client
+                            )->full_name,
+
+                        'case_title' =>
+                            optional($event->case)
+                                ->title,
+
+                        'lawyer_name' =>
+                            optional(
+                                optional($event->case)
+                                    ->lawyer
+                            )->name,
+
+                        'is_legal_event' =>
+                            true,
+
+                    ],
+
+                ];
+
+            });
+
+    }
+
+
 }

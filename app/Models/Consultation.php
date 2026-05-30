@@ -23,12 +23,18 @@ class Consultation extends Model
         'created_by',
         'assigned_at',
         'evaluated_at',
+        'quoted_at',
+        'accepted_at',
+        'rejected_at',
     ];
 
     protected $casts = [
 
         'assigned_at' => 'datetime',
         'evaluated_at' => 'datetime',
+        'quoted_at' => 'datetime',
+        'accepted_at' => 'datetime',
+        'rejected_at' => 'datetime',
 
     ];
 
