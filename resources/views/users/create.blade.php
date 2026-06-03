@@ -7,7 +7,7 @@
 		<h6> Nuevo usuario </h6>
 	</div>
 	<div class="card-body">
-		<form method="POST" action="{{ route('users.store') }}">
+		<form method="POST" action="{{ route('users.store') }}" class="form-loading">
 			@csrf
 			@include('users._form')
 			<x-form.button>

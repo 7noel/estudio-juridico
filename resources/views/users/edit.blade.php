@@ -7,7 +7,7 @@
 		<h6>Editar usuario</h6>
 	</div>
 	<div class="card-body">
-		<form method="POST" action="{{ route('users.update',$user) }}">
+		<form method="POST" action="{{ route('users.update',$user) }}" class="form-loading">
 			@csrf
 			@method('PUT')
 			@include('users._form')

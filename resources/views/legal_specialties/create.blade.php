@@ -7,7 +7,7 @@
 		<h6> Nueva especialidad </h6>
 	</div>
 	<div class="card-body">
-		<form method="POST" action="{{ route('legal-specialties.store') }}">
+		<form method="POST" action="{{ route('legal-specialties.store') }}" class="form-loading">
 			@csrf
 			@include('legal_specialties._form')
 			<x-form.button>

@@ -7,7 +7,7 @@
 	</div>
 
 	<div class="card-body">
-		<form method="POST" action="{{ route('password.update') }}">
+		<form method="POST" action="{{ route('password.update') }}" class="form-loading">
 			@csrf
 			@method('PUT')
 			<x-form.input name="current_password" type="password" label="Contraseña actual" required/>

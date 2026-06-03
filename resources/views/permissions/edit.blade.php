@@ -7,7 +7,7 @@
 		Editar Permiso
 	</div>
 	<div class="card-body">
-		<form method="POST" action="{{ route('permissions.update',$permission) }}">
+		<form method="POST" action="{{ route('permissions.update',$permission) }}" class="form-loading">
 			@csrf
 			@method('PUT')
 			@include('permissions._form')

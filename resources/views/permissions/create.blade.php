@@ -7,7 +7,7 @@
 		Nuevo Permiso
 	</div>
 	<div class="card-body">
-		<form method="POST" action="{{ route('permissions.store') }}">
+		<form method="POST" action="{{ route('permissions.store') }}" class="form-loading">
 			@csrf
 			@include('permissions._form')
 			<button class="btn btn-primary">

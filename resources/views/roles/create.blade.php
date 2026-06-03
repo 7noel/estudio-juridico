@@ -7,7 +7,7 @@
 		Nuevo Rol
 	</div>
 	<div class="card-body">
-		<form method="POST" action="{{ route('roles.store') }}">
+		<form method="POST" action="{{ route('roles.store') }}" class="form-loading">
 			@csrf
 			@include('roles._form')
 			<button class="btn btn-primary">

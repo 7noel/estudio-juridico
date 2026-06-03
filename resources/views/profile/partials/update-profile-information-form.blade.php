@@ -6,7 +6,7 @@
 	</div>
 
 	<div class="card-body">
-		<form method="POST" action="{{ route('profile.update') }}">
+		<form method="POST" action="{{ route('profile.update') }}" class="form-loading">
 			@csrf
 			@method('PATCH')
 			<x-form.input name="name" label="Nombre" :value="old('name', $user->name)" required />

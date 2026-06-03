@@ -7,7 +7,7 @@
         Nueva Consulta
     </div>
     <div class="card-body">
-        <form method="POST" action="{{ route('consultations.store') }}">
+        <form method="POST" action="{{ route('consultations.store') }}" class="form-loading">
             @csrf
             @include('consultations._form')
             <x-form.button>

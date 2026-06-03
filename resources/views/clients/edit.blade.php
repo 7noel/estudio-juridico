@@ -7,7 +7,7 @@
 		<h6>Editar cliente</h6>
 	</div>
 	<div class="card-body">
-		<form method="POST" action="{{ route('clients.update',$client) }}">
+		<form method="POST" action="{{ route('clients.update',$client) }}" class="form-loading">
 			@csrf
 			@method('PUT')
 			@include('clients._form')

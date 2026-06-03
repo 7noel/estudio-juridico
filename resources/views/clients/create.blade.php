@@ -7,7 +7,7 @@
 		<h6> Nuevo cliente </h6>
 	</div>
 	<div class="card-body">
-		<form method="POST" action="{{ route('clients.store') }}">
+		<form method="POST" action="{{ route('clients.store') }}" class="form-loading">
 			@csrf
 			@include('clients._form')
 			<x-form.button>

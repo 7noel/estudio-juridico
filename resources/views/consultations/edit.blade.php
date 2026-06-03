@@ -7,7 +7,7 @@
         Editar Consulta
     </div>
     <div class="card-body">
-        <form method="POST" action="{{ route('consultations.update', $consultation->id) }}">
+        <form method="POST" action="{{ route('consultations.update', $consultation->id) }}" class="form-loading">
             @csrf
             @method('PUT')
             @include('consultations._form')

@@ -7,7 +7,7 @@
 		<h6>Editar especialidad</h6>
 	</div>
 	<div class="card-body">
-		<form method="POST" action="{{ route('legal-specialties.update',$legalSpecialty) }}">
+		<form method="POST" action="{{ route('legal-specialties.update',$legalSpecialty) }}" class="form-loading">
 			@csrf
 			@method('PUT')
 			@include('legal_specialties._form')

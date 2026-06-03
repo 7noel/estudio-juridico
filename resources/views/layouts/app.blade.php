@@ -206,6 +206,67 @@ color: white !important;
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 <script>
+$(function () {
+  // Bloquea reenvíos múltiples
+  $(document).on('submit', 'form.form-loading', function (e) {
+    var form  = this;
+    var $form = $(form);
+
+    // Si ya fue enviado, cancela
+    if ($form.data('submitted') === true) {
+      e.preventDefault();
+      return false;
+    }
+
+    // Respeta validación nativa HTML5
+    if (form.checkValidity && !form.checkValidity()) {
+      return true; // el navegador mostrará los errores
+    }
+
+    // Marca como enviado
+    $form.data('submitted', true);
+
+    // Deshabilita botones submit y muestra "Enviando…"
+    $form.find('button[type="submit"], input[type="submit"]').each(function () {
+      var $btn = $(this);
+
+      if ($btn.is('button')) {
+        $btn.data('orig-html', $btn.html());
+        $btn.html('<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span> Enviando…');
+      } else {
+        $btn.data('orig-val', $btn.val());
+        $btn.val('Enviando…');
+      }
+      $btn.prop('disabled', true).addClass('disabled');
+    });
+
+    // Evita que se dispare otro submit por Enter mientras navega
+    $form.on('keydown.preventResubmit', function (ev) {
+      if (ev.key === 'Enter') ev.preventDefault();
+    });
+
+    return true; // deja continuar el submit normal (recarga de página)
+  });
+
+  // Si el usuario vuelve con Back/forward cache, restablece el estado
+  window.addEventListener('pageshow', function (evt) {
+    if (evt.persisted) {
+      $('form.form-loading').each(function () {
+        var $form = $(this).data('submitted', false).off('keydown.preventResubmit');
+        $form.find('button[type="submit"], input[type="submit"]').each(function () {
+          var $btn = $(this).prop('disabled', false).removeClass('disabled');
+          if ($btn.is('button')) {
+            var h = $btn.data('orig-html'); if (h != null) $btn.html(h);
+          } else {
+            var v = $btn.data('orig-val');  if (v != null) $btn.val(v);
+          }
+        });
+      });
+    }
+  });
+});
+
+
 $(document).on('click', '.toggle-password', function () {
     let button = $(this);
     let input = button.closest('.input-group').find('input');

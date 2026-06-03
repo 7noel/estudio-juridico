@@ -7,7 +7,7 @@
 		Editar Rol
 	</div>
 	<div class="card-body">
-		<form method="POST" action="{{ route('roles.update',$role) }}">
+		<form method="POST" action="{{ route('roles.update',$role) }}" class="form-loading">
 			@csrf
 			@method('PUT')
 			@include('roles._form')
