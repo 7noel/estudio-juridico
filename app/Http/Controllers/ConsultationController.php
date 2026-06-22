@@ -314,7 +314,7 @@ class ConsultationController extends Controller
                     $newStatus = 'quoted';
                 }
 
-                if ($newStatus !== $consultation->status) {
+                if (isset($newStatus) and $newStatus !== $consultation->status) {
                     $consultation->update([
                         'status' => $newStatus
                     ]);
