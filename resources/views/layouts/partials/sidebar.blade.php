@@ -1,10 +1,13 @@
 <div class="sidebar bg-white border-end" style="width:260px; min-height:100vh;">
 	<div class="p-3">
 		<h5 class="text-center fw-semibold text-primary">
-			⚖️ Jurídico
+            @if( file_exists(public_path("/img/logo.png")) )
+                  <img src="/img/logo.png" alt="" height="100px">
+            @else
+                  ⚖️ {{ config('app.name') }}
+            @endif
 		</h5>
 	</div>
-	<hr>
 	<ul class="nav flex-column px-2">
 		{{-- Dashboard --}}
 		<li class="nav-item">

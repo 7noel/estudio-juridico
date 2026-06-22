@@ -9,7 +9,7 @@
 <form method="POST" action="{{ route('login') }}" id="loginForm">
     @csrf
     {{-- Email --}}
-    <x-form.input name="email" type="email" label="Correo electrónico" required/>
+    <x-form.input name="email" type="email" label="Correo electrónico" required autofocus/>
     {{-- Password --}}
     <x-form.input name="password" type="password" label="Contraseña" togglePassword="true" required/>
     {{-- Remember --}}

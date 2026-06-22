@@ -51,7 +51,11 @@
                                     {{-- LOGO / TITULO --}}
                                     <div class="text-center mb-4">
                                           <div class="auth-logo">
-                                                ⚖️ {{ config('app.name') }}
+                                                @if( file_exists(public_path("/img/logo.png")) )
+                                                      <img src="/img/logo.png" alt="" height="200px">
+                                                @else
+                                                      ⚖️ {{ config('app.name') }}
+                                                @endif
                                           </div>
                                           <small class="text-muted">
                                                 Sistema de Gestión Jurídica
