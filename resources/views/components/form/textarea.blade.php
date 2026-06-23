@@ -20,7 +20,7 @@
         {{ $attributes->merge([
             'class' => 'form-control form-control-sm'
         ]) }}
-    >{{ old($name) }}</textarea>
+    >{{ old($name, $slot) }}</textarea>
 
     <x-form.error :name="$name" />
 
