@@ -87,7 +87,7 @@
         <span class="badge bg-secondary filter-quick p-2" data-status="">
             Todas: <span id="stat_all">0</span>
         </span>
-        <span class="badge bg-primary filter-quick p-2" data-status="">
+        <span class="badge bg-primary filter-quick p-2" data-status="assigned">
             Asignados: <span id="stat_assigned">0</span>
         </span>
 
