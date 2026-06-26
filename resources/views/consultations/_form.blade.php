@@ -16,6 +16,7 @@
         <x-form.select
             name="legal_specialty_id"
             label="Especialidad"
+            placeholder="Seleccione"
             :options="$specialties->pluck('name','id')->toArray()"
             :selected="$consultation->legal_specialty_id ?? ''"
             required
@@ -356,12 +357,6 @@ $('#generate_installments').click(function(){
                 <td class="text-center">
                     <span class="badge bg-secondary">Pendiente</span>
                 </td>
-                <td class="text-center">
-                    <span class="badge bg-secondary">
-                        Pendiente
-                    </span>
-                </td>
-
                 <td class="text-center">
                     <button type="button" class="btn btn-outline-danger btn-sm btn-remove"> <i class="bi bi-trash"></i> </button>
                 </td>

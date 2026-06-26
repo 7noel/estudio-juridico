@@ -23,6 +23,7 @@ $value = $selected ?? $value;
     <select
         name="{{ $name }}"
         id="{{ $name }}"
+        {{ $required ? 'required' : '' }}
 
         {{ $attributes->merge([
             'class' => 'form-control form-control-sm'
