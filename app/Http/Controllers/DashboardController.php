@@ -64,7 +64,7 @@ class DashboardController extends Controller
             |--------------------------------------------------------------------------
             */
             $consultationsQuery->where(
-                'assigned_lawyer_id',
+                'lawyer_id',
                 $user->id
             );
         }
@@ -234,7 +234,7 @@ class DashboardController extends Controller
                 function($q) use ($user){
 
                     $q->where(
-                        'assigned_lawyer_id',
+                        'lawyer_id',
                         $user->id
                     );
 
@@ -314,7 +314,7 @@ class DashboardController extends Controller
             |--------------------------------------------------------------------------
             */
             $consultationsPaymentsQuery->where(
-                'assigned_lawyer_id',
+                'lawyer_id',
                 $user->id
             );
         }
@@ -344,7 +344,7 @@ class DashboardController extends Controller
                 function($q) use ($user){
 
                     $q->where(
-                        'assigned_lawyer_id',
+                        'lawyer_id',
                         $user->id
                     );
 
