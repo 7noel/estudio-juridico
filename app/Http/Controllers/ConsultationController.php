@@ -292,6 +292,8 @@ class ConsultationController extends Controller
                         'installment_number' => $i + 1,
 
                         'amount' => $item['amount'],
+                        
+                        'paid_amount' => 0,
 
                         'due_date' => $item['due_date'],
 
