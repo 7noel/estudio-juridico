@@ -93,11 +93,11 @@
         </span>
 
         <span class="badge bg-secondary filter-quick px-3 py-2" data-status="on_hold">
-            Pausados: <span id="stat_on_hold">0</span>
+            En espera: <span id="stat_on_hold">0</span>
         </span>
 
         <span class="badge bg-success filter-quick px-3 py-2" data-status="closed">
-            Cerrados: <span id="stat_closed">0</span>
+            Culminados: <span id="stat_closed">0</span>
         </span>
 
     </div>

@@ -86,7 +86,7 @@ return [
         'open'        => 'Abierto',
         'in_progress' => 'En proceso',
         'on_hold'     => 'En espera',
-        'closed'      => 'Cerrado',
+        'closed'      => 'Culminado',
     ],
 
     'default_case_status' => 'open',
