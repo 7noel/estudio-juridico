@@ -287,6 +287,7 @@ class ConsultationController extends Controller
                 else {
 
                     $consultation->installments()->create([
+                        'establishment_id' => $consultation->establishment_id,
 
                         'installment_number' => $i + 1,
 
