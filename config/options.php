@@ -59,7 +59,7 @@ return [
     'consultation_statuses' => [
         'new'        => 'Nueva',
         'assigned'   => 'Asignada',
-        'evaluating' => 'En evaluación',
+        //'evaluating' => 'En evaluación',
         'quoted'     => 'Cotizado',
         'accepted'   => 'Aceptado',
         'rejected'   => 'Rechazado',
