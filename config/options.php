@@ -46,6 +46,8 @@ return [
 
         'extrajudicial_act' => 'Acto Extrajudicial',
 
+        'conciliation' => 'Conciliación',
+
     ],
 
     /*
