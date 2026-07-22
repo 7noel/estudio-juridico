@@ -155,11 +155,9 @@
 		            <div class="col-md-3">
 		                <small>Estado</small><br>
 
-		                @if($consultation->is_paid)
-		                    <span class="badge bg-success">Pagado</span>
-		                @else
-		                    <span class="badge bg-danger">Pendiente</span>
-		                @endif
+		                <span class="badge bg-{{ $consultation->financial_status_color }}">
+                            {{ $consultation->financial_status_label }}
+                        </span>
 
 		            </div>
 
