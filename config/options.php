@@ -146,7 +146,7 @@ return [
 
         'meeting' => 'Reunión',
 
-        'sms' => 'SMS',
+        'other' => 'Otro',
 
     ],
 
@@ -283,6 +283,24 @@ return [
         'taxes' => 'Impuestos',
 
         'other' => 'Otros',
+
+    ],
+
+    'follow_up_results' => [
+
+        'interested'      => 'Interesado',
+
+        'thinking'        => 'Solicita tiempo',
+
+        'proposal'        => 'Esperando propuesta',
+
+        'meeting'         => 'Reunión programada',
+
+        'no_answer'       => 'No contestó',
+
+        'not_interested'  => 'No desea continuar',
+
+        'other'           => 'Otro',
 
     ],
 

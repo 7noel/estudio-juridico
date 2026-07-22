@@ -20,7 +20,7 @@
 	        @if(!$consultation->case && $consultation->status != 'rejected')
 
 	            {{-- Generar caso --}}
-	            @if(in_array($consultation->status, ['quoted', 'evaluated']))
+	            @if(in_array($consultation->status, ['prospect', 'evaluated']))
 	                <button
 	                    type="button"
 	                    class="btn btn-sm btn-outline-success btn-generate-case"
@@ -41,7 +41,7 @@
 	            @endif
 
 	            {{-- Rechazar --}}
-	            @if(in_array($consultation->status, ['quoted', 'evaluated']))
+	            @if(in_array($consultation->status, ['prospect', 'evaluated']))
 	                <button
 	                    type="button"
 	                    class="btn btn-outline-danger btn-sm btn-reject"
