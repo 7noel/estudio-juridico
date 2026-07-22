@@ -170,4 +170,88 @@ class Consultation extends Model
         }
     }
 
+    // ==========================================
+    // ESTADO FINANCIERO
+    // ==========================================
+
+    public function getFinancialStatusAttribute(): string
+    {
+        if ($this->is_paid) {
+            return 'paid';
+        }
+
+        // Existe alguna cuota vencida
+        if ($this->installments->contains(function ($installment) {
+
+            return !$installment->is_paid
+                && $installment->due_date->isPast();
+
+        })) {
+
+            return 'overdue';
+
+        }
+
+        // Existe alguna cuota parcialmente pagada
+        if ($this->installments->contains(function ($installment) {
+
+            return $installment->paid_amount > 0
+                && !$installment->is_paid;
+
+        })) {
+
+            return 'partial';
+
+        }
+
+        // Tiene cuotas pendientes pero ninguna vencida
+        if ($this->has_pending_installments) {
+
+            return 'current';
+
+        }
+
+        return 'no_installments';
+    }
+
+    // ==========================================
+    // TEXTO ESTADO FINANCIERO
+    // ==========================================
+
+    public function getFinancialStatusLabelAttribute(): string
+    {
+        return match ($this->financial_status) {
+
+            'paid' => 'Cancelado',
+
+            'current' => 'Al día',
+
+            'partial' => 'Pago parcial',
+
+            'overdue' => 'Cuota vencida',
+
+            default => 'Sin cuotas',
+        };
+    }
+
+    // ==========================================
+    // COLOR ESTADO FINANCIERO
+    // ==========================================
+
+    public function getFinancialStatusColorAttribute(): string
+    {
+        return match ($this->financial_status) {
+
+            'paid' => 'primary',
+
+            'current' => 'success',
+
+            'partial' => 'warning',
+
+            'overdue' => 'danger',
+
+            default => 'secondary',
+        };
+    }
+
 }

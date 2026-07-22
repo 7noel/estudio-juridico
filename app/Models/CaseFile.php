@@ -18,6 +18,7 @@ class CaseFile extends Model
         'client_id',
         'lawyer_id',
         'slug',
+        'court_name',
         'case_number',
         'service_type',
         'legal_specialty_id',

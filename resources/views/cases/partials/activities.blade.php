@@ -22,11 +22,13 @@
                     $subtypeLabel =
                         config('options.activity_types')[$act->subtype]
                         ?? config('options.communication_types')[$act->subtype]
+                        ?? config('options.judicial_progress_types')[$act->subtype]
                         ?? 'Otro';
 
                     $color = match($act->type) {
                         'legal' => 'primary',
                         'communication' => 'info',
+                        'judicial_progress' => 'success',
                         default => 'secondary'
                     };
                 @endphp
@@ -227,6 +229,8 @@ let activitySubtypes = {
     legal: @json(config('options.activity_types')),
 
     communication: @json(config('options.communication_types')),
+
+    judicial_progress: @json(config('options.judicial_progress_types')),
 
     note: {}
 

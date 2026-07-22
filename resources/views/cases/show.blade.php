@@ -100,16 +100,16 @@
                     </div>
 
                     <div class="col-md-3">
-                        <strong>Expediente:</strong><br>
-                        <span id="case-case-number">
-                            {{ $case->file_number ?? '-' }}
+                        <strong>Juzgado:</strong><br>
+                        <span id="case-court-name">
+                            {{ $case->court_name ?? '-' }}
                         </span>
                     </div>
 
                     <div class="col-md-3">
-                        <strong>Estado:</strong><br>
-                        <span class="badge bg-{{ config('options.case_status_colors')[$case->status] }}">
-                            {{ config('options.case_statuses')[$case->status] }}
+                        <strong>Expediente:</strong><br>
+                        <span id="case-case-number">
+                            {{ $case->case_number ?? '-' }}
                         </span>
                     </div>
                 </div>
@@ -121,6 +121,29 @@
                             {{ $case->title }}
                         </span>
                     </div>
+
+                    <div class="col-md-3">
+                        <strong>Estado Procesal:</strong><br>
+                        <span class="badge bg-{{ config('options.case_status_colors')[$case->status] }}">
+                            {{ config('options.case_statuses')[$case->status] }}
+                        </span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <strong>Estado financiero:</strong><br>
+                        @if($case->consultation)
+                            <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#financialStatusModal">
+                                <span class="badge bg-{{ $case->consultation->financial_status_color }}">
+                                    {{ $case->consultation->financial_status_label }}
+                                </span>
+                            </a>
+                        @else
+                            <span class="badge bg-secondary">
+                                Sin consulta
+                            </span>
+                        @endif
+                    </div>
+
                 </div>
                 <div class="row mb-2">
                     <div class="col-md-12">
@@ -172,6 +195,20 @@
             <div class="modal-body">
 
                 <form id="formEditCase">
+
+                    <div class="mb-3">
+
+                        <label>
+                            Juzgado
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="edit_court_name"
+                            value="{{ $case->court_name }}">
+
+                    </div>
 
                     <div class="mb-3">
 
@@ -268,6 +305,187 @@
 
 </div>
 
+<div class="modal fade" id="financialStatusModal" tabindex="-1">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+
+                    Estado financiero
+
+                </h5>
+
+                <button
+                    class="btn-close"
+                    data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                @php($consultation = $case->consultation)
+
+                @if($consultation)
+
+                    <div class="row text-center mb-4">
+
+                        <div class="col-md-4">
+
+                            <small>Total</small>
+
+                            <h5>
+
+                                S/ {{ number_format($consultation->total_amount,2) }}
+
+                            </h5>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <small>Pagado</small>
+
+                            <h5 class="text-success">
+
+                                S/ {{ number_format($consultation->paid_amount,2) }}
+
+                            </h5>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <small>Pendiente</small>
+
+                            <h5 class="text-danger">
+
+                                S/ {{ number_format($consultation->pending_amount,2) }}
+
+                            </h5>
+
+                        </div>
+
+                    </div>
+
+                    <table class="table table-bordered table-sm">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>#</th>
+
+                                <th>Monto</th>
+
+                                <th>Pagado</th>
+
+                                <th>Saldo</th>
+
+                                <th>Vence</th>
+
+                                <th>Estado</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach($consultation->installments as $installment)
+
+                                <tr>
+
+                                    <td>
+
+                                        {{ $installment->installment_number }}
+
+                                    </td>
+
+                                    <td>
+
+                                        {{ number_format($installment->amount,2) }}
+
+                                    </td>
+
+                                    <td>
+
+                                        {{ number_format($installment->paid_amount,2) }}
+
+                                    </td>
+
+                                    <td>
+
+                                        {{ number_format($installment->pending_amount,2) }}
+
+                                    </td>
+
+                                    <td>
+
+                                        {{ $installment->due_date->format('d/m/Y') }}
+
+                                    </td>
+
+                                    <td>
+
+                                        @if($installment->is_paid)
+
+                                            <span class="badge bg-primary">
+
+                                                Pagado
+
+                                            </span>
+
+                                        @elseif($installment->paid_amount > 0)
+
+                                            <span class="badge bg-warning text-dark">
+
+                                                Parcial
+
+                                            </span>
+
+                                        @elseif($installment->due_date->isPast())
+
+                                            <span class="badge bg-danger">
+
+                                                Vencida
+
+                                            </span>
+
+                                        @else
+
+                                            <span class="badge bg-secondary">
+
+                                                Pendiente
+
+                                            </span>
+
+                                        @endif
+
+                                    </td>
+
+                                </tr>
+
+                            @endforeach
+
+                        </tbody>
+
+                    </table>
+
+                @endif
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
 @endsection
 
 
@@ -300,6 +518,9 @@ $('#btnSaveCase').click(function(){
 
             _token: '{{ csrf_token() }}',
 
+            court_name:
+                $('#edit_court_name').val(),
+
             case_number:
                 $('#edit_case_number').val(),
 
@@ -319,6 +540,10 @@ $('#btnSaveCase').click(function(){
             // ====================================
             // ACTUALIZAR DOM
             // ====================================
+
+            $('#case-court-name').text(
+                $('#edit_court_name').val() || '-'
+            );
 
             $('#case-case-number').text(
                 $('#edit_case_number').val() || '-'

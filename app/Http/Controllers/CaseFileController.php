@@ -135,7 +135,7 @@ class CaseFileController extends Controller
     public function show(CaseFile $case)
     {
         $lawyers = User::role('Abogado')->orderBy('name')->get();
-        $case->load(['client', 'lawyer', 'specialty', 'subject', 'activities.agendaEvent', 'documents', 'agendaEvents','expenses.user',]);
+        $case->load(['consultation.installments', 'client', 'lawyer', 'specialty', 'subject', 'activities.agendaEvent', 'documents', 'agendaEvents','expenses.user',]);
 
         return view('cases.show', compact('case', 'lawyers'));
     }
@@ -161,6 +161,9 @@ class CaseFileController extends Controller
 
         $request->validate([
 
+            'court_name' =>
+                'nullable|string|max:255',
+
             'case_number' =>
                 'nullable|string|max:255',
 
@@ -176,6 +179,9 @@ class CaseFileController extends Controller
         ]);
 
         $data = [
+
+            'court_name' =>
+                $request->court_name,
 
             'case_number' =>
                 $request->case_number,

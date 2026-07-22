@@ -121,8 +121,9 @@ return [
     ],
 
     'activity_main_types' => [
-        'legal' => 'Actividad legal',
+        'legal' => 'Actos procesales',
         'communication' => 'Comunicación',
+        'judicial_progress' => 'Avance judicial',
         'note' => 'Nota',
     ],
 
@@ -153,21 +154,31 @@ return [
     */
 
     'activity_types' => [
-
         'hearing' => 'Audiencia',
 
         'filing' => 'Presentación de Escrito',
 
-        'resolution' => 'Recepción de Resolución',
+        'resolution' => 'Notificacion de Resolución',
 
         'diligence' => 'Diligencia',
 
-        'meeting' => 'Reunión con Cliente',
-
-        'call' => 'Llamada',
-
         'other' => 'Otro',
 
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | TIPOS DE ACTIVIDADES LEGALES
+    |--------------------------------------------------------------------------
+    */
+
+    'judicial_progress_types' => [
+        'judge_listens'      => 'Juez te escucha',
+        'mau'                => 'MAU',
+        'onsite_follow_up'   => 'Impulso presencial',
+        'cej'                => 'CEJ',
+        'anc_complaint'      => 'Queja ANC',
+        'other'              => 'Otro',
     ],
 
     /*
