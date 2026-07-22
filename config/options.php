@@ -120,10 +120,17 @@ return [
 
     ],
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | TIPOS DE ACTIVIDADES
+    |--------------------------------------------------------------------------
+    */
+
     'activity_main_types' => [
         'legal' => 'Actos procesales',
-        'communication' => 'Comunicación',
         'judicial_progress' => 'Avance judicial',
+        'communication' => 'Comunicación',
         'note' => 'Nota',
     ],
 
@@ -168,7 +175,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | TIPOS DE ACTIVIDADES LEGALES
+    | TIPOS DE AVANCES JUDICIALES
     |--------------------------------------------------------------------------
     */
 

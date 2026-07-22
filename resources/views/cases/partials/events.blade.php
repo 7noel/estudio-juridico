@@ -435,11 +435,13 @@ $(document).on('change', '#activity_event_start_time', function(){
 // FULL CALENDAR
 // =====================================================
 
+let calendar;
+
 document.addEventListener('DOMContentLoaded', function () {
 
     const calendarEl = document.getElementById('calendar');
 
-    const calendar = new FullCalendar.Calendar(calendarEl, {
+    calendar = new FullCalendar.Calendar(calendarEl, {
 
         initialView: 'dayGridMonth',
 
@@ -724,6 +726,16 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     calendar.render();
+
+    document.getElementById('agenda-tab').addEventListener('shown.bs.tab', function () {
+
+        setTimeout(function () {
+
+            calendar.updateSize();
+
+        },100);
+
+    });
 
 });
 

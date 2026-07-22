@@ -158,15 +158,149 @@
         </div>
 
         @if($canViewCaseContent)
-            @include('cases.partials.activities')
-            @include('cases.partials.documents')
-            @include('cases.partials.expenses')
-            @include('cases.partials.events')
-        @else
-            <div class="alert alert-warning">
-                Debes iniciar el caso para registrar
-                actividades, documentos, gastos y agenda.
+
+        <ul class="nav nav-tabs mt-4" id="caseTabs" role="tablist">
+
+            <li class="nav-item" role="presentation">
+
+                <button
+                    class="nav-link active"
+                    id="activities-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#activities-pane"
+                    type="button">
+
+                    <i class="bi bi-list-task"></i>
+
+                    Actividades
+
+                    <span class="badge bg-secondary ms-1">
+
+                        {{ $case->activities->count() }}
+
+                    </span>
+
+                </button>
+
+            </li>
+
+            <li class="nav-item" role="presentation">
+
+                <button
+                    class="nav-link"
+                    id="documents-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#documents-pane"
+                    type="button">
+
+                    <i class="bi bi-folder2-open"></i>
+
+                    Documentos
+
+                    <span class="badge bg-secondary ms-1">
+
+                        {{ $case->documents->count() }}
+
+                    </span>
+
+                </button>
+
+            </li>
+
+            <li class="nav-item" role="presentation">
+
+                <button
+                    class="nav-link"
+                    id="expenses-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#expenses-pane"
+                    type="button">
+
+                    <i class="bi bi-cash-stack"></i>
+
+                    Gastos
+
+                    <span class="badge bg-secondary ms-1">
+
+                        {{ $case->expenses->count() }}
+
+                    </span>
+
+                </button>
+
+            </li>
+
+            <li class="nav-item" role="presentation">
+
+                <button
+                    class="nav-link"
+                    id="agenda-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#agenda-pane"
+                    type="button">
+
+                    <i class="bi bi-calendar-event"></i>
+
+                    Agenda
+
+                    <span class="badge bg-secondary ms-1">
+
+                        {{ $case->agendaEvents->count() }}
+
+                    </span>
+
+                </button>
+
+            </li>
+
+        </ul>
+
+
+        <div class="tab-content mt-3">
+
+            <div
+                class="tab-pane fade show active"
+                id="activities-pane">
+
+                @include('cases.partials.activities')
+
             </div>
+
+            <div
+                class="tab-pane fade"
+                id="documents-pane">
+
+                @include('cases.partials.documents')
+
+            </div>
+
+            <div
+                class="tab-pane fade"
+                id="expenses-pane">
+
+                @include('cases.partials.expenses')
+
+            </div>
+
+            <div
+                class="tab-pane fade"
+                id="agenda-pane">
+
+                @include('cases.partials.events')
+
+            </div>
+
+        </div>
+
+        @else
+
+        <div class="alert alert-warning">
+
+            Debes iniciar el caso para registrar
+            actividades, documentos, gastos y agenda.
+
+        </div>
+
         @endif
 
     </div>
@@ -305,192 +439,52 @@
 
 </div>
 
-<div class="modal fade" id="financialStatusModal" tabindex="-1">
-
-    <div class="modal-dialog modal-lg">
-
-        <div class="modal-content">
-
-            <div class="modal-header">
-
-                <h5 class="modal-title">
-
-                    Estado financiero
-
-                </h5>
-
-                <button
-                    class="btn-close"
-                    data-bs-dismiss="modal">
-                </button>
-
-            </div>
-
-            <div class="modal-body">
-
-                @php($consultation = $case->consultation)
-
-                @if($consultation)
-
-                    <div class="row text-center mb-4">
-
-                        <div class="col-md-4">
-
-                            <small>Total</small>
-
-                            <h5>
-
-                                S/ {{ number_format($consultation->total_amount,2) }}
-
-                            </h5>
-
-                        </div>
-
-                        <div class="col-md-4">
-
-                            <small>Pagado</small>
-
-                            <h5 class="text-success">
-
-                                S/ {{ number_format($consultation->paid_amount,2) }}
-
-                            </h5>
-
-                        </div>
-
-                        <div class="col-md-4">
-
-                            <small>Pendiente</small>
-
-                            <h5 class="text-danger">
-
-                                S/ {{ number_format($consultation->pending_amount,2) }}
-
-                            </h5>
-
-                        </div>
-
-                    </div>
-
-                    <table class="table table-bordered table-sm">
-
-                        <thead>
-
-                            <tr>
-
-                                <th>#</th>
-
-                                <th>Monto</th>
-
-                                <th>Pagado</th>
-
-                                <th>Saldo</th>
-
-                                <th>Vence</th>
-
-                                <th>Estado</th>
-
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            @foreach($consultation->installments as $installment)
-
-                                <tr>
-
-                                    <td>
-
-                                        {{ $installment->installment_number }}
-
-                                    </td>
-
-                                    <td>
-
-                                        {{ number_format($installment->amount,2) }}
-
-                                    </td>
-
-                                    <td>
-
-                                        {{ number_format($installment->paid_amount,2) }}
-
-                                    </td>
-
-                                    <td>
-
-                                        {{ number_format($installment->pending_amount,2) }}
-
-                                    </td>
-
-                                    <td>
-
-                                        {{ $installment->due_date->format('d/m/Y') }}
-
-                                    </td>
-
-                                    <td>
-
-                                        @if($installment->is_paid)
-
-                                            <span class="badge bg-primary">
-
-                                                Pagado
-
-                                            </span>
-
-                                        @elseif($installment->paid_amount > 0)
-
-                                            <span class="badge bg-warning text-dark">
-
-                                                Parcial
-
-                                            </span>
-
-                                        @elseif($installment->due_date->isPast())
-
-                                            <span class="badge bg-danger">
-
-                                                Vencida
-
-                                            </span>
-
-                                        @else
-
-                                            <span class="badge bg-secondary">
-
-                                                Pendiente
-
-                                            </span>
-
-                                        @endif
-
-                                    </td>
-
-                                </tr>
-
-                            @endforeach
-
-                        </tbody>
-
-                    </table>
-
-                @endif
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
+@include('cases.partials.modal-financial')
 
 @endsection
 
 
 @push('scripts')
 <script>
+
+// ==========================================
+// RECORDAR PESTAÑA ACTIVA
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    let activeTab = localStorage.getItem('caseActiveTab');
+
+    if (activeTab) {
+
+        let trigger = document.querySelector(
+            '[data-bs-target="' + activeTab + '"]'
+        );
+
+        if (trigger) {
+
+            new bootstrap.Tab(trigger).show();
+
+        }
+
+    }
+
+    document.querySelectorAll(
+        '#caseTabs button[data-bs-toggle="tab"]'
+    ).forEach(function(tab){
+
+        tab.addEventListener('shown.bs.tab', function(e){
+
+            localStorage.setItem(
+                'caseActiveTab',
+                e.target.dataset.bsTarget
+            );
+
+        });
+
+    });
+
+});
 
 // ==========================================
 // ABRIR MODAL EDITAR CASO
