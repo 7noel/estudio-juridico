@@ -103,6 +103,20 @@
 
 </div>
 
+@if(($consultation ?? null)?->status === 'new')
+<div class="row mb-3">
+
+    <div class="col-md-9">
+        <x-form.checkbox
+            name="change_to_prospect"
+            label="Cambiar a Prospecto"
+            checked
+        ></x-form.checkbox>
+    </div>
+
+</div>
+@endif
+
 <hr>
 
 {{-- CUOTAS --}}

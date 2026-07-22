@@ -57,10 +57,8 @@ return [
     */
 
     'consultation_statuses' => [
-        'new'        => 'Nueva',
-        'assigned'   => 'Asignada',
-        //'evaluating' => 'En evaluación',
-        'quoted'     => 'Cotizado',
+        'new'        => 'Nuevo',
+        'prospect'     => 'Prospecto',
         'accepted'   => 'Aceptado',
         'rejected'   => 'Rechazado',
     ],
@@ -68,10 +66,8 @@ return [
     'default_consultation_status' => 'new',
 
     'consultation_status_colors' => [
-        'new'        => 'secondary',
-        'assigned'   => 'primary',
-        'evaluating' => 'info',
-        'quoted'     => 'warning',
+        'new'        => 'primary',
+        'prospect'     => 'warning',
         'accepted'   => 'success',
         'rejected'   => 'danger',
     ],

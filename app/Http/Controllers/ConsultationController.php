@@ -108,13 +108,7 @@ class ConsultationController extends Controller
 
         try {
 
-            if (isset($request->installments) and $request->total_amount > 0) {
-                $status = 'quoted';
-            } elseif ($request->lawyer_id > 0) {
-                $status = 'assigned';
-            } else {
-                $status = config('options.default_consultation_status');
-            }
+            $status = config('options.default_consultation_status');
             
             // $status = ($request->lawyer_id > 0) ? 'assigned' : config('options.default_consultation_status') ;
 
@@ -190,13 +184,19 @@ class ConsultationController extends Controller
         try {
             $oldStatus = $consultation->status;
 
-            $consultation->update($request->only(
+            $data = $request->only(
                 'client_id',
                 'lawyer_id',
                 'title',
                 'description',
                 'total_amount'
-            ));
+            );
+
+            if ($consultation->status == 'new' and !is_null($request->input('change_to_prospect'))) {
+                $data['status'] = 'prospect';
+            }
+
+            $consultation->update($data);
 
             /*
             |--------------------------------------------------------------------------
@@ -303,26 +303,26 @@ class ConsultationController extends Controller
 
             }
 
-            if (!in_array($consultation->status, ['accepted', 'rejected'])) {
+            // if (!in_array($consultation->status, ['accepted', 'rejected'])) {
 
-                $consultation->load('installments');
+            //     $consultation->load('installments');
 
-                // 🔹 regla 1: NEW → ASSIGNED
-                if ($oldStatus === 'new' && $consultation->lawyer_id) {
-                    $newStatus = 'assigned';
-                }
+            //     // 🔹 regla 1: NEW → ASSIGNED
+            //     if ($oldStatus === 'new' && $consultation->lawyer_id) {
+            //         $newStatus = 'assigned';
+            //     }
 
-                // 🔹 regla 2: → QUOTED
-                if (in_array($oldStatus, ['new', 'assigned', 'evaluated']) && $consultation->total_amount > 0 && $consultation->installments->count() > 0) {
-                    $newStatus = 'quoted';
-                }
+            //     // 🔹 regla 2: → QUOTED
+            //     if (in_array($oldStatus, ['new', 'assigned', 'evaluated']) && $consultation->total_amount > 0 && $consultation->installments->count() > 0) {
+            //         $newStatus = 'quoted';
+            //     }
 
-                if (isset($newStatus) and $newStatus !== $consultation->status) {
-                    $consultation->update([
-                        'status' => $newStatus
-                    ]);
-                }
-            }
+            //     if (isset($newStatus) and $newStatus !== $consultation->status) {
+            //         $consultation->update([
+            //             'status' => $newStatus
+            //         ]);
+            //     }
+            // }
 
             DB::commit();
 
@@ -459,8 +459,8 @@ class ConsultationController extends Controller
 
         return response()->json([
             'all' => (clone $query)->count(),
-            'assigned' => (clone $query)->where('status', 'assigned')->count(),
-            'quoted' => (clone $query)->where('status', 'quoted')->count(),
+            'new' => (clone $query)->where('status', 'new')->count(),
+            'prospect' => (clone $query)->where('status', 'prospect')->count(),
             'accepted' => (clone $query)->where('status', 'accepted')->count(),
             'rejected' => (clone $query)->where('status', 'rejected')->count(),
         ]);

@@ -87,12 +87,12 @@
         <span class="badge bg-secondary filter-quick p-2" data-status="">
             Todas: <span id="stat_all">0</span>
         </span>
-        <span class="badge bg-primary filter-quick p-2" data-status="assigned">
-            Asignados: <span id="stat_assigned">0</span>
+        <span class="badge bg-primary filter-quick p-2" data-status="new">
+            Nuevos: <span id="stat_new">0</span>
         </span>
 
-        <span class="badge bg-warning text-dark filter-quick p-2" data-status="quoted">
-            Cotizados: <span id="stat_quoted">0</span>
+        <span class="badge bg-warning text-dark filter-quick p-2" data-status="prospect">
+            Prospectos: <span id="stat_prospect">0</span>
         </span>
 
         <span class="badge bg-success filter-quick p-2" data-status="accepted">
@@ -271,8 +271,8 @@ function loadStats(){
     }, function(res){
 
         $('#stat_all').text(res.all);
-        $('#stat_assigned').text(res.assigned);
-        $('#stat_quoted').text(res.quoted);
+        $('#stat_new').text(res.new);
+        $('#stat_prospect').text(res.prospect);
         $('#stat_accepted').text(res.accepted);
         $('#stat_rejected').text(res.rejected);
 
