@@ -558,47 +558,53 @@ $(document).on(
 /* ==========================================================
  * Filtro de actividades
  * ==========================================================*/
-$(function () {
+$(document).on(
+    'click',
+    '#activityFilters .btn',
+    function () {
 
-    $('#activityFilters .nav-link').on('click', function () {
+        $('#activityFilters .btn')
+            .removeClass('btn-primary active')
+            .addClass('btn-outline-secondary');
 
-        $('#activityFilters .nav-link').removeClass('active');
-        $(this).addClass('active');
+        $(this)
+            .removeClass('btn-outline-secondary')
+            .addClass('btn-primary active');
 
-        let filter = $(this).data('filter');
+        const filter = $(this).data('filter');
 
         if (filter === 'all') {
 
             $('.activity-item').show();
-            return;
 
+            return;
         }
 
         $('.activity-item').hide();
 
-        $('.activity-item').filter(function () {
+        $('.activity-item[data-type="' + filter + '"]').show();
 
-            return $(this).data('type') === filter;
+    }
+);
 
-        }).show();
-
-    });
-
-});
+// =====================================================
+// MOSTRAR / OCULTAR DESCRIPCIÓN
+// =====================================================
 
 $(document).on(
     'click',
     '.activity-title',
-    function(){
+    function () {
 
-        let description = $(this)
-            .siblings('.activity-description');
+        const description = $(this)
+            .closest('td')
+            .find('.activity-description');
 
-        if(!description.length){
+        if (!description.length) {
             return;
         }
 
-        description.toggleClass('d-none');
+        description.stop(true, true).slideToggle(180);
 
         $(this)
             .find('.activity-arrow')

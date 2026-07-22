@@ -14,172 +14,199 @@
 
     @endphp
 
-    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-
-        <div>
-
-            <h5 class="mb-0">
-                <i class="bi bi-list-task text-primary"></i>
-                Actividades
-            </h5>
-
-            <small class="text-muted">
-                Historial cronológico del expediente
-            </small>
-
-        </div>
-
-        @if($canManageCaseContent)
-
-            <button
-                class="btn btn-primary btn-sm"
-                id="btnAddActivity"
-                data-bs-toggle="modal"
-                data-bs-target="#modalActivity">
-
-                <i class="bi bi-plus-lg"></i>
-
-                Agregar actividad
-
-            </button>
-
-        @endif
-
-    </div>
-
+    {{-- Barra superior --}}
     <div class="card-body border-bottom">
 
-        <ul
-            class="nav nav-pills"
-            id="activityFilters">
+        <div class="row align-items-end g-3">
 
-            <li class="nav-item">
+            <div class="col">
 
-                <button
-                    type="button"
-                    class="nav-link active"
-                    data-filter="all">
+                <label class="form-label fw-semibold mb-2">
 
-                    Todas
+                    Filtrar actividades por tipo
 
-                    <span class="badge bg-secondary ms-1">
+                </label>
 
-                        {{ $activities->count() }}
-
-                    </span>
-
-                </button>
-
-            </li>
-
-            @foreach(config('options.activity_main_types') as $key => $label)
-
-                <li class="nav-item">
+                <div
+                    class="d-flex flex-wrap gap-2"
+                    id="activityFilters">
 
                     <button
                         type="button"
-                        class="nav-link"
-                        data-filter="{{ $key }}">
+                        class="btn btn-sm btn-primary active"
+                        data-filter="all">
 
-                        {{ $label }}
+                        Todas
 
-                        <span class="badge bg-secondary ms-1">
+                        <span class="badge bg-light text-dark ms-1">
 
-                            {{ $counts[$key] }}
+                            {{ $activities->count() }}
 
                         </span>
 
                     </button>
 
-                </li>
+                    @foreach(config('options.activity_main_types') as $key => $label)
 
-            @endforeach
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-secondary"
+                            data-filter="{{ $key }}">
 
-        </ul>
+                            {{ $label }}
+
+                            <span class="badge bg-secondary ms-1">
+
+                                {{ $counts[$key] }}
+
+                            </span>
+
+                        </button>
+
+                    @endforeach
+
+                </div>
+
+            </div>
+
+            @if($canManageCaseContent)
+
+                <div class="col-auto">
+
+                    <button
+                        class="btn btn-sm btn-outline-primary"
+                        id="btnAddActivity"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalActivity">
+
+                        <i class="bi bi-plus-lg"></i>
+
+                        Nueva actividad
+
+                    </button>
+
+                </div>
+
+            @endif
+
+        </div>
 
     </div>
 
-    <div class="card-body p-0">
+    {{-- Tabla --}}
+    <div class="table-responsive">
 
-        <div id="activities-list">
+        <table
+            class="table table-hover table-sm align-middle mb-0"
+            id="activitiesTable">
 
-            @forelse($activities as $act)
+            <thead class="table-light">
 
-                @php
+                <tr>
 
-                    $type = config("options.activity_main_types.{$act->type}");
+                    <th style="width:200px" class="text-center">
+                        Fecha
+                    </th>
 
-                    $subtype =
-                        config("options.activity_types.{$act->subtype}")
-                        ?? config("options.communication_types.{$act->subtype}")
-                        ?? config("options.judicial_progress_types.{$act->subtype}")
-                        ?? '-';
+                    <th style="width:170px" class="text-center">
+                        Tipo
+                    </th>
 
-                    $icon = match($act->type){
+                    <th style="width:220px" class="text-center">
+                        SubTipo
+                    </th>
 
-                        'legal' => 'bi-bank',
+                    <th class="text-center">
+                        Actividad
+                    </th>
 
-                        'judicial_progress' => 'bi-building',
+                    @if($canManageCaseContent)
 
-                        'communication' => 'bi-telephone',
+                        <th
+                            class="text-end text-center"
+                            style="width:200px">
 
-                        'note' => 'bi-journal-text',
+                            Acciones
 
-                        default => 'bi-circle'
+                        </th>
 
-                    };
+                    @endif
 
-                    $color = match($act->type){
+                </tr>
 
-                        'legal' => 'primary',
+            </thead>
 
-                        'judicial_progress' => 'success',
+            <tbody id="activities-list">
+                @forelse($activities as $act)
 
-                        'communication' => 'info',
+                    @php
 
-                        'note' => 'secondary',
+                        $type = config("options.activity_main_types.{$act->type}");
 
-                        default => 'dark'
+                        $subtype =
+                            config("options.activity_types.{$act->subtype}")
+                            ?? config("options.communication_types.{$act->subtype}")
+                            ?? config("options.judicial_progress_types.{$act->subtype}")
+                            ?? '-';
 
-                    };
 
-                @endphp
+                        $color = match($act->type){
 
-                <div
-                    class="activity-item activity-{{ $act->type }}"
-                    data-type="{{ $act->type }}">
+                            'legal' => 'primary',
 
-                    <div class="activity-row">
+                            'judicial_progress' => 'success',
 
-                        <div class="activity-date">
+                            'communication' => 'info',
 
-                            {{ strtoupper($act->activity_at?->translatedFormat('d M')) }}
+                            'note' => 'secondary',
 
-                            <span class="text-muted">
+                            default => 'dark'
 
-                                {{ $act->activity_at?->format('H:i') }}
+                        };
 
+                    @endphp
+
+                    <tr
+                        class="activity-item type-{{ str_replace('_', '-', $act->type) }}" data-type="{{ $act->type }}">
+
+                        {{-- FECHA --}}
+                        <td data-label="Fecha">
+
+                            <span class="fw-semibold">
+                                {{ $act->activity_at?->translatedFormat('d M Y') }}
+                                <small class="text-muted fw-normal">
+                                    · {{ $act->activity_at?->format('g:i A') }}
+                                </small>
                             </span>
 
-                        </div>
+                        </td>
 
-                        <div class="activity-meta">
+                        {{-- TIPO --}}
+                        <td data-label="Tipo">
+                                {{ $type }}
+                        </td>
 
-                            <i class="bi {{ $icon }} text-{{ $color }}"></i>
-
-                            <span>
-
+                        {{-- SUBTIPO --}}
+                        <td data-label="Actuación">
                                 {{ $subtype }}
 
-                            </span>
+                        </td>
 
-                        </div>
+                        {{-- ACTIVIDAD --}}
+                        <td data-label="Actividad">
 
-                        <div class="activity-content">
+                            <div
+                                class="activity-title d-flex align-items-center gap-2">
 
-                            <div class="activity-title">
+                                @if($act->description)
 
-                                <span class="activity-title-text">
+                                    <i
+                                        class="bi bi-caret-right-fill activity-arrow small text-secondary">
+                                    </i>
+
+                                @endif
+
+                                <span>
 
                                     {{ $act->title ?: '-' }}
 
@@ -189,7 +216,8 @@
 
                             @if($act->description)
 
-                                <div class="activity-description d-none">
+                                <div
+                                    class="activity-description" style="display:none;">
 
                                     {{ $act->description }}
 
@@ -197,78 +225,90 @@
 
                             @endif
 
-                        </div>
+                        </td>
 
-                        {{-- BOTONES --}}
-                        <div class="activity-actions">
+                        {{-- ACCIONES --}}
+                        @if($canManageCaseContent)
 
-                            @if($canManageCaseContent)
+                            <td
+                                data-label="Acciones"
+                                class="text-end">
 
-                                <button
+                                <div class="d-flex justify-content-end gap-2">
 
-                                    class="btn btn-sm btn-light btn-edit-activity"
+                                    <button
 
-                                    title="Editar"
+                                        class="btn btn-sm btn-outline-primary btn-edit-activity"
 
-                                    data-id="{{ $act->id }}"
-                                    data-type="{{ $act->type }}"
-                                    data-subtype="{{ $act->subtype }}"
-                                    data-title="{{ $act->title }}"
-                                    data-description="{{ $act->description }}"
-                                    data-date="{{ $act->activity_at?->format('Y-m-d\TH:i') }}"
-                                    data-has-event="{{ $act->agendaEvent ? 1 : 0 }}"
+                                        data-id="{{ $act->id }}"
+                                        data-type="{{ $act->type }}"
+                                        data-subtype="{{ $act->subtype }}"
+                                        data-title="{{ $act->title }}"
+                                        data-description="{{ $act->description }}"
+                                        data-date="{{ $act->activity_at?->format('Y-m-d\TH:i') }}"
+                                        data-has-event="{{ $act->agendaEvent ? 1 : 0 }}"
 
-                                    data-agenda-type="{{ $act->agendaEvent?->type }}"
-                                    data-agenda-title="{{ $act->agendaEvent?->title }}"
-                                    data-agenda-description="{{ $act->agendaEvent?->description }}"
-                                    data-agenda-start="{{ $act->agendaEvent?->start_datetime?->format('Y-m-d H:i:s') }}"
-                                    data-agenda-end="{{ $act->agendaEvent?->end_datetime?->format('Y-m-d H:i:s') }}"
-                                    data-agenda-location="{{ $act->agendaEvent?->location }}">
+                                        data-agenda-type="{{ $act->agendaEvent?->type }}"
+                                        data-agenda-title="{{ $act->agendaEvent?->title }}"
+                                        data-agenda-description="{{ $act->agendaEvent?->description }}"
+                                        data-agenda-start="{{ $act->agendaEvent?->start_datetime?->format('Y-m-d H:i:s') }}"
+                                        data-agenda-end="{{ $act->agendaEvent?->end_datetime?->format('Y-m-d H:i:s') }}"
+                                        data-agenda-location="{{ $act->agendaEvent?->location }}">
 
-                                    <i class="bi bi-pencil"></i> Editar
+                                        <i class="bi bi-pencil"></i> Editar
 
-                                </button>
+                                    </button>
 
-                                <button
+                                    <button
 
-                                    class="btn btn-sm btn-light btn-delete-activity"
+                                        class="btn btn-sm btn-outline-danger btn-delete-activity"
 
-                                    title="Eliminar"
+                                        data-id="{{ $act->id }}">
 
-                                    data-id="{{ $act->id }}">
+                                        <i class="bi bi-trash"></i> Eliminar
 
-                                    <i class="bi bi-trash text-danger"></i> Eliminar
+                                    </button>
 
-                                </button>
+                                </div>
 
-                            @endif
+                            </td>
 
-                        </div>
+                        @endif
 
-                    </div>
+                    </tr>
 
-                </div>
+                @empty
 
-            @empty
+                <tr>
 
-                <div class="text-center py-5">
+                    <td
+                        colspan="{{ $canManageCaseContent ? 5 : 4 }}"
+                        class="text-center py-5">
 
-                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                        <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
 
-                    <h6 class="mt-3 text-muted">
-                        Aún no hay actividades registradas.
-                    </h6>
+                        <h6 class="text-muted mb-1">
 
-                    <p class="text-muted mb-0">
-                        Utiliza el botón <strong>"Agregar actividad"</strong> para registrar el primer movimiento del expediente.
-                    </p>
+                            No hay actividades registradas
 
-                </div>
+                        </h6>
 
-            @endforelse
+                        <small class="text-muted">
 
-        </div> {{-- #activities-list --}}
+                            Aún no se ha registrado ninguna actividad para este expediente.
 
-    </div> {{-- card-body listado --}}
+                        </small>
 
-</div> {{-- card --}}
+                    </td>
+
+                </tr>
+
+                @endforelse
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
