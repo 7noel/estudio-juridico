@@ -38,8 +38,6 @@ return new class extends Migration
             $table->softDeletes();
 
             // Índices
-            $table->index('consultation_id');
-            $table->index('user_id');
             $table->index('contact_date');
             $table->index('next_contact_date');
             $table->index('communication_type');

@@ -345,30 +345,11 @@ class ConsultationController extends Controller
 
     public function generateCase(Consultation $consultation)
     {
-        if (!$consultation->case) {
-            //$status = ($consultation->lawyer_id > 0) ? 'assigned' : config('options.default_case_status') ;
-            CaseFile::create([
-                'consultation_id' => $consultation->id,
-                'establishment_id' => $consultation->establishment_id,
-                'client_id' => $consultation->client_id,
-                'service_type' => $consultation->service_type,
-                'legal_specialty_id' => $consultation->legal_specialty_id,
-                'legal_subject_id' => $consultation->legal_subject_id,
-                'lawyer_id' => $consultation->lawyer_id,
-                'title' => $consultation->title,
-                'description' => $consultation->description,
-                'total_amount' => $consultation->total_amount,
-                'status' => config('options.default_case_status'),
-                'opened_at' => now(),
-                'created_by' => auth()->user()->id,
-            ]);
+        $this->authorize('update', $consultation);
 
-            $consultation->update([
-                'status' => 'accepted'
-            ]);
-        }
+        $this->createCase($consultation);
 
-        return response()->json(['ok'=>true]);
+        return response()->json(['ok' => true]);
     }
 
     public function changeStatus(Request $request, Consultation $consultation)
@@ -384,13 +365,7 @@ class ConsultationController extends Controller
     {
         $this->authorize('update', $consultation);
 
-        if ($consultation->status === 'accepted') {
-            abort(403);
-        }
-
-        $consultation->update([
-            'status' => 'rejected'
-        ]);
+        $this->rejectConsultation($consultation);
 
         return response()->json(['ok' => true]);
     }
@@ -463,6 +438,44 @@ class ConsultationController extends Controller
             'prospect' => (clone $query)->where('status', 'prospect')->count(),
             'accepted' => (clone $query)->where('status', 'accepted')->count(),
             'rejected' => (clone $query)->where('status', 'rejected')->count(),
+        ]);
+    }
+
+    private function createCase(Consultation $consultation): void
+    {
+        if ($consultation->case) {
+            return;
+        }
+
+        CaseFile::create([
+            'consultation_id'      => $consultation->id,
+            'establishment_id'     => $consultation->establishment_id,
+            'client_id'            => $consultation->client_id,
+            'service_type'         => $consultation->service_type,
+            'legal_specialty_id'   => $consultation->legal_specialty_id,
+            'legal_subject_id'     => $consultation->legal_subject_id,
+            'lawyer_id'            => $consultation->lawyer_id,
+            'title'                => $consultation->title,
+            'description'          => $consultation->description,
+            'total_amount'         => $consultation->total_amount,
+            'status'               => config('options.default_case_status'),
+            'opened_at'            => now(),
+            'created_by'           => auth()->id(),
+        ]);
+
+        $consultation->update([
+            'status' => 'accepted'
+        ]);
+    }
+
+    private function rejectConsultation(Consultation $consultation): void
+    {
+        if ($consultation->status === 'accepted') {
+            abort(403);
+        }
+
+        $consultation->update([
+            'status' => 'rejected'
         ]);
     }
 

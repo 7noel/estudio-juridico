@@ -287,21 +287,25 @@ return [
     ],
 
     'follow_up_results' => [
-
+        'accepted'        => 'Acepta contratar',
         'interested'      => 'Interesado',
-
         'thinking'        => 'Solicita tiempo',
-
         'proposal'        => 'Esperando propuesta',
-
         'meeting'         => 'Reunión programada',
-
         'no_answer'       => 'No contestó',
-
-        'not_interested'  => 'No desea continuar',
-
+        'rejected'        => 'Rachazado',
         'other'           => 'Otro',
+    ],
 
+    'follow_up_result_colors' => [
+        'accepted'        => 'success',   // Acepta contratar
+        'interested'      => 'info',   // Interesado
+        'thinking'        => 'warning',   // Solicita tiempo
+        'proposal'        => 'info',      // Esperando propuesta
+        'meeting'         => 'primary',   // Reunión programada
+        'no_answer'       => 'secondary', // No contestó
+        'rejected'        => 'danger',    // No desea continuar
+        'other'           => 'dark',      // Otro
     ],
 
 ];

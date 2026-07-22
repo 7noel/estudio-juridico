@@ -243,6 +243,8 @@
 
 @include('consultations.partials.payments')
 
+@include('consultations.partials.follow-ups')
+
 <div class="modal fade" id="confirmModal" tabindex="-1">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">

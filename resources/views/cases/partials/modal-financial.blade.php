@@ -124,39 +124,22 @@
                                     </td>
 
                                     <td>
-
                                         @if($installment->is_paid)
-
                                             <span class="badge bg-primary">
-
                                                 Pagado
-
                                             </span>
-
                                         @elseif($installment->paid_amount > 0)
-
                                             <span class="badge bg-warning text-dark">
-
                                                 Parcial
-
                                             </span>
-
                                         @elseif($installment->due_date->isPast())
-
                                             <span class="badge bg-danger">
-
                                                 Vencida
-
                                             </span>
-
                                         @else
-
                                             <span class="badge bg-secondary">
-
                                                 Pendiente
-
                                             </span>
-
                                         @endif
 
                                     </td>

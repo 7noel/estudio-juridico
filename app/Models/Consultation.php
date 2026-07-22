@@ -89,6 +89,32 @@ class Consultation extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function followUps()
+    {
+        return $this->hasMany(ConsultationFollowUp::class)
+            ->orderByDesc('contact_date')
+            ->orderByDesc('id');
+    }
+
+    public function lastFollowUp()
+    {
+        return $this->hasOne(ConsultationFollowUp::class)
+            ->ofMany([
+                'contact_date' => 'max',
+                'id' => 'max',
+            ]);
+    }
+
+    public function latestPendingFollowUp()
+    {
+        return $this->hasOne(ConsultationFollowUp::class)
+            ->whereNotNull('next_contact_date')
+            ->ofMany([
+                'contact_date' => 'max',
+                'id' => 'max',
+            ]);
+    }
+
     // 💰 total pagado
     public function getPaidAmountAttribute()
     {

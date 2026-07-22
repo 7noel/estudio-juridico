@@ -18,6 +18,7 @@ use App\Http\Controllers\AgendaEventController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationSettingController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\ConsultationFollowUpController;
 use App\Http\Controllers\Reports\FinancialReportController;
 use App\Http\Controllers\Reports\CollectionReportController;
 use App\Http\Controllers\Reports\ProfitabilityReportController;
@@ -135,6 +136,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('expenses', [ExpenseController::class, 'store'])->name('expenses.store');
     Route::put('expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
     Route::delete('expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
+
+    Route::resource('follow-ups', ConsultationFollowUpController::class);
 });
 
 Route::get('ubigeos/search', [ClientController::class,'searchUbigeo'])->name('ubigeos.search');
