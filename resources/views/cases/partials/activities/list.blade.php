@@ -17,9 +17,9 @@
     {{-- Barra superior --}}
     <div class="card-body border-bottom">
 
-        <div class="row align-items-end g-3">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3">
 
-            <div class="col">
+            <div class="flex-grow-1">
 
                 <label class="form-label fw-semibold mb-2">
 
@@ -71,7 +71,7 @@
 
             @if($canManageCaseContent)
 
-                <div class="col-auto">
+                <div class="">
 
                     <button
                         class="btn btn-sm btn-outline-primary"
