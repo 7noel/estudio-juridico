@@ -23,7 +23,7 @@ function loadActivitySubtypes(type, selected = null){
 
     let options = activitySubtypes[type] || {};
 
-    let html = '';
+    let html = '<option value=""> Seleccionar </option>';
 
     for(let k in options){
 
@@ -55,18 +55,30 @@ $('#activity_type').change(function(){
 
 $('#activity_subtype').change(function(){
 
-    let text = $(this).find('option:selected').text();
+    let text = $(this).find('option:selected').text().trim();
 
     if(!$('[name="title"]').val()){
 
-        $('[name="title"]').val(text);
+        // $('[name="title"]').val(text);
 
     }
 
     // 🔥 titulo evento
+    //if(!$('#activity_event_title').val()){
+
+    //    $('#activity_event_title').val(text);
+
+    //}
+
+});
+
+$('#activity_event_type').change(function(){
+
+    let text = $(this).find('option:selected').text().trim();
+    // 🔥 titulo evento
     if(!$('#activity_event_title').val()){
 
-        $('#activity_event_title').val(text);
+        // $('#activity_event_title').val(text);
 
     }
 

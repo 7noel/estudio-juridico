@@ -94,7 +94,7 @@
                     <input type="hidden" id="event_id">
                     <div class="mb-2">
                         <label>Tipo</label>
-                        <select id="event_type" class="form-select form-control-sm">
+                        <select id="event_type" class="form-select form-select-sm">
                             <option value=""> Seleccionar </option>
                             @foreach(config('options.agenda_event_types') as $key => $label)
                                 <option value="{{ $key }}"> {{ $label }} </option>

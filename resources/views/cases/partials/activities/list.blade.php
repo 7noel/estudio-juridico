@@ -71,7 +71,7 @@
 
             @if($canManageCaseContent)
 
-                <div class="">
+                <div class="flex-shrink-0">
 
                     <button
                         class="btn btn-sm btn-outline-primary"

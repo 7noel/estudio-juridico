@@ -12,7 +12,7 @@
                     <input type="hidden" id="activity_id" name="activity_id">
                     <div class="mb-2">
                         <label>Tipo</label>
-                        <select name="type" id="activity_type" class="form-control form-control-sm">
+                        <select name="type" id="activity_type" class="form-select form-select-sm">
                             <option value=""> Seleccionar </option>
                             @foreach(config('options.activity_main_types') as $k => $v)
                                 <option value="{{ $k }}">{{ $v }}</option>
@@ -21,7 +21,7 @@
                     </div>
                     <div class="mb-2">
                         <label>Subtipo</label>
-                        <select name="subtype" id="activity_subtype" class="form-control form-control-sm"></select>
+                        <select name="subtype" id="activity_subtype" class="form-select form-select-sm"></select>
                     </div>
                     <div class="mb-2">
                         <label>Título</label>
@@ -49,7 +49,7 @@
                             </div>
                             <div class="mb-2">
                                 <label>Tipo de Evento</label>
-                                <select id="activity_event_type" class="form-select form-control-sm">
+                                <select id="activity_event_type" class="form-select form-select-sm">
                                     <option value=""> Seleccionar </option>
                                     @foreach(config('options.agenda_event_types') as $key => $label)
                                         <option value="{{ $key }}"> {{ $label }} </option>
@@ -58,7 +58,7 @@
                             </div>
                             <div class="mb-2">
                                 <label>Título evento</label>
-                                <input type="text" id="activity_event_title" class="form-control form-control-sm">
+                                <input type="text" id="activity_event_title" class="form-control form-control-sm text-uppercase">
                             </div>
                             <div class="mb-2">
                                 <label>Descripción evento</label>
@@ -70,7 +70,7 @@
                             </div>
                             <div class="col-md-6 mb-2">
                                 <label>Hora inicio</label>
-                                <select id="activity_event_start_time" class="form-select form-control-sm"> </select>
+                                <select id="activity_event_start_time" class="form-select form-select-sm"> </select>
                             </div>
                         </div>
                         <div class="row">
@@ -80,7 +80,7 @@
                             </div>
                             <div class="col-md-6 mb-2">
                                 <label>Hora fin</label>
-                                <select id="activity_event_end_time" class="form-select form-control-sm"> </select>
+                                <select id="activity_event_end_time" class="form-select form-select-sm"> </select>
                             </div>
                         </div>
                         <div class="mb-2">

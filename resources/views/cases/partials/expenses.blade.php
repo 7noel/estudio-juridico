@@ -1,81 +1,320 @@
 <div class="card mt-3">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <strong> Gastos </strong>
-        @if($canManageCaseContent)
-            <button
-                class="btn btn-sm btn-outline-primary"
-                id="btnAddExpense"
-                data-bs-toggle="modal"
-                data-bs-target="#modalExpense"
-            >
-                <i class="bi bi-plus"></i> Agregar
-            </button>
-        @endif
-    </div>
-    <div class="card-body">
-        <div id="expenses-list">
-            @forelse($case->expenses as $expense)
-                <div class="border rounded p-3 mb-3">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-danger">
-                                    Gasto
-                                </span>
-                                <strong>
-                                    {{ config('options.expense_categories')[$expense->category] ?? $expense->category }}
-                                </strong>
-                            </div>
-                            <small class="text-muted">
-                                {{ $expense->payment_method }}
-                            </small>
-                        </div>
-                        <div class="text-end">
-                            <div class="fw-bold text-danger">
-                                S/ {{ number_format($expense->amount, 2) }}
-                            </div>
-                            <small class="text-muted">
-                                {{ $expense->expense_date?->format('d/m/Y') }}
-                            </small>
-                        </div>
-                    </div>
-                    @if($expense->description)
-                        <div class="mt-2">
-                            {{ $expense->description }}
-                        </div>
-                    @endif
-                    <div class="mt-2 small text-muted">
-                        Registrado por:
-                        {{ $expense->user?->name }}
-                    </div>
-                    <div class="text-end mt-3 d-flex justify-content-end gap-2">
-                        @if($expense->attachment)
-                            <a href="{{ asset('storage/' . $expense->attachment) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-paperclip"></i> Ver archivo
-                            </a>
-                        @endif
-                        @if($canManageCaseContent)
-                            <button class="btn btn-sm btn-outline-success btn-edit-expense"
-                                data-id="{{ $expense->id }}"
-                                data-category="{{ $expense->category }}"
-                                data-amount="{{ $expense->amount }}"
-                                data-date="{{ $expense->expense_date?->format('Y-m-d') }}"
-                                data-method="{{ $expense->payment_method }}"
-                                data-reference="{{ $expense->reference }}"
-                                data-description="{{ $expense->description }}"
-                            >
-                                <i class="bi bi-pencil"></i> Editar
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger btn-delete-expense" data-id="{{ $expense->id }}">
-                                <i class="bi bi-trash"></i> Eliminar
-                            </button>
-                        @endif
-                    </div>
+    <div class="card-body border-bottom">
+        @php
+
+            $expenses = $case->expenses;
+
+            $counts = [];
+
+            foreach(config('options.expense_categories') as $key => $label){
+
+                $counts[$key] = $expenses
+                    ->where('category', $key)
+                    ->count();
+
+            }
+
+        @endphp
+
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3">
+
+            <div class="flex-grow-1">
+
+                <label class="form-label fw-semibold mb-2">
+
+                    Filtrar gastos
+
+                </label>
+
+                <div
+                    class="d-flex flex-wrap gap-2"
+                    id="expenseFilters">
+
+                    <button
+                        class="btn btn-sm btn-primary active"
+                        data-filter="all">
+
+                        Todos
+
+                        <span class="badge bg-light text-dark ms-1">
+
+                            {{ $expenses->count() }}
+
+                        </span>
+
+                    </button>
+
+                    @foreach(config('options.expense_categories') as $key => $label)
+
+                        <button
+                            class="btn btn-sm btn-outline-secondary"
+                            data-filter="{{ $key }}">
+
+                            {{ $label }}
+
+                            <span class="badge bg-secondary ms-1">
+
+                                {{ $counts[$key] }}
+
+                            </span>
+
+                        </button>
+
+                    @endforeach
+
                 </div>
-            @empty
-                <div class="text-muted">No hay gastos registrados</div>
-            @endforelse
+
+            </div>
+
+            @if($canManageCaseContent)
+
+                <div class="flex-shrink-0">
+
+                    <button
+                        class="btn btn-sm btn-outline-primary"
+                        id="btnAddExpense"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalExpense">
+
+                        <i class="bi bi-plus"></i>
+
+                        Agregar gasto
+
+                    </button>
+
+                </div>
+
+            @endif
+
         </div>
+
+        <div class="table-responsive mt-3">
+
+            <table
+                class="table table-sm table-hover align-middle mb-0"
+                id="expensesTable">
+
+                <thead class="table-light">
+
+                    <tr>
+
+                        <th style="width:120px">
+                            Fecha
+                        </th>
+
+                        <th style="width:180px">
+                            Categoría
+                        </th>
+
+                        <th>
+                            Descripción
+                        </th>
+
+                        <th style="width:150px">
+                            Monto
+                        </th>
+
+                        <th style="width:120px">
+                            Archivo
+                        </th>
+
+                        @if($canManageCaseContent)
+
+                            <th
+                                class="text-end"
+                                style="width:200px">
+
+                                Acciones
+
+                            </th>
+
+                        @endif
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+                    @forelse($expenses as $expense)
+
+                    <tr
+                        class="expense-item"
+                        data-category="{{ $expense->category }}">
+
+                        <td data-label="Fecha">
+
+                            {{ $expense->expense_date?->format('d/m/Y') }}
+
+                        </td>
+
+                        <td data-label="Categoría">
+
+                            {{ config('options.expense_categories')[$expense->category] ?? $expense->category }}
+
+                        </td>
+
+                        <td data-label="Descripción">
+
+                            @php
+
+                                $description = trim($expense->description ?? '');
+
+                            @endphp
+
+                            @if($description)
+
+                                @if(strlen($description) > 120)
+
+                                    <div class="expense-description-short">
+
+                                        {{ \Illuminate\Support\Str::limit($description,120) }}
+
+                                    </div>
+
+                                    <div
+                                        class="expense-description-full"
+                                        style="display:none;">
+
+                                        {{ $description }}
+
+                                    </div>
+
+                                    <a
+                                        href="#"
+                                        class="expense-toggle small">
+
+                                        Ver más
+
+                                    </a>
+
+                                @else
+
+                                    {{ $description }}
+
+                                @endif
+
+                            @else
+
+                                <span class="text-muted">
+
+                                    —
+
+                                </span>
+
+                            @endif
+
+                        </td>
+
+                        <td data-label="Monto">
+
+                            <div class="fw-semibold text-danger">
+
+                                S/ {{ number_format($expense->amount,2) }}
+
+                            </div>
+
+                            @if($expense->reference)
+
+                                <small class="text-muted">
+
+                                    Ref.: {{ $expense->reference }}
+
+                                </small>
+
+                            @endif
+
+                        </td>
+
+                        <td data-label="Archivo">
+
+                            @if($expense->attachment)
+
+                                <a
+                                    href="{{ asset('storage/'.$expense->attachment) }}"
+                                    target="_blank">
+
+                                    Ver archivo
+
+                                </a>
+
+                            @else
+
+                                <span class="text-muted">
+
+                                    —
+
+                                </span>
+
+                            @endif
+
+                        </td>
+
+                        @if($canManageCaseContent)
+
+                        <td
+                            data-label="Acciones"
+                            class="text-end">
+
+                            <div class="d-flex justify-content-end gap-2">
+
+                                <button
+                                    class="btn btn-sm btn-outline-primary btn-edit-expense"
+
+                                    data-id="{{ $expense->id }}"
+                                    data-category="{{ $expense->category }}"
+                                    data-amount="{{ $expense->amount }}"
+                                    data-date="{{ $expense->expense_date?->format('Y-m-d') }}"
+                                    data-method="{{ $expense->payment_method }}"
+                                    data-reference="{{ $expense->reference }}"
+                                    data-description="{{ $expense->description }}">
+
+                                    <i class="bi bi-pencil"></i>
+
+                                    Editar
+
+                                </button>
+
+                                <button
+                                    class="btn btn-sm btn-outline-danger btn-delete-expense"
+
+                                    data-id="{{ $expense->id }}">
+
+                                    <i class="bi bi-trash"></i>
+
+                                    Eliminar
+
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                        @endif
+
+                    </tr>
+
+                    @empty
+
+                    <tr>
+
+                        <td
+                            colspan="{{ $canManageCaseContent ? 6 : 5 }}"
+                            class="text-center py-5">
+
+                            No hay gastos registrados.
+
+                        </td>
+
+                    </tr>
+
+                    @endforelse
+
+                </tbody>
+
+            </table>
+
+        </div>
+
     </div>
 </div>
 
@@ -277,5 +516,153 @@ $(function(){
 
 });
 
+// ==========================================
+// FILTRAR GASTOS
+// ==========================================
+
+$(document).on(
+    'click',
+    '#expenseFilters .btn',
+    function(){
+
+        $('#expenseFilters .btn')
+            .removeClass('btn-primary active')
+            .addClass('btn-outline-secondary');
+
+        $(this)
+            .removeClass('btn-outline-secondary')
+            .addClass('btn-primary active');
+
+        const filter = $(this).data('filter');
+
+        if(filter === 'all'){
+
+            $('.expense-item').show();
+
+            return;
+
+        }
+
+        $('.expense-item').hide();
+
+        $('.expense-item[data-category="'+filter+'"]').show();
+
+    }
+);
+
+// ==========================================
+// VER MÁS / VER MENOS
+// ==========================================
+
+$(document).on(
+    'click',
+    '.expense-toggle',
+    function(e){
+
+        e.preventDefault();
+
+        const row = $(this).closest('td');
+
+        row.find('.expense-description-short').slideToggle(150);
+
+        row.find('.expense-description-full').slideToggle(150);
+
+        $(this).text(
+
+            $(this).text() === 'Ver más'
+
+                ? 'Ver menos'
+
+                : 'Ver más'
+
+        );
+
+    }
+);
+
 </script>
+@endpush
+
+@push('styles')
+
+<style>
+
+#expensesTable td,
+#expensesTable th{
+    vertical-align:middle;
+}
+
+.expense-toggle{
+    text-decoration:none;
+}
+
+@media(max-width:768px){
+
+    #expensesTable thead{
+        display:none;
+    }
+
+    #expensesTable,
+    #expensesTable tbody,
+    #expensesTable tr,
+    #expensesTable td{
+
+        display:block;
+        width:100%;
+
+    }
+
+    #expensesTable tr{
+
+        margin-bottom:1rem;
+        border:1px solid #dee2e6;
+        border-radius:.6rem;
+        overflow:hidden;
+        background:#fff;
+        box-shadow:0 .125rem .25rem rgba(0,0,0,.05);
+
+    }
+
+    #expensesTable td{
+
+        border:none;
+        border-bottom:1px solid #f1f1f1;
+        padding:.75rem 1rem;
+        text-align:left !important;
+
+    }
+
+    #expensesTable td:last-child{
+
+        border-bottom:none;
+
+    }
+
+    #expensesTable td::before{
+
+        content:attr(data-label);
+
+        display:block;
+
+        font-size:.72rem;
+        font-weight:600;
+
+        color:#6c757d;
+
+        text-transform:uppercase;
+
+        margin-bottom:.25rem;
+
+    }
+
+    #expensesTable .btn{
+
+        flex:1;
+
+    }
+
+}
+
+</style>
+
 @endpush

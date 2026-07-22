@@ -70,7 +70,7 @@
 
             @if($canManageCaseContent)
 
-                <div>
+                <div class="flex-shrink-0">
 
                     <button
                         class="btn btn-sm btn-outline-primary"
@@ -272,7 +272,7 @@
                 <div class="modal-body">
                     <div class="mb-2">
                         <label>Tipo</label>
-                        <select name="document_type" class="form-control form-control-sm mb-2">
+                        <select name="document_type" class="form-select form-select-sm mb-2">
                             <option value=""> Seleccionar </option>
                             @foreach(config('options.document_types') as $k => $v)
                                 <option value="{{ $k }}">{{ $v }}</option>
