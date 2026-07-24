@@ -29,7 +29,7 @@ class DocumentController extends Controller
             'file_path' => $path,
             'file_name' => $file->getClientOriginalName(),
             'file_size' => $file->getSize(),
-            'uploaded_by' => auth()->id(),
+            'user_id' => auth()->id(),
         ]);
 
         return response()->json(['success' => true]);

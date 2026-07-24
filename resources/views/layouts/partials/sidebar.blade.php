@@ -52,7 +52,8 @@
 
 			<a class="nav-link text-dark d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#menuReportes" role="button">
 				<span>
-					<i class="bi bi-bar-chart"></i>Reportes
+					<i class="bi bi-bar-chart"></i>
+					Reportes
 				</span>
 				<i class="bi bi-chevron-down"></i>
 			</a>

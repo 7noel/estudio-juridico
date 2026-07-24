@@ -23,10 +23,11 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->decimal('total_amount', 10, 2)->nullable();
             $table->string('status');
-            $table->foreignId('created_by')->constrained('users');
-            $table->timestamp('assigned_at')->nullable();
-            $table->timestamp('evaluated_at')->nullable();
-            $table->timestamp('quoted_at')->nullable();
+            $table->date('last_follow_up_at')->nullable();
+            $table->string('last_follow_up_result')->nullable();
+            $table->date('next_follow_up_at')->nullable();
+            $table->foreignId('user_id')->constrained('users');
+            $table->timestamp('prospect_at')->nullable();
             $table->timestamp('accepted_at')->nullable();
             $table->timestamp('rejected_at')->nullable();
             $table->timestamps();

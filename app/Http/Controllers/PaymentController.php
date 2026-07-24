@@ -57,7 +57,7 @@ class PaymentController extends Controller
             'reference' => $request->reference,
             'description' => $description,
             'generate_case' => $request->generate_case ? 1 : 0,
-            'created_by' => auth()->user()->id,
+            'user_id' => auth()->user()->id,
         ]);
 
         /*
@@ -90,7 +90,7 @@ class PaymentController extends Controller
                 'total_amount' => $consultation->total_amount,
                 'status' => config('options.default_case_status'),
                 'opened_at' => now(),
-                'created_by' => auth()->user()->id,
+                'user_id' => auth()->user()->id,
             ]);
 
             $consultation->update([

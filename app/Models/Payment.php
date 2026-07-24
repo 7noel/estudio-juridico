@@ -18,7 +18,7 @@ class Payment extends Model
         'payment_method',
         'reference',
         'description',
-        'created_by',
+        'user_id',
     ];
 
     protected $casts = [
@@ -41,12 +41,9 @@ class Payment extends Model
         return $this->belongsTo(ConsultationInstallment::class, 'consultation_installment_id');
     }
 
-    public function creator()
+    public function user()
     {
-        return $this->belongsTo(
-            User::class,
-            'created_by'
-        );
+        return $this->belongsTo(User::class);
     }
     
 }

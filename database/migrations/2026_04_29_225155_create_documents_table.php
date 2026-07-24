@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('file_path');
             $table->string('file_name');
             $table->integer('file_size')->nullable();
-            $table->foreignId('uploaded_by')->constrained('users');
+            $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
             $table->softDeletes();
         });

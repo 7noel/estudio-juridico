@@ -16,7 +16,7 @@ class CaseActivity extends Model
         'title',
         'description',
         'activity_at',
-        'created_by',
+        'user_id',
     ];
 
     protected $casts = [
@@ -30,7 +30,7 @@ class CaseActivity extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(User::class);
     }
     
     public function agendaEvent()

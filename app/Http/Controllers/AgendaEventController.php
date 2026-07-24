@@ -28,7 +28,7 @@ class AgendaEventController extends Controller
             'start_datetime' => $request->start_datetime,
             'end_datetime' => $request->end_datetime,
             'location' => $request->location,
-            'created_by' => auth()->id(),
+            'user_id' => auth()->id(),
         ]);
 
         return response()->json(['success' => true]);

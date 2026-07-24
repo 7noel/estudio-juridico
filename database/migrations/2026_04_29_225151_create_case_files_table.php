@@ -31,7 +31,7 @@ return new class extends Migration
             $table->timestamp('closed_at')->nullable();
 
             $table->index(['status', 'opened_at']);
-            $table->foreignId('created_by')->constrained('users');
+            $table->foreignId('user_id')->constrained('users');
             
             $table->timestamps();
             $table->softDeletes();

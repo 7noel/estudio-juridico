@@ -20,19 +20,20 @@ class Consultation extends Model
         'description',
         'total_amount',
         'status',
-        'created_by',
-        'assigned_at',
-        'evaluated_at',
-        'quoted_at',
+        'last_follow_up_at',
+        'last_follow_up_result',
+        'next_follow_up_at',
+        'user_id',
+        'prospect_at',
         'accepted_at',
         'rejected_at',
     ];
 
     protected $casts = [
 
-        'assigned_at' => 'datetime',
-        'evaluated_at' => 'datetime',
-        'quoted_at' => 'datetime',
+        'last_follow_up_at' => 'date',
+        'next_follow_up_at' => 'date',
+        'prospect_at' => 'datetime',
         'accepted_at' => 'datetime',
         'rejected_at' => 'datetime',
 
@@ -84,9 +85,9 @@ class Consultation extends Model
         return $this->hasOne(CaseFile::class);
     }
 
-    public function creator()
+    public function user()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(User::class);
     }
 
     public function followUps()

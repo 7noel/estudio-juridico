@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('payment_method');
             $table->string('reference')->nullable();
             $table->text('description')->nullable();
-            $table->foreignId('created_by')->constrained('users');
+            $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
             $table->softDeletes();
         });

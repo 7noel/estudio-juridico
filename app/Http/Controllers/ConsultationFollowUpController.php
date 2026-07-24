@@ -54,13 +54,13 @@ class ConsultationFollowUpController extends Controller
 
             ]);
 
-            if ($followUp->result === 'accepted') {
+            if ($request->result === 'accepted') {
 
                 if ($request->boolean('generate_case')) {
 
                     $this->createCase($consultation);
                 }
-            } elseif ($followUp->result === 'rejected') {
+            } elseif ($request->result === 'rejected') {
 
                 if ($request->boolean('reject_consultation')) {
 
@@ -77,6 +77,7 @@ class ConsultationFollowUpController extends Controller
 
                 $consultation->update([
                     'status' => 'prospect',
+                    'prospect_at' => now(),
                 ]);
 
             }
@@ -88,6 +89,8 @@ class ConsultationFollowUpController extends Controller
             //     ]);
 
             // }
+
+            $this->refreshFollowUpData($consultation);
 
             DB::commit();
 
@@ -139,6 +142,8 @@ class ConsultationFollowUpController extends Controller
 
         $followUp->delete();
 
+        $this->refreshFollowUpData($consultation);
+
         return response()->json([
             'success' => true,
             'redirect' => route('consultations.show', $consultation),
@@ -165,11 +170,12 @@ class ConsultationFollowUpController extends Controller
             'total_amount'         => $consultation->total_amount,
             'status'               => config('options.default_case_status'),
             'opened_at'            => now(),
-            'created_by'           => auth()->id(),
+            'user_id'           => auth()->id(),
         ]);
 
         $consultation->update([
-            'status' => 'accepted'
+            'status' => 'accepted',
+            'accepted_at' => now(),
         ]);
     }
 
@@ -180,7 +186,33 @@ class ConsultationFollowUpController extends Controller
         }
 
         $consultation->update([
-            'status' => 'rejected'
+            'status' => 'rejected',
+            'rejected_at' => now(),
+        ]);
+    }
+
+    private function refreshFollowUpData(Consultation $consultation): void
+    {
+        $lastFollowUp = $consultation->followUps()
+            ->latest('contact_date')
+            ->latest('id')
+            ->first();
+
+        if (!$lastFollowUp) {
+
+            $consultation->update([
+                'last_follow_up_at'     => null,
+                'last_follow_up_result' => null,
+                'next_follow_up_at'     => null,
+            ]);
+
+            return;
+        }
+
+        $consultation->update([
+            'last_follow_up_at'     => $lastFollowUp->contact_date,
+            'last_follow_up_result' => $lastFollowUp->result,
+            'next_follow_up_at'     => $lastFollowUp->next_contact_date,
         ]);
     }
 

@@ -28,7 +28,7 @@ return new class extends Migration
             // Fecha de la actividad (audiencia, llamada, etc.)
             $table->timestamp('activity_at')->nullable();
 
-            $table->foreignId('created_by')->constrained('users');
+            $table->foreignId('user_id')->constrained('users');
 
             $table->timestamps();
             $table->softDeletes();

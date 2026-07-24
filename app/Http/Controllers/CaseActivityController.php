@@ -59,7 +59,7 @@ class CaseActivityController extends Controller
                 'activity_at' =>
                     $request->activity_at ?: now(),
 
-                'created_by' => auth()->id(),
+                'user_id' => auth()->id(),
 
             ]);
 
@@ -88,7 +88,7 @@ class CaseActivityController extends Controller
                     'location' =>
                         $request->agenda_location,
 
-                    'created_by' => auth()->id(),
+                    'user_id' => auth()->id(),
 
                 ]);
 
@@ -229,7 +229,7 @@ class CaseActivityController extends Controller
                     'location' =>
                         $request->agenda_location,
 
-                    'created_by' =>
+                    'user_id' =>
                         auth()->id(),
 
                 ]);

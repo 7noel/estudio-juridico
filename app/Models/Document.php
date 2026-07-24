@@ -23,7 +23,7 @@ class Document extends Model
         'file_name',
         'file_size',
 
-        'uploaded_by',
+        'user_id',
 
     ];
 
@@ -38,9 +38,9 @@ class Document extends Model
         return $this->belongsTo(CaseFile::class);
     }
 
-    public function uploader()
+    public function user()
     {
-        return $this->belongsTo(User::class, 'uploaded_by');
+        return $this->belongsTo(User::class);
     }
 
     public function getUrlAttribute()

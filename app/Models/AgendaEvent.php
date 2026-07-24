@@ -27,7 +27,7 @@ class AgendaEvent extends Model
 
         'location',
 
-        'created_by',
+        'user_id',
 
     ];
 
@@ -58,9 +58,9 @@ class AgendaEvent extends Model
         );
     }
 
-    public function creator()
+    public function user()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(User::class);
     }
 
     public function establishment()

@@ -28,7 +28,7 @@ class CaseFile extends Model
         'status',
         'opened_at',
         'closed_at',
-        'created_by',
+        'user_id',
         'result',
     ];
 
@@ -111,9 +111,9 @@ class CaseFile extends Model
         return $this->belongsTo(LegalSubject::class, 'legal_subject_id');
     }
 
-    public function creator()
+    public function user()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(User::class);
     }
 
     public function expenses()

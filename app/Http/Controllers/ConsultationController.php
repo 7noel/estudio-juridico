@@ -194,6 +194,7 @@ class ConsultationController extends Controller
 
             if ($consultation->status == 'new' and !is_null($request->input('change_to_prospect'))) {
                 $data['status'] = 'prospect';
+                $data['prospect_at'] = now();
             }
 
             $consultation->update($data);
@@ -460,11 +461,12 @@ class ConsultationController extends Controller
             'total_amount'         => $consultation->total_amount,
             'status'               => config('options.default_case_status'),
             'opened_at'            => now(),
-            'created_by'           => auth()->id(),
+            'user_id'              => auth()->id(),
         ]);
 
         $consultation->update([
-            'status' => 'accepted'
+            'status' => 'accepted',
+            'accepted_at' => now(),
         ]);
     }
 
@@ -475,7 +477,8 @@ class ConsultationController extends Controller
         }
 
         $consultation->update([
-            'status' => 'rejected'
+            'status' => 'rejected',
+            'rejected_at' => now(),
         ]);
     }
 
