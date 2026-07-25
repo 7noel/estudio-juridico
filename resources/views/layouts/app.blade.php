@@ -206,6 +206,10 @@ color: white !important;
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 <script>
+let workMode = 'consultations';
+let followUpFilter = '';
+let consultationStatus='';
+
 $(function () {
   // Bloquea reenvíos múltiples
   $(document).on('submit', 'form.form-loading', function (e) {

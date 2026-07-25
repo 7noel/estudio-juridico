@@ -293,7 +293,7 @@ return [
         'proposal'        => 'Esperando propuesta',
         'meeting'         => 'Reunión programada',
         'no_answer'       => 'No contestó',
-        'rejected'        => 'Rachazado',
+        'rejected'        => 'Rechazado',
         'other'           => 'Otro',
     ],
 

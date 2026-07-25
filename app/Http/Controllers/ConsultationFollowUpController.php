@@ -94,6 +94,16 @@ class ConsultationFollowUpController extends Controller
 
             DB::commit();
 
+            if ($request->expectsJson()) {
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Seguimiento registrado correctamente.',
+                    'consultation_id' => $consultation->id,
+                ]);
+
+            }
+
             return redirect()
                 ->route('consultations.show', $consultation)
                 ->with('success', 'Seguimiento registrado correctamente.');

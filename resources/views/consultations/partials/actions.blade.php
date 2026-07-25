@@ -1,3 +1,13 @@
+@if(in_array($r->last_follow_up_result, ['rejected', 'accepted']) or in_array($r->status, ['rejected', 'accepted']))
+<button type="button" class="btn btn-sm btn-outline-success" disabled>
+    <i class="bi bi-telephone"></i> Seg.
+</button>
+@else
+<button type="button" class="btn btn-sm btn-outline-success btn-follow-up" data-id="{{ $r->id }}" title="Registrar seguimiento">
+    <i class="bi bi-telephone"></i> Seg.
+</button>
+@endif
+
 <a href="{{ route('consultations.show', $r->id) }}" class="btn btn-sm btn-outline-primary"> <i class="bi bi-eye"></i> Ver</a>
 @if(in_array($r->status, ['rejected']))
     <button type="button" class="btn btn-sm btn-outline-secondary" disabled> <i class="bi bi-pencil"></i> Editar</button>

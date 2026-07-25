@@ -5,8 +5,11 @@
         <strong>Seguimientos</strong>
 
         @if(!in_array($consultation->status, ['accepted', 'rejected']))
+
             <button
                 type="button"
+                id = "btnAddFollowUp"
+                data-consultation="{{ $consultation->id }}"
                 class="btn btn-sm btn-outline-primary"
                 data-bs-toggle="modal"
                 data-bs-target="#followUpModal">

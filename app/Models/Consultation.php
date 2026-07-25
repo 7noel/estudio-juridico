@@ -197,6 +197,60 @@ class Consultation extends Model
         }
     }
 
+    public function scopeApplyConsultationFilters($query, $request)
+    {
+        if ($request->lawyer_id) {
+            $query->where('lawyer_id', $request->lawyer_id);
+        }
+
+        if ($request->service_type) {
+            $query->where('service_type', $request->service_type);
+        }
+
+        if ($request->legal_specialty_id) {
+            $query->where('legal_specialty_id', $request->legal_specialty_id);
+        }
+
+        if ($request->date_from) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->date_to) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        return $query;
+    }
+
+    public function scopeFollowUp($query, $filter)
+    {
+        switch ($filter) {
+            case 'today':
+                $query->where('status', 'prospect')->whereDate('next_follow_up_at', today());
+                break;
+            case 'overdue':
+                $query->where('status', 'prospect')->whereDate('next_follow_up_at', '<', today());
+                break;
+            case 'week':
+                $query->where('status', 'prospect')->whereBetween('next_follow_up_at', [today(), today()->copy()->addDays(7)]);
+                break;
+            case 'none':
+                $query->where('status', 'prospect')->whereNull('last_follow_up_at');
+                break;
+            case 'accepted':
+                $query->where('last_follow_up_result', 'accepted');
+                break;
+            case 'rejected':
+                $query->where('last_follow_up_result', 'rejected');
+                break;
+            default:
+                $query->where('status', 'prospect');
+                break;
+        }
+
+        return $query;
+    }
+
     // ==========================================
     // ESTADO FINANCIERO
     // ==========================================

@@ -308,5 +308,11 @@ $('#result').on('change', function () {
 
 }).trigger('change');
 
+$(document).on('click', '#btnAddFollowUp', function () {
+    $('#followUpForm')[0].reset();
+    $('#followUpConsultationId').val($(this).data('consultation'));
+    $('#followUpModal').modal('show');
+});
+
 </script>
 @endpush

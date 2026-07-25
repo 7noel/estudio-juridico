@@ -25,39 +25,38 @@ class ConsultationController extends Controller
         $query = Consultation::with(['client', 'lawyer', 'specialty', 'subject', 'case'])
             ->byUser(auth()->user());
 
+        $workMode = $request->work_mode ?? 'consultations';
+
         // 🔥 FILTROS
+        if ($workMode == 'consultations') {
+            $query->applyConsultationFilters($request);
 
-        if ($request->status) {
-            $query->where('status', $request->status);
+            if ($request->status) {
+                $query->where('status', $request->status);
+            }
+
+        } else {
+            $followUp = $request->follow_up ?? '';
+            $query->followUp($followUp);
         }
 
-        if ($request->lawyer_id) {
-            $query->where('lawyer_id', $request->lawyer_id);
-        }
-
-        if ($request->service_type) {
-            $query->where('service_type', $request->service_type);
-        }
-
-        if ($request->legal_specialty_id) {
-            $query->where('legal_specialty_id', $request->legal_specialty_id);
-        }
-
-        if ($request->date_from) {
-            $query->whereDate('created_at', '>=', $request->date_from);
-        }
-
-        if ($request->date_to) {
-            $query->whereDate('created_at', '<=', $request->date_to);
-        }
+        $query->select('consultations.*');
 
         return datatables()->of($query)
             ->addColumn('client', fn($r) => $r->client->full_name ?? '')
             ->addColumn('lawyer', fn($r) => $r->lawyer->name ?? '')
-            ->addColumn('service_type', fn($r) => config('options.service_types')[$r->service_type] ?? '')
-            ->addColumn('specialty', fn($r) => $r->specialty->name ?? '')
-            ->addColumn('service_type', function($r){
-                return config('options.service_types')[$r->service_type] ?? '';
+            ->editColumn('service_type', function ($r) {
+                return config('options.service_types')[$r->service_type] ?? $r->service_type;
+            })
+            ->filterColumn('service_type', function ($query, $keyword) {
+                $values = collect(config('options.service_types'))
+                    ->filter(fn($label) => str_contains(
+                        mb_strtolower($label),
+                        mb_strtolower($keyword)
+                    ))->keys()->toArray();
+                if (!empty($values)) {
+                    $query->whereIn('service_type', $values);
+                }
             })
             ->addColumn('specialty', fn($r) => $r->specialty->name ?? '')
             ->addColumn('subject', fn($r) => $r->subject->name ?? '')
@@ -65,6 +64,9 @@ class ConsultationController extends Controller
             ->addColumn('status', function ($row) {
                 $label = config('options.consultation_statuses')[$row->status] ?? $row->status;
                 $color = config('options.consultation_status_colors')[$row->status] ?? 'secondary';
+                if ($row->status == 'prospect') {
+                    return '<span class="badge bg-' . $color . '  text-dark">' . $label . '</span>';
+                }
                 return '<span class="badge bg-' . $color . '">' . $label . '</span>';
             })
             ->editColumn('created_at', function($r){
@@ -84,10 +86,39 @@ class ConsultationController extends Controller
                     </a>
                 ';
             })
+            ->addColumn('last_follow_up_at', function ($r) {
+                return $r->last_follow_up_at ? $r->last_follow_up_at->format('d/m/Y') : '';
+            })
+            ->editColumn('last_follow_up_result', function ($r) {
+
+                if (!$r->last_follow_up_result) {
+                    return '';
+                }
+
+                $label = config('options.follow_up_results')[$r->last_follow_up_result] ?? $r->last_follow_up_result;
+
+                $color = config('options.follow_up_result_colors')[$r->last_follow_up_result] ?? 'secondary';
+
+                return '<span class="badge bg-'.$color.'">'.$label.'</span>';
+
+            })
+            ->filterColumn('last_follow_up_result', function ($query, $keyword) {
+                $values = collect(config('options.follow_up_results'))
+                    ->filter(fn($label) => str_contains(
+                        mb_strtolower($label),
+                        mb_strtolower($keyword)
+                    ))->keys()->toArray();
+                if (!empty($values)) {
+                    $query->whereIn('last_follow_up_result', $values);
+                }
+            })
+            ->addColumn('next_follow_up_at', function ($r) {
+                return $r->next_follow_up_at ? $r->next_follow_up_at->format('d/m/Y') : '';
+            })
             ->addColumn('actions', function ($r) {
                 return view('consultations.partials.actions', compact('r'))->render();
             })
-            ->rawColumns(['actions', 'status', 'case_link'])
+            ->rawColumns(['actions', 'status', 'case_link', 'last_follow_up_result'])
             ->make(true);
     }
 
@@ -123,7 +154,7 @@ class ConsultationController extends Controller
                 'description' => $request->description,
                 'total_amount' => $request->total_amount,
                 'status' => $status,
-                'created_by' => auth()->id(),
+                'user_id' => auth()->id(),
             ]);
 
             foreach ($request->installments ?? [] as $i => $item) {
@@ -373,34 +404,27 @@ class ConsultationController extends Controller
 
     public function stats(Request $request)
     {
+        $workMode = $request->work_mode ?? 'consultations';
+
+        if ($workMode === 'consultations') {
+            return $this->consultationStats($request);
+        }
+
+        return $this->followUpStats($request);
+    }
+
+    private function consultationStats(Request $request)
+    {
         $query = Consultation::query()
             ->with(['client', 'lawyer', 'specialty', 'subject'])
             ->byUser(auth()->user());
 
         // 🔥 FILTROS
 
+        $query->applyConsultationFilters($request);
+
         if ($request->status) {
             $query->where('status', $request->status);
-        }
-
-        if ($request->lawyer_id) {
-            $query->where('lawyer_id', $request->lawyer_id);
-        }
-        
-        if ($request->service_type) {
-            $query->where('service_type', $request->service_type);
-        }
-
-        if ($request->legal_specialty_id) {
-            $query->where('legal_specialty_id', $request->legal_specialty_id);
-        }
-
-        if ($request->date_from) {
-            $query->whereDate('created_at', '>=', $request->date_from);
-        }
-
-        if ($request->date_to) {
-            $query->whereDate('created_at', '<=', $request->date_to);
         }
 
         // 🔥 BUSCADOR GLOBAL (CLAVE)
@@ -408,7 +432,23 @@ class ConsultationController extends Controller
 
             $search = $request->search;
 
-            $query->where(function ($q) use ($search) {
+            $serviceTypes = collect(config('options.service_types'))
+                ->filter(fn($label) => str_contains(
+                    mb_strtolower($label),
+                    mb_strtolower($search)
+                ))
+                ->keys()
+                ->toArray();
+
+            $results = collect(config('options.follow_up_results'))
+                ->filter(fn($label) => str_contains(
+                    mb_strtolower($label),
+                    mb_strtolower($search)
+                ))
+                ->keys()
+                ->toArray();
+
+            $query->where(function ($q) use ($search, $serviceTypes, $results) {
 
                 $q->where('title', 'like', "%{$search}%")
 
@@ -428,6 +468,14 @@ class ConsultationController extends Controller
                       $q2->where('name', 'like', "%{$search}%");
                   });
 
+                if (!empty($serviceTypes)) {
+                    $q->orWhereIn('service_type', $serviceTypes);
+                }
+
+                if (!empty($results)) {
+                    $q->orWhereIn('last_follow_up_result', $results);
+                }
+
             });
         }
 
@@ -439,6 +487,83 @@ class ConsultationController extends Controller
             'prospect' => (clone $query)->where('status', 'prospect')->count(),
             'accepted' => (clone $query)->where('status', 'accepted')->count(),
             'rejected' => (clone $query)->where('status', 'rejected')->count(),
+        ]);
+    }
+
+    private function followUpStats(Request $request)
+    {
+        $query = Consultation::query()
+            ->byUser(auth()->user());
+
+        // 🔥 BUSCADOR GLOBAL (CLAVE)
+        if ($request->search) {
+
+            $search = $request->search;
+
+            $serviceTypes = collect(config('options.service_types'))
+                ->filter(fn($label) => str_contains(
+                    mb_strtolower($label),
+                    mb_strtolower($search)
+                ))
+                ->keys()
+                ->toArray();
+
+            $results = collect(config('options.follow_up_results'))
+                ->filter(fn($label) => str_contains(
+                    mb_strtolower($label),
+                    mb_strtolower($search)
+                ))
+                ->keys()
+                ->toArray();
+
+            $query->where(function ($q) use ($search, $serviceTypes, $results) {
+
+                $q->where('title', 'like', "%{$search}%")
+
+                  ->orWhereHas('client', function ($q2) use ($search) {
+                      $q2->where('full_name', 'like', "%{$search}%");
+                  })
+
+                  ->orWhereHas('lawyer', function ($q2) use ($search) {
+                      $q2->where('name', 'like', "%{$search}%");
+                  })
+
+                  ->orWhereHas('specialty', function ($q2) use ($search) {
+                      $q2->where('name', 'like', "%{$search}%");
+                  })
+
+                  ->orWhereHas('subject', function ($q2) use ($search) {
+                      $q2->where('name', 'like', "%{$search}%");
+                  });
+
+                if (!empty($serviceTypes)) {
+                    $q->orWhereIn('service_type', $serviceTypes);
+                }
+
+                if (!empty($results)) {
+                    $q->orWhereIn('last_follow_up_result', $results);
+                }
+            });
+
+
+        }
+
+        return response()->json([
+
+            'all' => (clone $query)->followUp('')->count(),
+
+            'today' => (clone $query)->followUp('today')->count(),
+
+            'overdue' => (clone $query)->followUp('overdue')->count(),
+
+            'week' => (clone $query)->followUp('week')->count(),
+
+            'none' => (clone $query)->followUp('none')->count(),
+
+            'accepted' => (clone $query)->followUp('accepted')->count(),
+
+            'rejected' => (clone $query)->followUp('rejected')->count(),
+
         ]);
     }
 

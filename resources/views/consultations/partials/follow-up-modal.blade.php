@@ -10,17 +10,15 @@
 
         <div class="modal-content">
 
-            <form
-                action="{{ route('follow-ups.store') }}"
-                method="POST"
-            >
+            <form id="followUpForm" action="{{ route('follow-ups.store') }}" method="POST">
 
                 @csrf
 
                 <input
                     type="hidden"
                     name="consultation_id"
-                    value="{{ $consultation->id }}"
+                    id="followUpConsultationId"
+                    value=""
                 >
 
                 <div class="modal-header">
