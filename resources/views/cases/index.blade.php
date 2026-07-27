@@ -134,7 +134,7 @@ $(function(){
         },
         columns: [
             { data: 'id', title: 'ID' },
-            { data: 'client', title: 'Cliente' },
+            { data: 'client', name: 'client.full_name', title: 'Cliente' },
             { data: 'lawyer', title: 'Abogado' },
             { data: 'service_type', title: 'Tipo Servicio' },
             { data: 'specialty', title: 'Especialidad' },
