@@ -277,37 +277,6 @@ $('#confirmActionBtn').click(function(){
 
 });
 
-const RESULT_ACCEPTED = 'accepted';
-const RESULT_REJECTED = 'rejected';
-
-$('#result').on('change', function () {
-
-    let result = $(this).val();
-
-    $('#followUpActions').addClass('d-none');
-    $('#generateCaseContainer').addClass('d-none');
-    $('#rejectConsultationContainer').addClass('d-none');
-
-    if (result === RESULT_ACCEPTED) {
-
-        $('#followUpActions').removeClass('d-none');
-        $('#generateCaseContainer').removeClass('d-none');
-
-        $('#generate_case').prop('checked', true);
-
-    }
-
-    if (result === RESULT_REJECTED) {
-
-        $('#followUpActions').removeClass('d-none');
-        $('#rejectConsultationContainer').removeClass('d-none');
-
-        $('#reject_consultation').prop('checked', true);
-
-    }
-
-}).trigger('change');
-
 $(document).on('click', '#btnAddFollowUp', function () {
     $('#followUpForm')[0].reset();
     $('#followUpConsultationId').val($(this).data('consultation'));

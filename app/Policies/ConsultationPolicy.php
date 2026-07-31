@@ -20,7 +20,7 @@ class ConsultationPolicy
 
     public function create(User $user)
     {
-        return $user->hasAnyRole(['Administrador', 'Recepcionista']);
+        return $user->hasAnyRole(['Administrador', 'Recepcionista', 'Abogado']);
     }
 
     public function update(User $user, Consultation $consultation)

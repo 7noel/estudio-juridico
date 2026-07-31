@@ -65,7 +65,7 @@ class ConsultationController extends Controller
                 $label = config('options.consultation_statuses')[$row->status] ?? $row->status;
                 $color = config('options.consultation_status_colors')[$row->status] ?? 'secondary';
                 if ($row->status == 'prospect') {
-                    return '<span class="badge bg-' . $color . '  text-dark">' . $label . '</span>';
+                    return '<span class="badge bg-' . $color . ' text-dark">' . $label . '</span>';
                 }
                 return '<span class="badge bg-' . $color . '">' . $label . '</span>';
             })
@@ -90,15 +90,14 @@ class ConsultationController extends Controller
                 return $r->last_follow_up_at ? $r->last_follow_up_at->format('d/m/Y') : '';
             })
             ->editColumn('last_follow_up_result', function ($r) {
-
                 if (!$r->last_follow_up_result) {
                     return '';
                 }
-
                 $label = config('options.follow_up_results')[$r->last_follow_up_result] ?? $r->last_follow_up_result;
-
                 $color = config('options.follow_up_result_colors')[$r->last_follow_up_result] ?? 'secondary';
-
+                if ( in_array($r->last_follow_up_result, ['thinking', 'proposal']) ) {
+                    return '<span class="badge bg-' . $color . ' text-dark">' . $label . '</span>';
+                }
                 return '<span class="badge bg-'.$color.'">'.$label.'</span>';
 
             })

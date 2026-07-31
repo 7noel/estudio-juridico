@@ -227,6 +227,7 @@ $(function(){
         columnDefs: [
             { className: "text-center", targets: [0,3,4,5,6,7,8,10,11,12] },
             { className: "text-end", targets: [8] },
+            { className: "text-nowrap text-center", targets: [13] },
         ],
 
         scrollX: true,
@@ -444,15 +445,10 @@ function loadStats(){
 
 
 $(document).on('click', '.btn-follow-up', function () {
-
     let consultationId = $(this).data('id');
-
     $('#followUpForm')[0].reset();
-
     $('#followUpForm input[name="consultation_id"]').val(consultationId);
-
     $('#followUpModal').modal('show');
-
 });
 
 $('#followUpForm').submit(function(e){
