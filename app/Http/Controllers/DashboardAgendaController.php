@@ -24,7 +24,7 @@ class DashboardAgendaController extends Controller
             $user->hasRole('Abogado')
         ){
             $query->where(
-                'created_by',
+                'user_id',
                 $user->id
             );
         }
@@ -135,7 +135,7 @@ class DashboardAgendaController extends Controller
             'location' =>
                 $request->location,
 
-            'created_by' =>
+            'user_id' =>
                 auth()->id(),
 
         ]);

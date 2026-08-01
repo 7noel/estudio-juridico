@@ -211,8 +211,8 @@ function generateTimeOptions(selector) {
 
 generateTimeOptions('#event_start_time');
 generateTimeOptions('#event_end_time');
-        generateTimeOptions('#activity_event_start_time');
-        generateTimeOptions('#activity_event_end_time');
+generateTimeOptions('#activity_event_start_time');
+generateTimeOptions('#activity_event_end_time');
 
 
 
@@ -227,6 +227,12 @@ $('#event_start_time').change(function(){
     let endTime = add60Minutes(startTime);
 
     $('#event_end_time').val(endTime);
+
+});
+
+$('#event_start_date').change(function(){
+
+    $('#event_end_date').val($(this).val());
 
 });
 

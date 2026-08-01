@@ -29,7 +29,7 @@ class CaseActivityPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasAnyRole(['Administrador', 'Abogado']);
     }
 
     /**
@@ -38,7 +38,7 @@ class CaseActivityPolicy
     public function update(User $user, CaseActivity $activity)
     {
         return $user->hasRole('Administrador')
-            || $activity->created_by === $user->id;
+            || $activity->user_id === $user->id;
     }
 
     /**
@@ -47,8 +47,9 @@ class CaseActivityPolicy
     public function delete(User $user, CaseActivity $activity)
     {
         return $user->hasRole('Administrador') ||
-               $activity->case->created_by == $user->id ||
-               $activity->created_by == $user->id;
+               $activity->case->lawyer_id == $user->id ||
+               $activity->case->user_id == $user->id ||
+               $activity->user_id == $user->id;
     }
 
     /**

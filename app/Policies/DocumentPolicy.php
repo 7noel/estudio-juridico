@@ -21,11 +21,15 @@ class DocumentPolicy
     public function update(User $user, Document $doc)
     {
         return $user->hasRole('Administrador') ||
-            $doc->uploaded_by == $user->id;
+            $doc->user_id == $user->id;
     }
 
     public function delete(User $user, Document $doc)
     {
-        return $this->update($user, $doc);
+        return $user->hasRole('Administrador') ||
+               $doc->case->lawyer_id == $user->id ||
+               $doc->case->user_id == $user->id ||
+               $doc->user_id == $user->id;
+        //return $this->update($user, $doc);
     }
 }
