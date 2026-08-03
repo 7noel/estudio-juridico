@@ -226,19 +226,16 @@ $(document).on(
 // CAMBIO HORA INICIO
 // =====================================================
 
-$(document).on(
-    'change',
-    '#activity_event_start_time',
-    function(){
+$(document).on('change', '#activity_event_start_time', function(){
+    let startTime = $(this).val();
+    $('#activity_event_end_time').val(
+        add60Minutes(startTime)
+    );
+});
 
-        let startTime = $(this).val();
-
-        $('#activity_event_end_time').val(
-            add60Minutes(startTime)
-        );
-
-    }
-);
+$(document).on('change', '#activity_event_start_date', function(){
+    $('#activity_event_end_date').val( $(this).val() );
+});
 
 // =====================================================
 // EDITAR ACTIVIDAD
