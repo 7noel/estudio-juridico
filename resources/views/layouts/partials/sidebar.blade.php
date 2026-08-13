@@ -60,66 +60,65 @@
 
 		    <div class="collapse" id="menuReportes">
 		        <ul class="nav flex-column ms-3">
+		            {{-- 1. FINANCIERO INTEGRAL (Financiero + Caja + Rentabilidad) --}}
 		            <li class="nav-item">
+		                <a class="nav-link text-dark fw-semibold" href="{{ route('reports.financial') }}">
+		                    <i class="bi bi-graph-up-arrow"></i>
+		                    Financiero Integral
+		                </a>
+		            </li>
+		            <li class="nav-item ms-3">
 		                <a class="nav-link text-dark" href="{{ route('reports.cash') }}">
 		                    <i class="bi bi-cash-coin"></i>
 		                    Caja
 		                </a>
 		            </li>
-
-		            <li class="nav-item">
-		                <a class="nav-link text-dark" href="{{ route('reports.collection') }}">
-		                    <i class="bi bi-cash-stack"></i>
-		                    Cobranza
-		                </a>
-		            </li>
-
-		            <li class="nav-item">
-		                <a class="nav-link text-dark" href="{{ route('reports.financial') }}">
-		                    <i class="bi bi-graph-up-arrow"></i>
-		                    Financiero
-		                </a>
-		            </li>
-
-		            <li class="nav-item">
+		            <li class="nav-item ms-3">
 		                <a class="nav-link text-dark" href="{{ route('reports.profitability') }}">
 		                    <i class="bi bi-piggy-bank"></i>
 		                    Rentabilidad
 		                </a>
 		            </li>
 
-		            <li class="nav-item">
-		                <a class="nav-link text-dark" href="{{ route('reports.operational') }}">
-		                    <i class="bi bi-briefcase"></i>
-		                    Operativo
+		            {{-- 2. CLIENTES Y COBRANZA (Clientes + Cobranza) --}}
+		            <li class="nav-item mt-1">
+		                <a class="nav-link text-dark fw-semibold" href="{{ route('reports.clients') }}">
+		                    <i class="bi bi-person-vcard"></i>
+		                    Clientes y Cobranza
+		                </a>
+		            </li>
+		            <li class="nav-item ms-3">
+		                <a class="nav-link text-dark" href="{{ route('reports.collection') }}">
+		                    <i class="bi bi-cash-stack"></i>
+		                    Detalle de Cobranza
 		                </a>
 		            </li>
 
-		            <li class="nav-item">
+		            {{-- 3. ACTIVIDAD Y RECURSOS (Operativo + Abogados + Agenda) --}}
+		            <li class="nav-item mt-1">
+		                <a class="nav-link text-dark fw-semibold" href="{{ route('reports.operational') }}">
+		                    <i class="bi bi-briefcase"></i>
+		                    Actividad y Recursos
+		                </a>
+		            </li>
+		            <li class="nav-item ms-3">
 		                <a class="nav-link text-dark" href="{{ route('reports.lawyers') }}">
 		                    <i class="bi bi-person-workspace"></i>
 		                    Abogados
 		                </a>
 		            </li>
-
-		            <li class="nav-item">
-		                <a class="nav-link text-dark" href="{{ route('reports.clients') }}">
-		                    <i class="bi bi-person-vcard"></i>
-		                    Clientes
-		                </a>
-		            </li>
-
-		            <li class="nav-item">
+		            <li class="nav-item ms-3">
 		                <a class="nav-link text-dark" href="{{ route('reports.agenda') }}">
 		                    <i class="bi bi-calendar-event"></i>
 		                    Agenda
 		                </a>
 		            </li>
 
-		            <li class="nav-item">
-		                <a class="nav-link text-dark" href="{{ route('reports.conversion') }}">
+		            {{-- 4. CONVERSIÓN COMERCIAL --}}
+		            <li class="nav-item mt-1">
+		                <a class="nav-link text-dark fw-semibold" href="{{ route('reports.conversion') }}">
 		                    <i class="bi bi-graph-up"></i>
-		                    Seguimiento y Conversión
+		                    Conversión Comercial
 		                </a>
 		            </li>
 		        </ul>

@@ -20,9 +20,7 @@ class OperationalReportController extends Controller
     public function index()
     {
         $establishments = Establishment::orderBy('name')->get();
-
         $specialties = LegalSpecialty::orderBy('name')->get();
-
         $lawyers = User::orderBy('name')->get();
 
         return view(
@@ -39,320 +37,115 @@ class OperationalReportController extends Controller
     {
         /*
         |--------------------------------------------------------------------------
-        | Casos
+        | Configuración
+        |--------------------------------------------------------------------------
+        */
+
+        $inactiveDays = (int) NotificationSetting::get('client_inactivity_days', 15);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Query base con filtros
         |--------------------------------------------------------------------------
         */
 
         $cases = CaseFile::query()
-
             ->with([
-
                 'client',
-
                 'lawyer',
-
                 'specialty',
-
-                'activities',
-
-                'agendaEvents',
-
                 'establishment',
+            ])
+            ->withCount('activities')
+            ->withMax('activities', 'activity_at')
+            ->withMax('activities as last_communication_at', 'activity_at')
+            ->withCount('agendaEvents')
+            ->withMin('agendaEvents as next_event_at', 'start_datetime');
 
-            ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Fecha
-        |--------------------------------------------------------------------------
-        */
-
+        // Fecha
         if ($request->date_from) {
-
-            $cases->whereDate(
-                'opened_at',
-                '>=',
-                $request->date_from
-            );
-
+            $cases->whereDate('opened_at', '>=', $request->date_from);
         }
 
         if ($request->date_to) {
-
-            $cases->whereDate(
-                'opened_at',
-                '<=',
-                $request->date_to
-            );
-
+            $cases->whereDate('opened_at', '<=', $request->date_to);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Sede
-        |--------------------------------------------------------------------------
-        */
-
+        // Sede
         if ($request->establishment_id) {
-
-            $cases->where(
-                'establishment_id',
-                $request->establishment_id
-            );
-
+            $cases->where('establishment_id', $request->establishment_id);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Especialidad
-        |--------------------------------------------------------------------------
-        */
-
+        // Especialidad
         if ($request->specialty_id) {
-
-            $cases->where(
-                'legal_specialty_id',
-                $request->specialty_id
-            );
-
+            $cases->where('legal_specialty_id', $request->specialty_id);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Abogado
-        |--------------------------------------------------------------------------
-        */
-
+        // Abogado
         if ($request->lawyer_id) {
-
-            $cases->where(
-                'lawyer_id',
-                $request->lawyer_id
-            );
-
+            $cases->where('lawyer_id', $request->lawyer_id);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Estado
-        |--------------------------------------------------------------------------
-        */
-
+        // Estado
         if ($request->status) {
-
-            $cases->where(
-                'status',
-                $request->status
-            );
-
+            $cases->where('status', $request->status);
         }
 
         $cases = $cases->get();
 
         /*
         |--------------------------------------------------------------------------
-        | Configuración
-        |--------------------------------------------------------------------------
-        */
-
-        $inactiveDays = (int)
-            NotificationSetting::get(
-                'client_inactivity_days',
-                15
-            );
-
-        /*
-        |--------------------------------------------------------------------------
-        | Dataset principal
+        | Dataset principal - usando withCount/withMax/withMin
         |--------------------------------------------------------------------------
         */
 
         $dataset = [];
-
         $totalActivities = 0;
-
         $totalEvents = 0;
-
         $casesWithoutActivities = 0;
-
         $casesWithoutFutureEvents = 0;
-
         $casesWithoutRecentCommunication = 0;
 
         foreach ($cases as $case) {
-
-            /*
-            |--------------------------------------------------------------------------
-            | Actividades
-            |--------------------------------------------------------------------------
-            */
-
-            $activitiesCount =
-                $case->activities->count();
-
-            $totalActivities +=
-                $activitiesCount;
+            $activitiesCount = $case->activities_count;
+            $totalActivities += $activitiesCount;
 
             if ($activitiesCount == 0) {
-
                 $casesWithoutActivities++;
-
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | Última actividad
-            |--------------------------------------------------------------------------
-            */
+            $lastActivity = $case->activities_max_activity_at;
+            $lastCommunication = $case->last_communication_at;
 
-            $lastActivity =
-                $case->activities
-
-                    ->sortByDesc(
-                        'activity_at'
-                    )
-
-                    ->first();
-
-            /*
-            |--------------------------------------------------------------------------
-            | Comunicación más reciente
-            |--------------------------------------------------------------------------
-            */
-
-            $lastCommunication =
-                $case->activities
-
-                    ->where(
-                        'type',
-                        'communication'
-                    )
-
-                    ->sortByDesc(
-                        'activity_at'
-                    )
-
-                    ->first();
-
+            // Comunicación reciente
             if ($case->status === 'in_progress') {
-
-                if (!$lastCommunication) {
-
-                    $days =
-                        Carbon::parse(
-                            $case->opened_at
-                        )->diffInDays(
-                            now()
-                        );
-
-                    if (
-                        $days >=
-                        $inactiveDays
-                    ) {
-
+                $referenceDate = $lastCommunication ?? $case->opened_at;
+                if ($referenceDate) {
+                    $days = Carbon::parse($referenceDate)->diffInDays(now());
+                    if ($days >= $inactiveDays) {
                         $casesWithoutRecentCommunication++;
-
                     }
-
-                } else {
-
-                    $days =
-                        Carbon::parse(
-                            $lastCommunication->activity_at
-                        )->diffInDays(
-                            now()
-                        );
-
-                    if (
-                        $days >=
-                        $inactiveDays
-                    ) {
-
-                        $casesWithoutRecentCommunication++;
-
-                    }
-
                 }
-
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | Próximo evento
-            |--------------------------------------------------------------------------
-            */
-
-            $nextEvent =
-                $case->agendaEvents
-
-                    ->where(
-                        'start_datetime',
-                        '>=',
-                        now()
-                    )
-
-                    ->sortBy(
-                        'start_datetime'
-                    )
-
-                    ->first();
-
-            if (!$nextEvent) {
-
+            $nextEvent = $case->next_event_at;
+            if (!$nextEvent || Carbon::parse($nextEvent)->lt(now())) {
                 $casesWithoutFutureEvents++;
-
             }
 
-            $totalEvents +=
-                $case->agendaEvents->count();
-
-            /*
-            |--------------------------------------------------------------------------
-            | Dataset
-            |--------------------------------------------------------------------------
-            */
+            $totalEvents += $case->agenda_events_count;
 
             $dataset[] = [
-
-                'case_id' =>
-                    $case->id,
-
-                'case_title' =>
-                    $case->title,
-
-                'client' =>
-                    optional(
-                        $case->client
-                    )->full_name,
-
-                'specialty' =>
-                    optional(
-                        $case->specialty
-                    )->name,
-
-                'lawyer' =>
-                    optional(
-                        $case->lawyer
-                    )->name,
-
-                'status' =>
-                    $case->status,
-
-                'activities_count' =>
-                    $activitiesCount,
-
-                'last_activity' =>
-                    optional(
-                        $lastActivity
-                    )->activity_at,
-
-                'next_event' =>
-                    optional(
-                        $nextEvent
-                    )->start_datetime,
-
+                'case_id' => $case->id,
+                'case_title' => $case->title,
+                'client' => optional($case->client)->full_name,
+                'specialty' => optional($case->specialty)->name,
+                'lawyer' => optional($case->lawyer)->name,
+                'status' => $case->status,
+                'activities_count' => $activitiesCount,
+                'last_activity' => $lastActivity,
+                'next_event' => $nextEvent,
             ];
-
         }
 
         /*
@@ -361,236 +154,164 @@ class OperationalReportController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $totalCases =
-            count($dataset);
+        $totalCases = count($dataset);
 
-        $activeCases =
-            collect($dataset)
+        $activeCases = collect($dataset)->whereIn('status', ['open', 'in_progress'])->count();
+        $closedCases = collect($dataset)->where('status', 'closed')->count();
+        $pausedCases = collect($dataset)->where('status', 'paused')->count();
 
-                ->whereIn(
-                    'status',
-                    [
-                        'open',
-                        'in_progress'
-                    ]
-                )
-
-                ->count();
-
-        $closedCases =
-            collect($dataset)
-
-                ->where(
-                    'status',
-                    'closed'
-                )
-
-                ->count();
-
-        $pausedCases =
-            collect($dataset)
-
-                ->where(
-                    'status',
-                    'paused'
-                )
-
-                ->count();
-
-        $avgActivitiesPerCase =
-            $totalCases > 0
-
-            ? round(
-                $totalActivities
-                /
-                $totalCases,
-                2
-            )
-
+        $avgActivitiesPerCase = $totalCases > 0
+            ? round($totalActivities / $totalCases, 2)
             : 0;
 
         /*
         |--------------------------------------------------------------------------
-        | Casos por Estado
+        | Casos por Estado (GROUP BY en SQL)
         |--------------------------------------------------------------------------
         */
+
+        $casesByStatusQuery = CaseFile::query()
+            ->when($request->date_from, function ($q) use ($request) {
+                $q->whereDate('opened_at', '>=', $request->date_from);
+            })
+            ->when($request->date_to, function ($q) use ($request) {
+                $q->whereDate('opened_at', '<=', $request->date_to);
+            })
+            ->when($request->establishment_id, function ($q) use ($request) {
+                $q->where('establishment_id', $request->establishment_id);
+            })
+            ->when($request->specialty_id, function ($q) use ($request) {
+                $q->where('legal_specialty_id', $request->specialty_id);
+            })
+            ->when($request->lawyer_id, function ($q) use ($request) {
+                $q->where('lawyer_id', $request->lawyer_id);
+            })
+            ->when($request->status, function ($q) use ($request) {
+                $q->where('status', $request->status);
+            })
+            ->selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->get();
 
         $casesByStatus = [];
-
-        foreach ($dataset as $row) {
-
-            $status = $row['status'];
-
-            if (!isset(
-                $casesByStatus[$status]
-            )) {
-
-                $casesByStatus[$status] = 0;
-
-            }
-
-            $casesByStatus[$status]++;
-
+        foreach ($casesByStatusQuery as $row) {
+            $casesByStatus[$row->status] = $row->count;
         }
 
         /*
         |--------------------------------------------------------------------------
-        | Casos por Especialidad
+        | Casos por Especialidad (GROUP BY en SQL)
         |--------------------------------------------------------------------------
         */
+
+        $casesBySpecialtyQuery = CaseFile::query()
+            ->when($request->date_from, function ($q) use ($request) {
+                $q->whereDate('opened_at', '>=', $request->date_from);
+            })
+            ->when($request->date_to, function ($q) use ($request) {
+                $q->whereDate('opened_at', '<=', $request->date_to);
+            })
+            ->when($request->establishment_id, function ($q) use ($request) {
+                $q->where('establishment_id', $request->establishment_id);
+            })
+            ->when($request->specialty_id, function ($q) use ($request) {
+                $q->where('legal_specialty_id', $request->specialty_id);
+            })
+            ->when($request->lawyer_id, function ($q) use ($request) {
+                $q->where('lawyer_id', $request->lawyer_id);
+            })
+            ->when($request->status, function ($q) use ($request) {
+                $q->where('status', $request->status);
+            })
+            ->selectRaw('COALESCE(legal_specialties.name, "Sin especialidad") as name, COUNT(*) as count')
+            ->leftJoin('legal_specialties', 'cases.legal_specialty_id', '=', 'legal_specialties.id')
+            ->groupBy('cases.legal_specialty_id')
+            ->get();
 
         $casesBySpecialty = [];
-
-        foreach ($dataset as $row) {
-
-            $specialty =
-                $row['specialty']
-                ?: 'Sin especialidad';
-
-            if (!isset(
-                $casesBySpecialty[$specialty]
-            )) {
-
-                $casesBySpecialty[$specialty] = 0;
-
-            }
-
-            $casesBySpecialty[$specialty]++;
-
+        foreach ($casesBySpecialtyQuery as $row) {
+            $casesBySpecialty[$row->name] = $row->count;
         }
 
         /*
         |--------------------------------------------------------------------------
-        | Casos por Abogado
+        | Casos por Abogado (GROUP BY en SQL)
         |--------------------------------------------------------------------------
         */
+
+        $casesByLawyerQuery = CaseFile::query()
+            ->when($request->date_from, function ($q) use ($request) {
+                $q->whereDate('opened_at', '>=', $request->date_from);
+            })
+            ->when($request->date_to, function ($q) use ($request) {
+                $q->whereDate('opened_at', '<=', $request->date_to);
+            })
+            ->when($request->establishment_id, function ($q) use ($request) {
+                $q->where('establishment_id', $request->establishment_id);
+            })
+            ->when($request->specialty_id, function ($q) use ($request) {
+                $q->where('legal_specialty_id', $request->specialty_id);
+            })
+            ->when($request->lawyer_id, function ($q) use ($request) {
+                $q->where('lawyer_id', $request->lawyer_id);
+            })
+            ->when($request->status, function ($q) use ($request) {
+                $q->where('status', $request->status);
+            })
+            ->selectRaw('COALESCE(users.name, "Sin abogado") as name, COUNT(*) as count')
+            ->leftJoin('users', 'cases.lawyer_id', '=', 'users.id')
+            ->groupBy('cases.lawyer_id')
+            ->get();
 
         $casesByLawyer = [];
-
-        foreach ($dataset as $row) {
-
-            $lawyer =
-                $row['lawyer']
-                ?: 'Sin abogado';
-
-            if (!isset(
-                $casesByLawyer[$lawyer]
-            )) {
-
-                $casesByLawyer[$lawyer] = 0;
-
-            }
-
-            $casesByLawyer[$lawyer]++;
-
+        foreach ($casesByLawyerQuery as $row) {
+            $casesByLawyer[$row->name] = $row->count;
         }
 
         /*
         |--------------------------------------------------------------------------
-        | Actividades por Tipo
+        | Actividades por Tipo (GROUP BY en SQL)
         |--------------------------------------------------------------------------
         */
+
+        $activitiesByTypeQuery = CaseActivity::query()
+            ->whereIn('case_id', $cases->pluck('id'))
+            ->when($request->date_from, function ($q) use ($request) {
+                $q->whereDate('activity_at', '>=', $request->date_from);
+            })
+            ->when($request->date_to, function ($q) use ($request) {
+                $q->whereDate('activity_at', '<=', $request->date_to);
+            })
+            ->selectRaw('type, COUNT(*) as count')
+            ->groupBy('type')
+            ->get();
 
         $activitiesByType = [];
-
-        $activities = CaseActivity::query()
-            ->whereIn(
-                'case_id',
-                $cases->pluck('id')
-            );
-
-        if ($request->date_from) {
-
-            $activities->whereDate(
-                'activity_at',
-                '>=',
-                $request->date_from
-            );
-
-        }
-
-        if ($request->date_to) {
-
-            $activities->whereDate(
-                'activity_at',
-                '<=',
-                $request->date_to
-            );
-
-        }
-
-        $activities = $activities->get();
-
-        foreach ($activities as $activity) {
-
-            $type =
-                $activity->type
-                ?: 'Sin tipo';
-
-            if (!isset(
-                $activitiesByType[$type]
-            )) {
-
-                $activitiesByType[$type] = 0;
-
-            }
-
-            $activitiesByType[$type]++;
-
+        foreach ($activitiesByTypeQuery as $row) {
+            $activitiesByType[$row->type ?: 'Sin tipo'] = $row->count;
         }
 
         /*
         |--------------------------------------------------------------------------
-        | Eventos por Tipo
+        | Eventos por Tipo (GROUP BY en SQL)
         |--------------------------------------------------------------------------
         */
 
+        $eventsByTypeQuery = AgendaEvent::query()
+            ->whereIn('case_id', $cases->pluck('id'))
+            ->when($request->date_from, function ($q) use ($request) {
+                $q->whereDate('start_datetime', '>=', $request->date_from);
+            })
+            ->when($request->date_to, function ($q) use ($request) {
+                $q->whereDate('start_datetime', '<=', $request->date_to);
+            })
+            ->selectRaw('type, COUNT(*) as count')
+            ->groupBy('type')
+            ->get();
+
         $eventsByType = [];
-
-        $events = AgendaEvent::query()
-            ->whereIn(
-                'case_id',
-                $cases->pluck('id')
-            );
-
-        if ($request->date_from) {
-
-            $events->whereDate(
-                'start_datetime',
-                '>=',
-                $request->date_from
-            );
-
-        }
-
-        if ($request->date_to) {
-
-            $events->whereDate(
-                'start_datetime',
-                '<=',
-                $request->date_to
-            );
-
-        }
-
-        $events = $events->get();
-
-        foreach ($events as $event) {
-
-            $type =
-                $event->type
-                ?: 'Sin tipo';
-
-            if (!isset(
-                $eventsByType[$type]
-            )) {
-
-                $eventsByType[$type] = 0;
-
-            }
-
-            $eventsByType[$type]++;
-
+        foreach ($eventsByTypeQuery as $row) {
+            $eventsByType[$row->type ?: 'Sin tipo'] = $row->count;
         }
 
         /*
@@ -600,11 +321,8 @@ class OperationalReportController extends Controller
         */
 
         arsort($casesByLawyer);
-
         arsort($casesBySpecialty);
-
         arsort($activitiesByType);
-
         arsort($eventsByType);
 
         /*
@@ -614,117 +332,26 @@ class OperationalReportController extends Controller
         */
 
         $charts = [
-
-            /*
-            |--------------------------------------------------------------------------
-            | Casos por estado
-            |--------------------------------------------------------------------------
-            */
-
             'status' => [
-
-                'labels' =>
-
-                    array_keys(
-                        $casesByStatus
-                    ),
-
-                'values' =>
-
-                    array_values(
-                        $casesByStatus
-                    ),
-
+                'labels' => array_keys($casesByStatus),
+                'values' => array_values($casesByStatus),
             ],
-
-            /*
-            |--------------------------------------------------------------------------
-            | Casos por especialidad
-            |--------------------------------------------------------------------------
-            */
-
             'specialties' => [
-
-                'labels' =>
-
-                    array_keys(
-                        $casesBySpecialty
-                    ),
-
-                'values' =>
-
-                    array_values(
-                        $casesBySpecialty
-                    ),
-
+                'labels' => array_keys($casesBySpecialty),
+                'values' => array_values($casesBySpecialty),
             ],
-
-            /*
-            |--------------------------------------------------------------------------
-            | Casos por abogado
-            |--------------------------------------------------------------------------
-            */
-
             'lawyers' => [
-
-                'labels' =>
-
-                    array_keys(
-                        $casesByLawyer
-                    ),
-
-                'values' =>
-
-                    array_values(
-                        $casesByLawyer
-                    ),
-
+                'labels' => array_keys($casesByLawyer),
+                'values' => array_values($casesByLawyer),
             ],
-
-            /*
-            |--------------------------------------------------------------------------
-            | Actividades por tipo
-            |--------------------------------------------------------------------------
-            */
-
             'activities' => [
-
-                'labels' =>
-
-                    array_keys(
-                        $activitiesByType
-                    ),
-
-                'values' =>
-
-                    array_values(
-                        $activitiesByType
-                    ),
-
+                'labels' => array_keys($activitiesByType),
+                'values' => array_values($activitiesByType),
             ],
-
-            /*
-            |--------------------------------------------------------------------------
-            | Eventos por tipo
-            |--------------------------------------------------------------------------
-            */
-
             'events' => [
-
-                'labels' =>
-
-                    array_keys(
-                        $eventsByType
-                    ),
-
-                'values' =>
-
-                    array_values(
-                        $eventsByType
-                    ),
-
+                'labels' => array_keys($eventsByType),
+                'values' => array_values($eventsByType),
             ],
-
         ];
 
         /*
@@ -734,106 +361,36 @@ class OperationalReportController extends Controller
         */
 
         $rows = collect($dataset)
-
-            ->sortByDesc(function ($row) {
-
-                return $row['activities_count'];
-
-            })
-
+            ->sortByDesc('activities_count')
             ->values()
-
             ->map(function ($row) {
-
-                /*
-                |--------------------------------------------------------------------------
-                | Estado
-                |--------------------------------------------------------------------------
-                */
-
                 $statusLabel = match ($row['status']) {
-
                     'open' => 'Abierto',
-
                     'in_progress' => 'En Proceso',
-
                     'paused' => 'Pausado',
-
                     'closed' => 'Cerrado',
-
                     default => $row['status']
-
                 };
 
-                /*
-                |--------------------------------------------------------------------------
-                | Última actividad
-                |--------------------------------------------------------------------------
-                */
+                $lastActivity = $row['last_activity']
+                    ? Carbon::parse($row['last_activity'])->format('d/m/Y H:i')
+                    : 'Sin actividades';
 
-                $lastActivity =
-
-                    $row['last_activity']
-
-                        ? Carbon::parse(
-                            $row['last_activity']
-                        )->format('d/m/Y H:i')
-
-                        : 'Sin actividades';
-
-                /*
-                |--------------------------------------------------------------------------
-                | Próximo evento
-                |--------------------------------------------------------------------------
-                */
-
-                $nextEvent =
-
-                    $row['next_event']
-
-                        ? Carbon::parse(
-                            $row['next_event']
-                        )->format('d/m/Y H:i')
-
-                        : 'Sin programar';
+                $nextEvent = $row['next_event']
+                    ? Carbon::parse($row['next_event'])->format('d/m/Y H:i')
+                    : 'Sin programar';
 
                 return [
-
-                    'case_title' =>
-                        $row['case_title'],
-
-                    'client' =>
-                        $row['client'],
-
-                    'specialty' =>
-                        $row['specialty'],
-
-                    'lawyer' =>
-                        $row['lawyer'],
-
-                    'status' =>
-                        $statusLabel,
-
-                    'activities_count' =>
-                        $row['activities_count'],
-
-                    'last_activity' =>
-                        $lastActivity,
-
-                    'next_event' =>
-                        $nextEvent,
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Valores crudos
-                    |--------------------------------------------------------------------------
-                    */
-
-                    'activities_count_raw' =>
-                        $row['activities_count'],
-
+                    'case_title' => $row['case_title'],
+                    'client' => $row['client'],
+                    'specialty' => $row['specialty'],
+                    'lawyer' => $row['lawyer'],
+                    'status' => $statusLabel,
+                    'activities_count' => $row['activities_count'],
+                    'last_activity' => $lastActivity,
+                    'next_event' => $nextEvent,
+                    'activities_count_raw' => $row['activities_count'],
                 ];
-
             });
 
         /*
@@ -843,61 +400,20 @@ class OperationalReportController extends Controller
         */
 
         return response()->json([
-
             'summary' => [
-
-                'total_cases' =>
-
-                    $totalCases,
-
-                'active_cases' =>
-
-                    $activeCases,
-
-                'closed_cases' =>
-
-                    $closedCases,
-
-                'paused_cases' =>
-
-                    $pausedCases,
-
-                'activities' =>
-
-                    $totalActivities,
-
-                'events' =>
-
-                    $totalEvents,
-
-                'avg_activities' =>
-
-                    $avgActivitiesPerCase,
-
-                'without_activities' =>
-
-                    $casesWithoutActivities,
-
-                'without_future_events' =>
-
-                    $casesWithoutFutureEvents,
-
-                'without_recent_communication' =>
-
-                    $casesWithoutRecentCommunication,
-
+                'total_cases' => $totalCases,
+                'active_cases' => $activeCases,
+                'closed_cases' => $closedCases,
+                'paused_cases' => $pausedCases,
+                'activities' => $totalActivities,
+                'events' => $totalEvents,
+                'avg_activities' => $avgActivitiesPerCase,
+                'without_activities' => $casesWithoutActivities,
+                'without_future_events' => $casesWithoutFutureEvents,
+                'without_recent_communication' => $casesWithoutRecentCommunication,
             ],
-
-            'charts' =>
-
-                $charts,
-
-            'data' =>
-
-                $rows,
-
+            'charts' => $charts,
+            'data' => $rows,
         ]);
-
     }
-
 }

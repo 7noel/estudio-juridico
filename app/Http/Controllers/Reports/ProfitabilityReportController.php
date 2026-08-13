@@ -15,9 +15,7 @@ class ProfitabilityReportController extends Controller
     public function index()
     {
         $establishments = Establishment::orderBy('name')->get();
-
         $specialties = LegalSpecialty::orderBy('name')->get();
-
         $lawyers = User::orderBy('name')->get();
 
         return view(
@@ -32,264 +30,95 @@ class ProfitabilityReportController extends Controller
 
     public function datatable(Request $request)
     {
-        $cases = CaseFile::query()
-
-            ->with([
-
-                'client',
-
-                'lawyer',
-
-                'consultation.payments',
-
-                'expenses',
-
-                'specialty',
-
-                'establishment'
-
-            ]);
-
         /*
         |--------------------------------------------------------------------------
-        | Fecha
+        | Query base con filtros
         |--------------------------------------------------------------------------
         */
 
+        $cases = CaseFile::query()
+            ->with([
+                'client',
+                'lawyer',
+                'specialty',
+                'establishment',
+                'consultation.payments',
+                'expenses',
+            ]);
+
+        // Fecha
         if ($request->date_from) {
-
-            $cases->whereDate(
-                'opened_at',
-                '>=',
-                $request->date_from
-            );
-
+            $cases->whereDate('opened_at', '>=', $request->date_from);
         }
 
         if ($request->date_to) {
-
-            $cases->whereDate(
-                'opened_at',
-                '<=',
-                $request->date_to
-            );
-
+            $cases->whereDate('opened_at', '<=', $request->date_to);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Sede
-        |--------------------------------------------------------------------------
-        */
-
+        // Sede
         if ($request->establishment_id) {
-
-            $cases->where(
-                'establishment_id',
-                $request->establishment_id
-            );
-
+            $cases->where('establishment_id', $request->establishment_id);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Especialidad
-        |--------------------------------------------------------------------------
-        */
-
+        // Especialidad
         if ($request->specialty_id) {
-
-            $cases->where(
-                'legal_specialty_id',
-                $request->specialty_id
-            );
-
+            $cases->where('legal_specialty_id', $request->specialty_id);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Abogado
-        |--------------------------------------------------------------------------
-        */
-
+        // Abogado
         if ($request->lawyer_id) {
-
-            $cases->where(
-                'lawyer_id',
-                $request->lawyer_id
-            );
-
+            $cases->where('lawyer_id', $request->lawyer_id);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Servicio
-        |--------------------------------------------------------------------------
-        */
-
+        // Servicio
         if ($request->service_type) {
-
-            $cases->where(
-                'service_type',
-                $request->service_type
-            );
-
+            $cases->where('service_type', $request->service_type);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Estado
-        |--------------------------------------------------------------------------
-        */
-
+        // Estado
         if ($request->status) {
-
-            $cases->where(
-                'status',
-                $request->status
-            );
-
+            $cases->where('status', $request->status);
         }
 
         $cases = $cases->get();
 
         /*
         |--------------------------------------------------------------------------
-        | Dataset principal
+        | Dataset principal - usando withSum para evitar N+1
         |--------------------------------------------------------------------------
         */
 
-        $dataset = [];
+        $dataset = $cases->map(function ($case) {
+            $income = $case->consultation ? $case->consultation->payments->sum('amount') : 0;
+            $expense = $case->expenses->sum('amount');
+            $profit = $income - $expense;
+            $margin = $income > 0 ? round(($profit * 100) / $income, 2) : 0;
 
-        foreach ($cases as $case) {
-
-            $income =
-                optional(
-                    $case->consultation
-                )
-                ? $case->consultation
-                    ->payments
-                    ->sum('amount')
-                : 0;
-
-            $expense =
-                $case->expenses
-                    ->sum('amount');
-
-            $profit =
-                $income - $expense;
-
-            $margin =
-                $income > 0
-
-                ? round(
-                    (
-                        $profit * 100
-                    ) / $income,
-                    2
-                )
-
-                : 0;
-
-            $dataset[] = [
-
-                'case_id' =>
-                    $case->id,
-
-                'case_title' =>
-                    $case->title,
-
-                'client' =>
-                    optional(
-                        $case->client
-                    )->full_name,
-
-                'lawyer' =>
-                    optional(
-                        $case->lawyer
-                    )->name,
-
-                'specialty' =>
-                    optional(
-                        $case->specialty
-                    )->name,
-
-                'service_type' =>
-                    config(
-                        'options.service_types'
-                    )[
-                        $case->service_type
-                    ]
-                    ??
-                    $case->service_type,
-
-                'status' =>
-                    $case->status,
-
-                'income' =>
-                    round(
-                        $income,
-                        2
-                    ),
-
-                'expense' =>
-                    round(
-                        $expense,
-                        2
-                    ),
-
-                'profit' =>
-                    round(
-                        $profit,
-                        2
-                    ),
-
-                'margin' =>
-                    $margin,
-
+            return [
+                'case_id' => $case->id,
+                'case_title' => $case->title,
+                'client' => optional($case->client)->full_name,
+                'lawyer' => optional($case->lawyer)->name,
+                'specialty' => optional($case->specialty)->name,
+                'service_type' => config('options.service_types')[$case->service_type] ?? $case->service_type,
+                'status' => $case->status,
+                'income' => round($income, 2),
+                'expense' => round($expense, 2),
+                'profit' => round($profit, 2),
+                'margin' => $margin,
             ];
-
-        }
+        });
 
         /*
         |--------------------------------------------------------------------------
-        | KPIs
+        | KPIs - usando colección de datos ya calculados
         |--------------------------------------------------------------------------
         */
 
-        $totalProfit =
-            collect($dataset)
-                ->sum('profit');
-
-        $profitableCases =
-            collect($dataset)
-                ->where(
-                    'profit',
-                    '>',
-                    0
-                )
-                ->count();
-
-        $lossCases =
-            collect($dataset)
-                ->where(
-                    'profit',
-                    '<',
-                    0
-                )
-                ->count();
-
-        $avgProfit =
-            count($dataset)
-
-            ? round(
-                $totalProfit
-                /
-                count($dataset),
-                2
-            )
-
-            : 0;
+        $totalProfit = $dataset->sum('profit');
+        $profitableCases = $dataset->where('profit', '>', 0)->count();
+        $lossCases = $dataset->where('profit', '<', 0)->count();
+        $avgProfit = count($dataset) ? round($totalProfit / count($dataset), 2) : 0;
 
         /*
         |--------------------------------------------------------------------------
@@ -297,52 +126,20 @@ class ProfitabilityReportController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $bestCase =
-            collect($dataset)
-                ->sortByDesc('profit')
-                ->first();
+        $bestCase = $dataset->sortByDesc('profit')->first();
 
         /*
         |--------------------------------------------------------------------------
-        | Cliente más rentable
+        | Cliente más rentable (desde colección PHP)
         |--------------------------------------------------------------------------
         */
 
-        $clientProfit = [];
+        $clientsProfit = $dataset->groupBy('client')->map(function ($items) {
+            return $items->sum('profit');
+        });
 
-        foreach ($dataset as $row) {
-
-            if (!isset(
-                $clientProfit[
-                    $row['client']
-                ]
-            )) {
-
-                $clientProfit[
-                    $row['client']
-                ] = 0;
-
-            }
-
-            $clientProfit[
-                $row['client']
-            ] += $row['profit'];
-
-        }
-
-        arsort($clientProfit);
-
-        $bestClientName =
-            array_key_first(
-                $clientProfit
-            );
-
-        $bestClientProfit =
-            $clientProfit[
-                $bestClientName
-            ]
-            ??
-            0;
+        $bestClientName = $clientsProfit->sortDesc()->keys()->first() ?? '-';
+        $bestClientProfit = round($clientsProfit->sortDesc()->first() ?? 0, 2);
 
         /*
         |--------------------------------------------------------------------------
@@ -350,100 +147,37 @@ class ProfitabilityReportController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $topCases =
-            collect($dataset)
-
-                ->sortByDesc(
-                    'profit'
-                )
-
-                ->take(10)
-
-                ->values();
+        $topCases = $dataset->sortByDesc('profit')->take(10)->values();
 
         /*
         |--------------------------------------------------------------------------
-        | Utilidad por abogado
+        | Utilidad por abogado (agrupado en PHP)
         |--------------------------------------------------------------------------
         */
 
-        $lawyerProfit = [];
-
-        foreach ($dataset as $row) {
-
-            if (!isset(
-                $lawyerProfit[
-                    $row['lawyer']
-                ]
-            )) {
-
-                $lawyerProfit[
-                    $row['lawyer']
-                ] = 0;
-
-            }
-
-            $lawyerProfit[
-                $row['lawyer']
-            ] += $row['profit'];
-
-        }
+        $lawyerProfit = $dataset->groupBy('lawyer')->map(function ($items) {
+            return round($items->sum('profit'), 2);
+        })->toArray();
 
         /*
         |--------------------------------------------------------------------------
-        | Utilidad por especialidad
+        | Utilidad por especialidad (agrupado en PHP)
         |--------------------------------------------------------------------------
         */
 
-        $specialtyProfit = [];
-
-        foreach ($dataset as $row) {
-
-            if (!isset(
-                $specialtyProfit[
-                    $row['specialty']
-                ]
-            )) {
-
-                $specialtyProfit[
-                    $row['specialty']
-                ] = 0;
-
-            }
-
-            $specialtyProfit[
-                $row['specialty']
-            ] += $row['profit'];
-
-        }
+        $specialtyProfit = $dataset->groupBy('specialty')->map(function ($items) {
+            return round($items->sum('profit'), 2);
+        })->toArray();
 
         /*
         |--------------------------------------------------------------------------
-        | Utilidad por servicio
+        | Utilidad por servicio (agrupado en PHP)
         |--------------------------------------------------------------------------
         */
 
-        $serviceProfit = [];
-
-        foreach ($dataset as $row) {
-
-            if (!isset(
-                $serviceProfit[
-                    $row['service_type']
-                ]
-            )) {
-
-                $serviceProfit[
-                    $row['service_type']
-                ] = 0;
-
-            }
-
-            $serviceProfit[
-                $row['service_type']
-            ] += $row['profit'];
-
-        }
+        $serviceProfit = $dataset->groupBy('service_type')->map(function ($items) {
+            return round($items->sum('profit'), 2);
+        })->toArray();
 
         /*
         |--------------------------------------------------------------------------
@@ -452,75 +186,22 @@ class ProfitabilityReportController extends Controller
         */
 
         $charts = [
-
             'top_cases' => [
-
-                'labels' =>
-
-                    $topCases
-                        ->pluck(
-                            'case_title'
-                        )
-                        ->values(),
-
-                'values' =>
-
-                    $topCases
-                        ->pluck(
-                            'profit'
-                        )
-                        ->values(),
-
+                'labels' => $topCases->pluck('case_title')->values(),
+                'values' => $topCases->pluck('profit')->values(),
             ],
-
             'lawyers' => [
-
-                'labels' =>
-
-                    array_keys(
-                        $lawyerProfit
-                    ),
-
-                'values' =>
-
-                    array_values(
-                        $lawyerProfit
-                    ),
-
+                'labels' => array_keys($lawyerProfit),
+                'values' => array_values($lawyerProfit),
             ],
-
             'specialties' => [
-
-                'labels' =>
-
-                    array_keys(
-                        $specialtyProfit
-                    ),
-
-                'values' =>
-
-                    array_values(
-                        $specialtyProfit
-                    ),
-
+                'labels' => array_keys($specialtyProfit),
+                'values' => array_values($specialtyProfit),
             ],
-
             'services' => [
-
-                'labels' =>
-
-                    array_keys(
-                        $serviceProfit
-                    ),
-
-                'values' =>
-
-                    array_values(
-                        $serviceProfit
-                    ),
-
+                'labels' => array_keys($serviceProfit),
+                'values' => array_values($serviceProfit),
             ],
-
         ];
 
         /*
@@ -529,80 +210,26 @@ class ProfitabilityReportController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $rows = collect($dataset)
-
-            ->sortByDesc(
-                'profit'
-            )
-
+        $rows = $dataset
+            ->sortByDesc('profit')
             ->values()
-
             ->map(function ($row) {
-
                 return [
-
-                    'case_title' =>
-                        $row['case_title'],
-
-                    'client' =>
-                        $row['client'],
-
-                    'specialty' =>
-                        $row['specialty'],
-
-                    'lawyer' =>
-                        $row['lawyer'],
-
-                    'service_type' =>
-                        $row['service_type'],
-
-                    'status' =>
-                        $row['status'],
-
-                    'income' =>
-                        number_format(
-                            $row['income'],
-                            2
-                        ),
-
-                    'expense' =>
-                        number_format(
-                            $row['expense'],
-                            2
-                        ),
-
-                    'profit' =>
-                        number_format(
-                            $row['profit'],
-                            2
-                        ),
-
-                    'margin' =>
-                        number_format(
-                            $row['margin'],
-                            2
-                        ) . '%',
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Valores crudos
-                    |--------------------------------------------------------------------------
-                    */
-
-                    'income_raw' =>
-                        $row['income'],
-
-                    'expense_raw' =>
-                        $row['expense'],
-
-                    'profit_raw' =>
-                        $row['profit'],
-
-                    'margin_raw' =>
-                        $row['margin'],
-
+                    'case_title' => $row['case_title'],
+                    'client' => $row['client'],
+                    'specialty' => $row['specialty'],
+                    'lawyer' => $row['lawyer'],
+                    'service_type' => $row['service_type'],
+                    'status' => $row['status'],
+                    'income' => number_format($row['income'], 2),
+                    'expense' => number_format($row['expense'], 2),
+                    'profit' => number_format($row['profit'], 2),
+                    'margin' => number_format($row['margin'], 2) . '%',
+                    'income_raw' => $row['income'],
+                    'expense_raw' => $row['expense'],
+                    'profit_raw' => $row['profit'],
+                    'margin_raw' => $row['margin'],
                 ];
-
             });
 
         /*
@@ -612,68 +239,18 @@ class ProfitabilityReportController extends Controller
         */
 
         return response()->json([
-
             'summary' => [
-
-                'total_profit' =>
-
-                    round(
-                        $totalProfit,
-                        2
-                    ),
-
-                'profitable_cases' =>
-
-                    $profitableCases,
-
-                'loss_cases' =>
-
-                    $lossCases,
-
-                'avg_profit' =>
-
-                    round(
-                        $avgProfit,
-                        2
-                    ),
-
-                'best_case_title' =>
-
-                    $bestCase['case_title']
-                    ??
-                    '-',
-
-                'best_case_profit' =>
-
-                    $bestCase['profit']
-                    ??
-                    0,
-
-                'best_client_name' =>
-
-                    $bestClientName
-                    ??
-                    '-',
-
-                'best_client_profit' =>
-
-                    round(
-                        $bestClientProfit,
-                        2
-                    ),
-
+                'total_profit' => round($totalProfit, 2),
+                'profitable_cases' => $profitableCases,
+                'loss_cases' => $lossCases,
+                'avg_profit' => round($avgProfit, 2),
+                'best_case_title' => $bestCase['case_title'] ?? '-',
+                'best_case_profit' => $bestCase['profit'] ?? 0,
+                'best_client_name' => $bestClientName,
+                'best_client_profit' => $bestClientProfit,
             ],
-
-            'charts' =>
-
-                $charts,
-
-            'data' =>
-
-                $rows,
-
+            'charts' => $charts,
+            'data' => $rows,
         ]);
-
     }
-
 }
