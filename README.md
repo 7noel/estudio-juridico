@@ -1,59 +1,180 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistema de Gestión para Estudio Jurídico
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema web para la gestión integral de un estudio jurídico, construido con **Laravel 12** y **PHP 8.2+**. Permite administrar el ciclo completo de atención legal: registro de clientes, consultas, seguimiento comercial, expedientes/casos, pagos, gastos, agenda y reportes financieros.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## ✨ Características
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Clientes**: Registro con tipos de documento peruanos (DNI, CEX, PAS, RUC), búsqueda por ubigeo y autocompletado.
+- **Consultas**: Registro de consultas legales con estados (`Nuevo → Prospecto → Aceptado/Rechazado`), cuotas de pago y seguimiento comercial (llamadas, WhatsApp, correo).
+- **Casos (Expedientes)**: Vinculados a consultas, con estados (`Abierto, En proceso, En espera, Culminado`), actividades procesales, documentos adjuntos y gastos asociados.
+- **Pagos / Cobranzas**: Pagos por cuota con métodos peruanos (efectivo, transferencia, Yape, Plin, tarjeta) y generación automática de caso al pagar.
+- **Gastos**: Registro de gastos por caso con categorías (tasa judicial, movilidad, SUNARP, notaría, peritaje, etc.).
+- **Agenda**: Eventos por caso (audiencias, vencimientos, reuniones, tareas) con calendario visual.
+- **Especialidades Legales**: Catálogo de especialidades y materias jurídicas.
+- **Reportes (8 módulos)**: Caja, Cobranza, Financiero, Rentabilidad, Operativo, Abogados, Clientes y Agenda — con KPIs y gráficos.
+- **Notificaciones WhatsApp**: Envío de mensajes vía Evolution API con colas de trabajo y registro de notificaciones.
+- **Administración**: Gestión de usuarios, roles y permisos (RBAC).
+- **Multi-sede**: Soporte para múltiples establecimientos (sedes) con filtrado por sede.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🛠️ Requisitos
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- PHP 8.2 o superior
+- Composer
+- Node.js y npm (para assets, si se usan)
+- Base de datos: SQLite (por defecto) o MySQL
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 📦 Instalación
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 1. Instalar dependencias
 
-### Premium Partners
+```bash
+composer install
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 2. Crear archivo de entorno
 
-## Contributing
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 3. Configurar la base de datos
 
-## Code of Conduct
+Por defecto usa SQLite. Crear el archivo de base de datos:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+touch database/database.sqlite
+```
 
-## Security Vulnerabilities
+Si usas MySQL, edita `.env`:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=estudio_juridico
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## License
+### 4. Ejecutar migraciones y seeders
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan migrate --seed
+```
+
+Los seeders crean:
+- Roles: `Administrador`, `Recepcionista`, `Abogado`
+- Permisos por módulo (clientes, consultas, casos, agenda, roles, usuarios, establecimientos)
+- Especialidades y materias jurídicas
+- Ubigeos (departamentos, provincias, distritos)
+- Configuraciones de notificación
+
+### 5. Crear enlace de almacenamiento (para documentos)
+
+```bash
+php artisan storage:link
+```
+
+### 6. (Opcional) Compilar assets
+
+```bash
+npm install
+npm run build
+```
+
+> **Nota**: El sistema carga las librerías frontend (Bootstrap, DataTables, FullCalendar, etc.) por CDN, por lo que los assets npm son opcionales.
+
+---
+
+## ⚙️ Configuración de WhatsApp (Evolution API)
+
+Para habilitar el envío de mensajes de WhatsApp, configurar en `.env`:
+
+```env
+EVOLUTION_API_URL=https://tu-servidor-evolution.com
+EVOLUTION_API_KEY=tu-api-key
+EVOLUTION_INSTANCE=nombre-de-instancia
+```
+
+Se recomienda ejecutar el worker de colas para procesar los envíos:
+
+```bash
+php artisan queue:listen
+```
+
+---
+
+## 👥 Roles y Permisos
+
+| Rol | Acceso |
+|-----|--------|
+| **Administrador** | Acceso total: clientes, consultas, casos, reportes, agenda, usuarios, roles, permisos, notificaciones |
+| **Recepcionista** | Clientes, consultas y agenda |
+| **Abogado** | Consultas, casos y agenda (filtrado por abogado asignado) |
+
+---
+
+## 🏗️ Estructura del Proyecto
+
+```
+app/
+├── Console/          # Comandos artisan
+├── Http/
+│   ├── Controllers/  # Controladores (incluye Reportes)
+│   └── Requests/     # Form Requests de validación
+├── Jobs/             # Jobs en cola (envío WhatsApp)
+├── Models/           # Modelos Eloquent
+├── Policies/         # Políticas de autorización
+├── Providers/        # Proveedores de servicios
+├── Services/         # Servicios (WhatsAppService)
+└── View/             # View Composers
+config/
+├── options.php       # Catálogos de opciones (estados, tipos, métodos)
+└── services.php      # Configuración de servicios externos (Evolution API)
+database/
+├── migrations/       # Esquema de base de datos
+└── seeders/          # Datos iniciales
+resources/views/      # Vistas Blade
+routes/web.php        # Rutas web
+```
+
+---
+
+## 🔑 Cuenta de acceso inicial
+
+Después de ejecutar los seeders, crear un usuario administrador manualmente o mediante Tinker:
+
+```bash
+php artisan tinker
+```
+
+```php
+$user = App\Models\User::create([
+    'name' => 'Administrador',
+    'email' => 'admin@estudiojuridico.com',
+    'password' => bcrypt('password'),
+]);
+
+$user->assignRole('Administrador');
+```
+
+---
+
+## 🧪 Tests
+
+```bash
+php artisan test
+```
+
+---
+
+## 📄 Licencia
+
+Proyecto privado.

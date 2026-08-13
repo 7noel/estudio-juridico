@@ -27,23 +27,8 @@ use App\Http\Controllers\Reports\LawyerReportController;
 use App\Http\Controllers\Reports\ClientReportController;
 use App\Http\Controllers\Reports\AgendaReportController;
 use App\Http\Controllers\Reports\CashReportController;
+use App\Http\Controllers\Reports\ConversionReportController;
 use App\Http\Controllers\DashboardAgendaController;
-
-use App\Services\WhatsAppService;
-
-Route::get('/test-whatsapp', function () {
-
-    $service = app(WhatsAppService::class);
-
-    return $service->sendText(
-
-        '51945641484',
-
-        'Hola, prueba desde Laravel 12'
-
-    );
-
-});
 
 Route::get('/', function () {
     if(auth()->check()){
@@ -67,10 +52,6 @@ Route::get('/session-check', function () {
 Route::get('/refresh-csrf', function () {
     return response()->json(['token' => csrf_token()]);
 })->name('refresh.csrf');
-
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -128,8 +109,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/documents/{document}', [DocumentController::class, 'destroy'])->name('cases.documents.destroy');
 
     Route::post('/cases/{case}/agenda', [AgendaEventController::class, 'store'])->name('cases.agenda.store');
-    Route::put('/agenda/{event}', [AgendaEventController::class, 'update'])->name('cases.agenda.store');
-    Route::delete('/agenda/{event}', [AgendaEventController::class, 'destroy'])->name('cases.agenda.store');
+    Route::put('/agenda/{event}', [AgendaEventController::class, 'update'])->name('cases.agenda.update');
+    Route::delete('/agenda/{event}', [AgendaEventController::class, 'destroy'])->name('cases.agenda.destroy');
     Route::get('/cases/{case}/agenda/events', [AgendaEventController::class, 'events']);
     Route::put('/cases/{case}/quick-update', [CaseFileController::class, 'quickUpdate'])->name('cases.quick-update');
 
@@ -170,6 +151,8 @@ Route::prefix('reports')->name('reports.')->group(function () {
     Route::get( 'agenda/datatable', [AgendaReportController::class, 'datatable'])->name('agenda.datatable');
     Route::get( 'cash', [CashReportController::class, 'index'])->name('cash');
     Route::get( 'cash/datatable', [CashReportController::class, 'datatable'])->name('cash.datatable');
+    Route::get( 'conversion', [ConversionReportController::class, 'index'])->name('conversion');
+    Route::get( 'conversion/datatable', [ConversionReportController::class, 'datatable'])->name('conversion.datatable');
 });
 
 Route::prefix('dashboard/agenda')->name('dashboard.agenda.')->group(function () {

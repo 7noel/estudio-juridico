@@ -182,7 +182,7 @@ class Consultation extends Model
 
             return $query->where(
                 'lawyer_id',
-                $user->employee->id
+                $user->id
             );
 
         }

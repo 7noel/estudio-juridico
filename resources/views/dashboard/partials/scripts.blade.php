@@ -833,6 +833,67 @@ new ApexCharts(
 
 ).render();
 
+@if($isLawyer)
+/*
+|--------------------------------------------------------------------------
+| Embudo de Consultas por Estado (Abogado)
+|--------------------------------------------------------------------------
+*/
+
+@php
+    $funnelLabels = collect($consultationFunnel)->keys()->map(function($status){
+        return config('options.consultation_statuses')[$status] ?? $status;
+    })->values();
+    $funnelValues = collect($consultationFunnel)->values();
+@endphp
+
+new ApexCharts(
+
+    document.querySelector(
+        '#consultationFunnelChart'
+    ),
+
+    {
+
+        chart: {
+
+            type: 'bar',
+
+            height: 350
+
+        },
+
+        series: [
+
+            {
+
+                name:
+                    'Consultas',
+
+                data:
+
+                    {!! json_encode(
+                        $funnelValues
+                    ) !!}
+
+            }
+
+        ],
+
+        xaxis: {
+
+            categories:
+
+                {!! json_encode(
+                    $funnelLabels
+                ) !!}
+
+        }
+
+    }
+
+).render();
+@endif
 
 </script>
 

@@ -115,6 +115,13 @@
 		                    Agenda
 		                </a>
 		            </li>
+
+		            <li class="nav-item">
+		                <a class="nav-link text-dark" href="{{ route('reports.conversion') }}">
+		                    <i class="bi bi-graph-up"></i>
+		                    Seguimiento y Conversión
+		                </a>
+		            </li>
 		        </ul>
 		    </div>
 		</li>

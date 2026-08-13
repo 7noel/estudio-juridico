@@ -10,13 +10,28 @@ use App\Models\Document;
 use App\Models\Payment;
 use App\Models\Expense;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Filtro de fechas
+        |--------------------------------------------------------------------------
+        */
+
+        $dateFrom = $request->filled('date_from')
+            ? Carbon::parse($request->date_from)->startOfDay()
+            : now()->startOfMonth();
+
+        $dateTo = $request->filled('date_to')
+            ? Carbon::parse($request->date_to)->endOfDay()
+            : now()->endOfDay();
 
         /*
         |--------------------------------------------------------------------------
@@ -51,9 +66,7 @@ class DashboardController extends Controller
         $consultationsQuery = Consultation::query()
             ->whereIn('status', [
                 'new',
-                'assigned',
-                'evaluating',
-                'quoted'
+                'prospect'
             ]);
 
         if($isLawyer)
@@ -209,20 +222,105 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
+        | LISTA PRÓXIMOS VENCIMIENTOS
+        |--------------------------------------------------------------------------
+        */
+
+        $upcomingDeadlinesList = AgendaEvent::query()
+
+            ->with(['case.client', 'case.lawyer'])
+
+            ->where('type', 'deadline')
+
+            ->whereBetween(
+
+                'start_datetime',
+
+                [
+                    now(),
+                    now()->copy()->addDays(7)
+                ]
+
+            );
+
+        if($isLawyer)
+        {
+            $upcomingDeadlinesList->whereHas(
+
+                'case',
+
+                function($q) use ($user){
+
+                    $q->where(
+                        'lawyer_id',
+                        $user->id
+                    );
+
+                }
+
+            );
+        }
+
+        $upcomingDeadlinesList = $upcomingDeadlinesList
+            ->orderBy('start_datetime')
+            ->limit(5)
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | LISTA CASOS SIN ACTIVIDAD
+        |--------------------------------------------------------------------------
+        */
+
+        $inactiveCasesList = CaseFile::query()
+
+            ->with(['client', 'lawyer'])
+
+            ->whereIn('status', [
+                'open',
+                'in_progress'
+            ])
+
+            ->whereDoesntHave(
+
+                'activities',
+
+                function($q){
+
+                    $q->where(
+                        'activity_at',
+                        '>=',
+                        now()->subDays(15)
+                    );
+
+                }
+
+            );
+
+        if($isLawyer)
+        {
+            $inactiveCasesList->where(
+                'lawyer_id',
+                $user->id
+            );
+        }
+
+        $inactiveCasesList = $inactiveCasesList
+            ->orderBy('opened_at')
+            ->limit(5)
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
         | INGRESOS DEL MES
         |--------------------------------------------------------------------------
         */
 
         $monthlyIncomeQuery = Payment::query()
 
-            ->whereMonth(
+            ->whereBetween(
                 'payment_date',
-                now()->month
-            )
-
-            ->whereYear(
-                'payment_date',
-                now()->year
+                [$dateFrom, $dateTo]
             );
 
         if($isLawyer)
@@ -254,14 +352,9 @@ class DashboardController extends Controller
 
         $monthlyExpenseQuery = Expense::query()
 
-            ->whereMonth(
+            ->whereBetween(
                 'expense_date',
-                now()->month
-            )
-
-            ->whereYear(
-                'expense_date',
-                now()->year
+                [$dateFrom, $dateTo]
             );
 
         if($isLawyer)
@@ -407,6 +500,89 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
+        | CONVERSIÓN PERSONAL (ABOGADO)
+        |--------------------------------------------------------------------------
+        */
+
+        $lawyerConsultations = 0;
+        $lawyerConvertedCases = 0;
+        $lawyerConversionRate = 0;
+        $lawyerProspects = 0;
+        $consultationFunnel = [];
+        $prospectsToContact = collect();
+
+        if($isLawyer)
+        {
+            /*
+            |--------------------------------------------------------------------------
+            | Consultas del abogado
+            |--------------------------------------------------------------------------
+            */
+
+            $lawyerConsultationsQuery = Consultation::query()
+                ->where('lawyer_id', $user->id);
+
+            $lawyerConsultations = (clone $lawyerConsultationsQuery)->count();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Convertidas a caso (tienen CaseFile)
+            |--------------------------------------------------------------------------
+            */
+
+            $lawyerConvertedCases = (clone $lawyerConsultationsQuery)
+                ->whereHas('case')
+                ->count();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Tasa de conversión
+            |--------------------------------------------------------------------------
+            */
+
+            $lawyerConversionRate = $lawyerConsultations > 0
+                ? round(($lawyerConvertedCases * 100) / $lawyerConsultations, 2)
+                : 0;
+
+            /*
+            |--------------------------------------------------------------------------
+            | Prospectos (en seguimiento)
+            |--------------------------------------------------------------------------
+            */
+
+            $lawyerProspects = (clone $lawyerConsultationsQuery)
+                ->where('status', 'prospect')
+                ->count();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Embudo de consultas por estado
+            |--------------------------------------------------------------------------
+            */
+
+            $consultationFunnel = (clone $lawyerConsultationsQuery)
+                ->select('status', DB::raw('count(*) as total'))
+                ->groupBy('status')
+                ->pluck('total', 'status')
+                ->toArray();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Prospectos por contactar (ordenados por próxima fecha)
+            |--------------------------------------------------------------------------
+            */
+
+            $prospectsToContact = (clone $lawyerConsultationsQuery)
+                ->with(['client', 'specialty'])
+                ->where('status', 'prospect')
+                ->whereNotNull('next_follow_up_at')
+                ->orderBy('next_follow_up_at')
+                ->limit(5)
+                ->get();
+        }
+
+        /*
+        |--------------------------------------------------------------------------
         | GRÁFICO CASOS POR ESTADO
         |--------------------------------------------------------------------------
         */
@@ -415,6 +591,10 @@ class DashboardController extends Controller
             ->select(
                 'status',
                 DB::raw('count(*) as total')
+            )
+            ->whereBetween(
+                'opened_at',
+                [$dateFrom, $dateTo]
             )
             ->groupBy('status');
 
@@ -453,6 +633,10 @@ class DashboardController extends Controller
             ->select(
                 'legal_specialties.name',
                 DB::raw('count(*) as total')
+            )
+            ->whereBetween(
+                'cases.opened_at',
+                [$dateFrom, $dateTo]
             )
             ->groupBy('legal_specialties.name');
 
@@ -521,6 +705,30 @@ class DashboardController extends Controller
 
             'monthlyProfit' =>
                 $monthlyProfit,
+
+            'lawyerConsultations' =>
+                $lawyerConsultations,
+
+            'lawyerConvertedCases' =>
+                $lawyerConvertedCases,
+
+            'lawyerConversionRate' =>
+                $lawyerConversionRate,
+
+            'lawyerProspects' =>
+                $lawyerProspects,
+
+            'consultationFunnel' =>
+                $consultationFunnel,
+
+            'prospectsToContact' =>
+                $prospectsToContact,
+
+            'upcomingDeadlinesList' =>
+                $upcomingDeadlinesList,
+
+            'inactiveCasesList' =>
+                $inactiveCasesList,
         ]);
     }
 

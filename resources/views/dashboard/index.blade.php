@@ -4,6 +4,13 @@
 
 <div class="container-fluid">
 
+    {{-- Filtro de fechas (solo admin) --}}
+    @if($isAdmin)
+
+        @include('dashboard.partials.date-filter')
+
+    @endif
+
     {{-- KPIs --}}
     @if($isLawyer)
 
@@ -35,6 +42,13 @@
 
     </div>
 
+    {{-- Secciones específicas del abogado --}}
+    @if($isLawyer)
+
+        @include('dashboard.partials.lawyer-sections')
+
+    @endif
+
     <div class="row mt-4">
 
         <div class="col-lg-6">
@@ -56,6 +70,24 @@
         </div>
 
     </div>
+
+    {{-- Gráfico de embudo de consultas (abogado) --}}
+    @if($isLawyer)
+
+        <div class="row mt-4">
+
+            <div class="col-lg-12">
+
+                @include('dashboard.partials.charts', [
+                    'chartId' => 'consultationFunnelChart',
+                    'title' => 'Mis Consultas por Estado'
+                ])
+
+            </div>
+
+        </div>
+
+    @endif
 
 </div>
 
