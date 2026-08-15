@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
+use OwenIt\Auditing\Auditable as AuditableTrait;
 
-class CaseActivity extends Model
+class CaseActivity extends Model implements Auditable
 {
-    use SoftDeletes;
+    use SoftDeletes, AuditableTrait;
     
     protected $fillable = [
         'case_id',

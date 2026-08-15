@@ -160,6 +160,12 @@
 		                    Notificaciones
 		                </a>
 		            </li>
+		            <li class="nav-item">
+		                <a class="nav-link text-dark" href="{{ route('audits.index') }}">
+		                    <i class="bi bi-shield-check"></i>
+		                    Auditoría
+		                </a>
+		            </li>
 		        </ul>
 		    </div>
 		</li>

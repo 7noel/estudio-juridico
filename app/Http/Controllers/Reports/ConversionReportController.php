@@ -202,10 +202,10 @@ class ConversionReportController extends Controller
 
         $conversionBySpecialtyQuery = Consultation::query()
             ->when($request->date_from, function ($q) use ($request) {
-                $q->whereDate('created_at', '>=', $request->date_from);
+                $q->whereDate('consultations.created_at', '>=', $request->date_from);
             })
             ->when($request->date_to, function ($q) use ($request) {
-                $q->whereDate('created_at', '<=', $request->date_to);
+                $q->whereDate('consultations.created_at', '<=', $request->date_to);
             })
             ->when($request->establishment_id, function ($q) use ($request) {
                 $q->where('establishment_id', $request->establishment_id);
@@ -245,10 +245,10 @@ class ConversionReportController extends Controller
 
         $conversionByLawyerQuery = Consultation::query()
             ->when($request->date_from, function ($q) use ($request) {
-                $q->whereDate('created_at', '>=', $request->date_from);
+                $q->whereDate('consultations.created_at', '>=', $request->date_from);
             })
             ->when($request->date_to, function ($q) use ($request) {
-                $q->whereDate('created_at', '<=', $request->date_to);
+                $q->whereDate('consultations.created_at', '<=', $request->date_to);
             })
             ->when($request->establishment_id, function ($q) use ($request) {
                 $q->where('establishment_id', $request->establishment_id);
@@ -334,10 +334,10 @@ class ConversionReportController extends Controller
 
         $monthlyEvolutionQuery = Consultation::query()
             ->when($request->date_from, function ($q) use ($request) {
-                $q->whereDate('created_at', '>=', $request->date_from);
+                $q->whereDate('consultations.created_at', '>=', $request->date_from);
             })
             ->when($request->date_to, function ($q) use ($request) {
-                $q->whereDate('created_at', '<=', $request->date_to);
+                $q->whereDate('consultations.created_at', '<=', $request->date_to);
             })
             ->when($request->establishment_id, function ($q) use ($request) {
                 $q->where('establishment_id', $request->establishment_id);
@@ -352,7 +352,7 @@ class ConversionReportController extends Controller
                 $q->where('status', $request->status);
             })
             ->selectRaw("
-                DATE_FORMAT(created_at, '%Y-%m') as month,
+                DATE_FORMAT(consultations.created_at, '%Y-%m') as month,
                 COUNT(*) as consultations,
                 SUM(CASE WHEN cases.id IS NOT NULL THEN 1 ELSE 0 END) as converted
             ")

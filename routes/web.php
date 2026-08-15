@@ -29,6 +29,7 @@ use App\Http\Controllers\Reports\AgendaReportController;
 use App\Http\Controllers\Reports\CashReportController;
 use App\Http\Controllers\Reports\ConversionReportController;
 use App\Http\Controllers\DashboardAgendaController;
+use App\Http\Controllers\AuditController;
 
 Route::get('/', function () {
     if(auth()->check()){
@@ -133,6 +134,11 @@ Route::middleware(['auth'])->prefix('notification-settings')->name('notification
     Route::get('/datatable/data', [NotificationSettingController::class, 'datatable'])->name('datatable');
 });
 
+
+Route::middleware(['auth'])->prefix('audits')->name('audits.')->group(function () {
+    Route::get('/', [AuditController::class, 'index'])->name('index');
+    Route::get('/datatable', [AuditController::class, 'datatable'])->name('datatable');
+});
 
 Route::prefix('reports')->name('reports.')->group(function () {
     Route::get( 'collection', [CollectionReportController::class, 'index'])->name('collection');

@@ -1,1 +1,2 @@
+<a href="{{ route('users.show',$user) }}" class="btn btn-sm btn-outline-secondary"> <i class="bi bi-eye"></i> Ver </a>
 <a href="{{ route('users.edit',$user) }}" class="btn btn-sm btn-outline-primary"> <i class="bi bi-pencil"></i> Editar </a>

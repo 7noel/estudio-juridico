@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Establishment;
 use App\Http\Requests\UserRequest;
 use Illuminate\Http\Request;
+use OwenIt\Auditing\Models\Audit;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -82,7 +83,12 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        //
+        $establishments = Establishment::pluck('name', 'id');
+        $roles = Role::pluck('name', 'name');
+        $auditsByUser = Audit::query()->with('user')->where('user_id', $user->id)->latest()->limit(50)->get();
+        $auditsToUser = Audit::query()->with('user')->where('auditable_type', User::class)->where('auditable_id', $user->id)->latest()->limit(50)->get();
+
+        return view('users.show', compact('user', 'establishments', 'roles', 'auditsByUser', 'auditsToUser'));
     }
 
     /**

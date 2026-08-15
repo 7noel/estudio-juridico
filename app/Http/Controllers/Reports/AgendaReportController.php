@@ -55,7 +55,7 @@ class AgendaReportController extends Controller
 
                 'case.specialty',
 
-                'creator',
+                'user',
 
             ]);
 
@@ -340,7 +340,7 @@ class AgendaReportController extends Controller
                 'creator' =>
 
                     optional(
-                        $event->creator
+                        $event->user
                     )->name,
 
             ];
