@@ -97,6 +97,13 @@ $('#btnAddActivity').click(function(){
 
     $('#modalTitle').text('Agregar actividad');
 
+    // 🔥 Preseleccionar tipo según filtro activo
+    let activeFilter = $('#activityFilters .btn.active').data('filter');
+
+    if (activeFilter && activeFilter !== 'all') {
+        $('#activity_type').val(activeFilter);
+    }
+
     loadActivitySubtypes(
         $('#activity_type').val()
     );
