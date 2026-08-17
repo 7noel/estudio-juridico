@@ -15,7 +15,7 @@ class CaseActivityController extends Controller
 
         $request->validate([
 
-            'type' => 'required|in:legal,communication,note',
+            'type' => 'required|in:legal,judicial_progress,communication,note',
 
             'subtype' => 'nullable|string',
 
