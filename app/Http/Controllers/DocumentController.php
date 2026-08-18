@@ -16,7 +16,7 @@ class DocumentController extends Controller
         $request->validate([
             'document_type' => 'required|string',
             'title' => 'required|string',
-            'file' => 'required|file|max:10240',
+            'file' => 'required|file|max:102400',
         ]);
 
         $file = $request->file('file');
