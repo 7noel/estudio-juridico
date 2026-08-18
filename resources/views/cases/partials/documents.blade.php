@@ -294,10 +294,26 @@
                         </a>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button class="btn btn-sm btn-outline-primary"> <i class="bi bi-save"></i> Guardar</button>
-                </div>
+                <div class="modal-footer d-block">
 
+                    {{-- PROGRESO DE SUBIDA --}}
+                    <div id="uploadProgressWrapper" class="d-none mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">Subiendo documento... </small>
+                            <small id="uploadProgressText" class="fw-semibold"> 0% </small>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div id="uploadProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-sm btn-outline-primary" id="btnSaveDocument">
+                            <i class="bi bi-save"></i><span id="btnSaveDocumentText">Guardar</span>
+                        </button>
+                    </div>
+                    
+                </div>
             </form>
 
         </div>
@@ -314,32 +330,157 @@ let currentDocumentId = null;
 // CREAR / EDITAR
 // =================
 $('#form-document').submit(function(e){
+
     e.preventDefault();
 
-    let id = $('#doc_id').val();
+    const form = this;
+    const id = $('#doc_id').val();
 
-    let formData = new FormData(this);
+    // Evitar doble envío
+    if ($('#btnSaveDocument').prop('disabled')) {
+        return;
+    }
 
-    let url = id
+    const formData = new FormData(form);
+
+    const url = id
         ? `/documents/${id}`
         : `/cases/${caseId}/documents`;
 
-    let method = id ? 'POST' : 'POST';
+    const method = 'POST';
 
-    if(id){
+    if (id) {
         formData.append('_method', 'PUT');
     }
 
+    // ==========================
+    // UI - INICIAR SUBIDA
+    // ==========================
+
+    const $button = $('#btnSaveDocument');
+    const $buttonText = $('#btnSaveDocumentText');
+
+    const $progressWrapper = $('#uploadProgressWrapper');
+    const $progressBar = $('#uploadProgressBar');
+    const $progressText = $('#uploadProgressText');
+
+    // Deshabilitar botón
+    $button.prop('disabled', true);
+
+    // Cambiar texto
+    $buttonText.text('Subiendo...');
+
+    // Mostrar progreso
+    $progressWrapper.removeClass('d-none');
+
+    // Reiniciar progreso
+    $progressBar.css('width', '0%');
+    $progressText.text('0%');
+
+    // ==========================
+    // AJAX
+    // ==========================
+
     $.ajax({
+
         url: url,
+
         method: method,
+
         data: formData,
+
         processData: false,
+
         contentType: false,
+
+        xhr: function(){
+
+            const xhr = new window.XMLHttpRequest();
+
+            xhr.upload.addEventListener('progress', function(e){
+
+                if (e.lengthComputable) {
+
+                    const percent = Math.round(
+                        (e.loaded / e.total) * 100
+                    );
+
+                    $progressBar.css(
+                        'width',
+                        percent + '%'
+                    );
+
+                    $progressText.text(
+                        percent + '%'
+                    );
+
+                }
+
+            });
+
+            return xhr;
+        },
+
         success: function(){
-            location.reload();
+
+            $progressBar
+                .removeClass('progress-bar-animated')
+                .addClass('bg-success');
+
+            $progressText.text('100%');
+
+            $buttonText.text('Completado');
+
+            // Dar un pequeño tiempo para mostrar el 100%
+            setTimeout(function(){
+                location.reload();
+            }, 300);
+
+        },
+
+        error: function(xhr){
+
+            console.error(xhr);
+
+            // Volver a habilitar botón
+            $button.prop('disabled', false);
+
+            $buttonText.text('Guardar');
+
+            // Ocultar progreso
+            $progressWrapper.addClass('d-none');
+
+            // Mostrar mensaje
+            if (xhr.status === 422) {
+
+                let message = 'El documento no pudo ser validado.';
+
+                if (
+                    xhr.responseJSON &&
+                    xhr.responseJSON.errors
+                ) {
+
+                    const errors = xhr.responseJSON.errors;
+
+                    message = Object.values(errors)
+                        .flat()
+                        .join('\n');
+                }
+
+                alert(message);
+
+            } else {
+
+                alert(
+                    'Ocurrió un error al subir el documento.'
+                );
+
+            }
+
         }
+
     });
+
 });
 
 // =================
