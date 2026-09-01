@@ -1,5 +1,24 @@
 @push('scripts')
 
+<style>
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.btn-icon i {
+    font-size: 0.95rem;
+    line-height: 1;
+}
+
+</style>
+
 <script>
 
 let activityTable;
@@ -114,6 +133,8 @@ function initDataTable()
 
             { data: 'title' },
 
+            { data: 'case_lawyer' },
+
             { data: 'case_number' },
 
             { data: 'client_name' },
@@ -130,24 +151,23 @@ function initDataTable()
 
                         return `
 
-                            <div class="d-flex justify-content-center gap-1">
+                            <div class="d-flex justify-content-center gap-2">
 
                                 <button
-                                    class="btn btn-sm btn-outline-primary btn-detail"
+                                    class="btn btn-sm btn-icon btn-outline-primary btn-detail"
                                     data-id="${row.id}"
                                     title="Ver detalle"
                                 >
                                     <i class="bi bi-eye"></i>
-                                    Detalle
                                 </button>
 
                                 <a
-                                    class="btn btn-sm btn-outline-secondary"
+                                    class="btn btn-sm btn-icon btn-outline-secondary"
                                     href="${row.case_url || '#'}"
                                     target="_blank"
                                     title="Abrir caso"
                                 >
-                                    <i class="bi bi-folder2-open"></i>
+                                    <i class="bi bi-box-arrow-up-right"></i>
                                 </a>
 
                             </div>

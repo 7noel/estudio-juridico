@@ -48,12 +48,27 @@ class ActivityDetailReportController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | FILTRO ABOGADO (quien realizó la actividad)
+        | FILTRO ABOGADO
         |--------------------------------------------------------------------------
+        |
+        | Se filtra por el abogado asignado al caso (case.lawyer_id) o por quien
+        | registró la actividad (user_id), para cubrir ambos escenarios.
+        |
         */
 
         if ($request->lawyer_id) {
-            $query->where('user_id', $request->lawyer_id);
+            $query->where(function ($q) use ($request) {
+                $q->where('user_id', $request->lawyer_id)
+                    ->orWhereHas(
+                        'case',
+                        function ($cq) use ($request) {
+                            $cq->where(
+                                'lawyer_id',
+                                $request->lawyer_id
+                            );
+                        }
+                    );
+            });
         }
 
         /*

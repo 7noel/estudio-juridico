@@ -23,6 +23,8 @@
 
                     <th>Actividad</th>
 
+                    <th>Abogado</th>
+
                     <th>Nº Caso</th>
 
                     <th>Cliente</th>
