@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use OwenIt\Auditing\Contracts\Auditable;
 use OwenIt\Auditing\Auditable as AuditableTrait;
 
@@ -76,6 +77,37 @@ class Client extends Model implements Auditable
     {
         return config('options.client_document_types')[$this->document_type]
             ?? $this->document_type;
+    }
+
+    public function getIsTemporaryDocumentAttribute(): bool
+    {
+        return str_starts_with((string) $this->document_number, 'TMP');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | DOCUMENTO TEMPORAL
+    |--------------------------------------------------------------------------
+    */
+
+    public static function generateTemporaryDocumentNumber(?\DateTimeInterface $when = null): string
+    {
+        $when ??= now();
+
+        return 'TMP'.$when->format('YmdHis');
+    }
+
+    public static function nextTemporaryDocumentNumber(): string
+    {
+        $base = static::generateTemporaryDocumentNumber();
+
+        $number = $base;
+
+        while (static::withTrashed()->where('document_number', $number)->exists()) {
+            $number = $base.strtoupper(Str::random(2));
+        }
+
+        return $number;
     }
 
 }

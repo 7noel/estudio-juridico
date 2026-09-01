@@ -24,7 +24,11 @@ Cliente
 
 <strong>Documento:</strong>
 
-{{ $client->document_number }}
+{{ $client->document_type_text }} {{ $client->document_number }}
+
+@if($client->is_temporary_document)
+    <span class="badge bg-warning text-dark">TMP</span>
+@endif
 
 </p>
 

@@ -15,6 +15,7 @@ return [
         '7' => 'PAS',
         '6' => 'RUC',
         'A' => 'CÉDULA DIPLOMÁTICA',
+        'T' => 'SIN DOCUMENTO',
 
     ],
 

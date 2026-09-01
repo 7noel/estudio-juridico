@@ -27,7 +27,13 @@ class ClientController extends Controller
             return datatables()
                 ->of($clients)
                 ->addColumn('document', function ($client) {
-                    return $client->document_type_text.' '.$client->document_number;
+                    $doc = $client->document_type_text.' '.$client->document_number;
+
+                    if ($client->is_temporary_document) {
+                        $doc .= ' <span class="badge bg-warning text-dark" title="Documento temporal: el cliente aún no lo ha proporcionado">TMP</span>';
+                    }
+
+                    return $doc;
                 })
                 ->addColumn('actions', function ($client) {
                     return view(
@@ -35,7 +41,7 @@ class ClientController extends Controller
                         compact('client')
                     )->render();
                 })
-                ->rawColumns(['actions'])
+                ->rawColumns(['actions', 'document'])
                 ->make(true);
         }
 
@@ -52,9 +58,14 @@ class ClientController extends Controller
     public function store(ClientRequest $request)
     {
         // $this->authorize('create', Client::class);
-        $client = Client::create(
-            $request->validated()
-        );
+
+        $data = $request->validated();
+
+        if (($data['document_type'] ?? null) === 'T' && blank($data['document_number'] ?? null)) {
+            $data['document_number'] = Client::nextTemporaryDocumentNumber();
+        }
+
+        $client = Client::create($data);
 
         // =====================================
         // AJAX
@@ -106,9 +117,13 @@ class ClientController extends Controller
     {
         // $this->authorize('update', $client);
 
-        $client->update(
-            $request->validated()
-        );
+        $data = $request->validated();
+
+        if (($data['document_type'] ?? null) === 'T' && blank($data['document_number'] ?? null)) {
+            $data['document_number'] = $client->document_number;
+        }
+
+        $client->update($data);
 
         return redirect()
             ->route('clients.index')

@@ -1,5 +1,13 @@
 {{-- Documento --}}
 
+@if(($client->is_temporary_document ?? false))
+<div class="alert alert-warning py-2 small mb-3">
+    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+    Este cliente tiene un <strong>documento temporal</strong> (<code>{{ $client->document_number }}</code>).
+    Cuando proporcione su documento, cambie el <strong>Tipo de documento</strong> e ingrese el número real.
+</div>
+@endif
+
 <div class="row mb-3">
     <div class="col-md-3">
         <x-form.select
@@ -15,8 +23,10 @@
         name="document_number"
         label="Número documento"
         :value="$client->document_number ?? ''"
-        required
         />
+        <div class="form-text text-muted small d-none" id="document_number_hint">
+            Se generará un documento temporal (TMP + fecha y hora).
+        </div>
     </div>
 
 {{-- Nombre completo --}}
@@ -104,6 +114,26 @@ $(document).on('input', '[name="mobile"]', function(){
     // Solo dígitos y el signo + (espacios, guiones y paréntesis se eliminan solos)
     this.value = this.value.replace(/[^\d+]/g, '');
 
+});
+
+// =====================================
+// Documento temporal (cliente sin documento)
+// =====================================
+
+function toggleTemporaryDocument(){
+    let isTemp = $('#document_type').val() === 'T';
+
+    $('#document_number')
+        .prop('disabled', isTemp)
+        .prop('required', !isTemp);
+
+    $('#document_number_hint').toggleClass('d-none', !isTemp);
+}
+
+$('#document_type').on('change', toggleTemporaryDocument);
+
+$(function(){
+    toggleTemporaryDocument();
 });
 
 $(function(){

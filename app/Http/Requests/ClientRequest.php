@@ -62,13 +62,15 @@ class ClientRequest extends FormRequest
             ],
 
             'document_number' => [
-                'required',
+                Rule::requiredIf(fn () => $this->input('document_type') !== 'T'),
+                'nullable',
                 'string',
+                'max:20',
                 Rule::unique('clients')
                     ->where(function ($query) {
 
                         return $query
-                            ->where('document_type', request('document_type'));
+                            ->where('document_type', $this->input('document_type'));
 
                     })
                     ->ignore($id)
