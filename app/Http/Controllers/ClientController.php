@@ -27,13 +27,11 @@ class ClientController extends Controller
             return datatables()
                 ->of($clients)
                 ->addColumn('document', function ($client) {
-                    $doc = $client->document_type_text.' '.$client->document_number;
-
                     if ($client->is_temporary_document) {
-                        $doc .= ' <span class="badge bg-warning text-dark" title="Documento temporal: el cliente aún no lo ha proporcionado">TMP</span>';
+                        return '<span class="badge bg-warning text-dark" title="Documento temporal: '.e($client->document_number).' — el cliente aún no lo ha proporcionado">TMP</span>';
                     }
 
-                    return $doc;
+                    return $client->document_type_text.' '.$client->document_number;
                 })
                 ->addColumn('actions', function ($client) {
                     return view(
