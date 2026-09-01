@@ -207,6 +207,16 @@ class CaseFileController extends Controller
 
         $case->update($data);
 
+        // =====================================
+        // SINCRONIZAR ABOGADO CON LA CONSULTA
+        // =====================================
+
+        if (auth()->user()->hasRole('Administrador') && isset($data['lawyer_id'])) {
+            $case->consultation?->update([
+                'lawyer_id' => $data['lawyer_id'],
+            ]);
+        }
+
         return response()->json([
             'success' => true
         ]);

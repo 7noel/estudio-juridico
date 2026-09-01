@@ -215,6 +215,9 @@ class ConsultationController extends Controller
             $oldStatus = $consultation->status;
 
             $data = $request->only(
+                'service_type',
+                'legal_specialty_id',
+                'legal_subject_id',
                 'client_id',
                 'lawyer_id',
                 'title',
@@ -228,6 +231,19 @@ class ConsultationController extends Controller
             }
 
             $consultation->update($data);
+
+            // =====================================
+            // SINCRONIZAR CON EL CASO VINCULADO
+            // =====================================
+
+            if ($consultation->case) {
+                $consultation->case->update([
+                    'service_type'       => $consultation->service_type,
+                    'legal_specialty_id' => $consultation->legal_specialty_id,
+                    'legal_subject_id'   => $consultation->legal_subject_id,
+                    'lawyer_id'          => $consultation->lawyer_id,
+                ]);
+            }
 
             /*
             |--------------------------------------------------------------------------
