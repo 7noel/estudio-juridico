@@ -113,6 +113,12 @@
 		                    Agenda
 		                </a>
 		            </li>
+		            <li class="nav-item ms-3">
+		                <a class="nav-link text-dark" href="{{ route('reports.activity-detail') }}">
+		                    <i class="bi bi-list-check"></i>
+		                    Detalle de Actividades
+		                </a>
+		            </li>
 
 		            {{-- 4. CONVERSIÓN COMERCIAL --}}
 		            <li class="nav-item mt-1">

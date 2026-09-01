@@ -28,6 +28,7 @@ use App\Http\Controllers\Reports\ClientReportController;
 use App\Http\Controllers\Reports\AgendaReportController;
 use App\Http\Controllers\Reports\CashReportController;
 use App\Http\Controllers\Reports\ConversionReportController;
+use App\Http\Controllers\Reports\ActivityDetailReportController;
 use App\Http\Controllers\DashboardAgendaController;
 use App\Http\Controllers\AuditController;
 
@@ -159,6 +160,8 @@ Route::prefix('reports')->name('reports.')->group(function () {
     Route::get( 'cash/datatable', [CashReportController::class, 'datatable'])->name('cash.datatable');
     Route::get( 'conversion', [ConversionReportController::class, 'index'])->name('conversion');
     Route::get( 'conversion/datatable', [ConversionReportController::class, 'datatable'])->name('conversion.datatable');
+    Route::get( 'activity-detail', [ActivityDetailReportController::class, 'index'])->name('activity-detail');
+    Route::get( 'activity-detail/datatable', [ActivityDetailReportController::class, 'datatable'])->name('activity-detail.datatable');
 });
 
 Route::prefix('dashboard/agenda')->name('dashboard.agenda.')->group(function () {
