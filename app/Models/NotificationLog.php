@@ -12,6 +12,7 @@ class NotificationLog extends Model
         'related_id',
         'phone',
         'sent_at',
+        'status',
 
     ];
 }

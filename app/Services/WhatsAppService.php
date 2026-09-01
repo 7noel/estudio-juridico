@@ -121,7 +121,38 @@ class WhatsAppService
 
         );
 
-        return $response->json();
+        /*
+        |--------------------------------------------------------------------------
+        | Lanzar excepción en errores HTTP (4xx/5xx)
+        |--------------------------------------------------------------------------
+        */
+
+        $response->throw();
+
+        $data = $response->json();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Validar error en el body (Evolution puede responder 200/201 con error)
+        |--------------------------------------------------------------------------
+        */
+
+        $status = $data['status'] ?? null;
+
+        if (
+            (is_int($status) && $status >= 400)
+            || in_array($status, ['ERROR', 'error'], true)
+            || isset($data['error'])
+        ) {
+
+            throw new Exception(
+                'Evolution API respondió con error: '
+                . json_encode($data)
+            );
+
+        }
+
+        return $data;
     }
 
     /*

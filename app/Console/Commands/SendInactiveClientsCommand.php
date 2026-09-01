@@ -48,17 +48,14 @@ class SendInactiveClientsCommand extends Command
         |--------------------------------------------------------------------------
         */
 
-        $scheduledTime = today()
+        $windowStart = today()
             ->setTimeFromTimeString($hour);
 
-        $diffInMinutes = $scheduledTime
-            ->diffInMinutes(now(), false);
+        $windowEnd = today()
+            ->setTimeFromTimeString($hour)
+            ->addMinutes(15);
 
-        if (
-            $diffInMinutes < 0
-            ||
-            $diffInMinutes > 100
-        ) {
+        if (! now()->between($windowStart, $windowEnd)) {
 
             return;
 
@@ -172,6 +169,12 @@ class SendInactiveClientsCommand extends Command
                     $case->id
                 )
 
+                ->where(
+                    'status',
+                    '!=',
+                    'failed'
+                )
+
                 ->exists();
 
             if ($alreadySent) {
@@ -207,17 +210,9 @@ class SendInactiveClientsCommand extends Command
 
                 ."{$url}";
 
-            SendWhatsAppMessageJob::dispatch(
-
-                $case->lawyer_mobile,
-
-                $message
-
-            );
-
             /*
             |--------------------------------------------------------------------------
-            | Registrar log
+            | Registrar intento de envío (pendiente)
             |--------------------------------------------------------------------------
             */
 
@@ -235,7 +230,22 @@ class SendInactiveClientsCommand extends Command
                 'sent_at' =>
                     now(),
 
+                'status' =>
+                    'pending',
+
             ]);
+
+            SendWhatsAppMessageJob::dispatch(
+
+                $case->lawyer_mobile,
+
+                $message,
+
+                'case_without_communication',
+
+                $case->id
+
+            );
         }
 
         /*
@@ -379,6 +389,12 @@ class SendInactiveClientsCommand extends Command
                     $case->activity_id
                 )
 
+                ->where(
+                    'status',
+                    '!=',
+                    'failed'
+                )
+
                 ->exists();
 
             if ($alreadySent) {
@@ -413,17 +429,9 @@ class SendInactiveClientsCommand extends Command
 
                 ."{$url}";
 
-            SendWhatsAppMessageJob::dispatch(
-
-                $case->lawyer_mobile,
-
-                $message
-
-            );
-
             /*
             |--------------------------------------------------------------------------
-            | Registrar log
+            | Registrar intento de envío (pendiente)
             |--------------------------------------------------------------------------
             */
 
@@ -441,7 +449,22 @@ class SendInactiveClientsCommand extends Command
                 'sent_at' =>
                     now(),
 
+                'status' =>
+                    'pending',
+
             ]);
+
+            SendWhatsAppMessageJob::dispatch(
+
+                $case->lawyer_mobile,
+
+                $message,
+
+                'inactive_client',
+
+                $case->activity_id
+
+            );
         }
     }
 }

@@ -13,10 +13,13 @@ Artisan::command('test', function () {
 });
 
 Schedule::command('reminders:quotas')
-    ->everyMinute();
+    ->everyMinute()
+    ->withoutOverlapping();
 
 Schedule::command('reminders:inactive-clients')
-    ->everyMinute();
+    ->everyMinute()
+    ->withoutOverlapping();
 
 Schedule::command('reminders:agenda')
-    ->everyMinute();
+    ->everyMinute()
+    ->withoutOverlapping();

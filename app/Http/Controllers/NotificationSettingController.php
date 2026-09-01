@@ -73,7 +73,7 @@ class NotificationSettingController extends Controller
         NotificationSetting $notificationSetting
     ) {
 
-        $request->validate([
+        $rules = [
 
             'label' => 'required',
 
@@ -81,7 +81,41 @@ class NotificationSettingController extends Controller
 
             'type' => 'required',
 
-        ]);
+        ];
+
+        /*
+        |--------------------------------------------------------------------------
+        | Validación específica según la clave
+        |--------------------------------------------------------------------------
+        */
+
+        $specificRules = [
+
+            'quota_reminder_days_before' => 'required|integer|min:0',
+
+            'inactive_client_days' => 'required|integer|min:0',
+
+            'agenda_reminder_minutes_before' => 'required|integer|min:1',
+
+            'quota_reminder_hour' => 'required|date_format:H:i',
+
+            'inactive_client_hour' => 'required|date_format:H:i',
+
+            'quota_reminder_enabled' => 'required|in:0,1',
+
+            'agenda_reminder_enabled' => 'required|in:0,1',
+
+            'inactive_client_enabled' => 'required|in:0,1',
+
+        ];
+
+        if (isset($specificRules[$notificationSetting->key])) {
+
+            $rules['value'] = $specificRules[$notificationSetting->key];
+
+        }
+
+        $request->validate($rules);
 
         $notificationSetting->update([
 

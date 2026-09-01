@@ -200,6 +200,12 @@ class SendAgendaRemindersCommand extends Command
                     $event->id
                 )
 
+                ->where(
+                    'status',
+                    '!=',
+                    'failed'
+                )
+
                 ->exists();
 
             if ($alreadySent) {
@@ -247,17 +253,9 @@ class SendAgendaRemindersCommand extends Command
 
                 // ."{$url}";
 
-            SendWhatsAppMessageJob::dispatch(
-
-                $event->user_mobile,
-
-                $message
-
-            );
-
             /*
             |--------------------------------------------------------------------------
-            | Registrar log
+            | Registrar intento de envío (pendiente)
             |--------------------------------------------------------------------------
             */
 
@@ -275,7 +273,22 @@ class SendAgendaRemindersCommand extends Command
                 'sent_at' =>
                     now(),
 
+                'status' =>
+                    'pending',
+
             ]);
+
+            SendWhatsAppMessageJob::dispatch(
+
+                $event->user_mobile,
+
+                $message,
+
+                'agenda_event',
+
+                $event->id
+
+            );
         }
 
         /*
@@ -300,6 +313,12 @@ class SendAgendaRemindersCommand extends Command
                 ->where(
                     'related_id',
                     $event->id
+                )
+
+                ->where(
+                    'status',
+                    '!=',
+                    'failed'
                 )
 
                 ->exists();
@@ -347,17 +366,9 @@ class SendAgendaRemindersCommand extends Command
 
                 ."{$url}";
 
-            SendWhatsAppMessageJob::dispatch(
-
-                $event->user_mobile,
-
-                $message
-
-            );
-
             /*
             |--------------------------------------------------------------------------
-            | Registrar log
+            | Registrar intento de envío (pendiente)
             |--------------------------------------------------------------------------
             */
 
@@ -375,7 +386,22 @@ class SendAgendaRemindersCommand extends Command
                 'sent_at' =>
                     now(),
 
+                'status' =>
+                    'pending',
+
             ]);
+
+            SendWhatsAppMessageJob::dispatch(
+
+                $event->user_mobile,
+
+                $message,
+
+                'agenda_event',
+
+                $event->id
+
+            );
         }
     }
 }

@@ -103,11 +103,27 @@ EVOLUTION_API_KEY=tu-api-key
 EVOLUTION_INSTANCE=nombre-de-instancia
 ```
 
-Se recomienda ejecutar el worker de colas para procesar los envíos:
+### Recordatorios automáticos (cron y colas)
+
+El sistema usa recordatorios programados (cuotas por vencer, clientes inactivos y agenda).
+Para que se envíen en la fecha y hora configuradas deben estar activos **dos procesos** en el servidor:
+
+1. **Scheduler de Laravel** — ejecutarlo cada minuto en el crontab del servidor:
 
 ```bash
-php artisan queue:listen
+* * * * * cd /ruta/del/proyecto && php artisan schedule:run >> /dev/null 2>&1
 ```
+
+2. **Worker de colas** — procesa los envíos de WhatsApp. Debe permanecer corriendo
+   de forma permanente (con Supervisor/systemd o un gestor equivalente):
+
+```bash
+php artisan queue:work --tries=3 --timeout=60
+```
+
+> **Nota**: la zona horaria de la aplicación es `America/Lima` (`config/app.php`).
+> La hora de cada recordatorio se configura en **Administración → Notificaciones**
+> (ej. cuotas: "1 día antes" a las `09:00`).
 
 ---
 

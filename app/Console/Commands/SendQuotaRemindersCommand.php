@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 use App\Models\NotificationLog;
 use App\Models\NotificationSetting;
 use App\Models\ConsultationInstallment;
-use App\Services\WhatsAppService;
 use App\Jobs\SendWhatsAppMessageJob;
 
 class SendQuotaRemindersCommand extends Command
@@ -49,20 +48,18 @@ class SendQuotaRemindersCommand extends Command
 
         /*
         |--------------------------------------------------------------------------
-        | Ejecutar solo a la hora configurada
+        | Ejecutar solo dentro de la ventana de la hora configurada
+        | (hora configurada + 15 minutos de tolerancia)
         |--------------------------------------------------------------------------
         */
 
-        $scheduledTime = today()->setTimeFromTimeString($hour);
+        $windowStart = today()->setTimeFromTimeString($hour);
 
-        $now = now();
+        $windowEnd = today()
+            ->setTimeFromTimeString($hour)
+            ->addMinutes(15);
 
-        $diffInMinutes = $scheduledTime->diffInMinutes(
-            $now,
-            false
-        );
-
-        if ($diffInMinutes < 0 || $diffInMinutes > 10) {
+        if (! now()->between($windowStart, $windowEnd)) {
 
             return;
 
@@ -90,6 +87,14 @@ class SendQuotaRemindersCommand extends Command
 
             /*
             |--------------------------------------------------------------------------
+            | Nunca recordar cuotas ya vencidas
+            |--------------------------------------------------------------------------
+            */
+
+            ->whereDate('due_date', '>=', today()->toDateString())
+
+            /*
+            |--------------------------------------------------------------------------
             | Cuotas NO pagadas
             |--------------------------------------------------------------------------
             */
@@ -107,8 +112,6 @@ class SendQuotaRemindersCommand extends Command
             ])
 
             ->get();
-
-        $whatsapp = app(WhatsAppService::class);
 
         foreach ($installments as $installment) {
 
@@ -148,6 +151,8 @@ class SendQuotaRemindersCommand extends Command
 
                 ->where('related_id', $installment->id)
 
+                ->where('status', '!=', 'failed')
+
                 ->exists();
 
             if ($alreadySent) {
@@ -171,6 +176,26 @@ class SendQuotaRemindersCommand extends Command
 
             /*
             |--------------------------------------------------------------------------
+            | Registrar intento de envío (pendiente)
+            |--------------------------------------------------------------------------
+            */
+
+            NotificationLog::create([
+
+                'type' => 'quota_reminder',
+
+                'related_id' => $installment->id,
+
+                'phone' => $client->mobile,
+
+                'sent_at' => now(),
+
+                'status' => 'pending',
+
+            ]);
+
+            /*
+            |--------------------------------------------------------------------------
             | Enviar WhatsApp
             |--------------------------------------------------------------------------
             */
@@ -186,23 +211,6 @@ class SendQuotaRemindersCommand extends Command
                 $installment->id
 
             );
-            /*
-            |--------------------------------------------------------------------------
-            | Registrar envío
-            |--------------------------------------------------------------------------
-            */
-
-            NotificationLog::create([
-
-                'type' => 'quota_reminder',
-
-                'related_id' => $installment->id,
-
-                'phone' => $client->mobile,
-
-                'sent_at' => now(),
-
-            ]);
             
         }
     }

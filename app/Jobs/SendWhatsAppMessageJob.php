@@ -49,7 +49,6 @@ class SendWhatsAppMessageJob implements ShouldQueue
 
     public function handle(): void
     {
-        //dd("aqui command");
         $service = app(WhatsAppService::class);
 
         $response = $service->sendText(
@@ -65,17 +64,20 @@ class SendWhatsAppMessageJob implements ShouldQueue
 
         if ($this->type && $this->relatedId) {
 
-            NotificationLog::create([
+            NotificationLog::updateOrCreate(
 
-                'type' => $this->type,
+                [
+                    'type' => $this->type,
+                    'related_id' => $this->relatedId,
+                ],
 
-                'related_id' => $this->relatedId,
+                [
+                    'phone' => $this->number,
+                    'sent_at' => now(),
+                    'status' => 'sent',
+                ]
 
-                'phone' => $this->number,
-
-                'sent_at' => now(),
-
-            ]);
+            );
         }
 
         /*
@@ -104,5 +106,22 @@ class SendWhatsAppMessageJob implements ShouldQueue
             'error' => $exception->getMessage(),
 
         ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Marcar como fallido para permitir reintentos futuros
+        |--------------------------------------------------------------------------
+        */
+
+        if ($this->type && $this->relatedId) {
+
+            NotificationLog::query()
+
+                ->where('type', $this->type)
+
+                ->where('related_id', $this->relatedId)
+
+                ->update(['status' => 'failed']);
+        }
     }
 }
