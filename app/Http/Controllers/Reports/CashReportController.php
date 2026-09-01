@@ -80,16 +80,9 @@ class CashReportController extends Controller
 
         if($establishmentId)
         {
-            $payments->whereHas(
-                'consultation',
-                function($q) use ($establishmentId){
-
-                    $q->where(
-                        'establishment_id',
-                        $establishmentId
-                    );
-
-                }
+            $payments->where(
+                'establishment_id',
+                $establishmentId
             );
 
             $expenses->where(

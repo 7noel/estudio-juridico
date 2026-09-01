@@ -31,6 +31,7 @@ use App\Http\Controllers\Reports\ConversionReportController;
 use App\Http\Controllers\Reports\ActivityDetailReportController;
 use App\Http\Controllers\DashboardAgendaController;
 use App\Http\Controllers\AuditController;
+use App\Http\Controllers\CashController;
 
 Route::get('/', function () {
     if(auth()->check()){
@@ -83,6 +84,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('payments/data', [PaymentController::class, 'data'])->name('payments.data');
     Route::post('payments/delete', [PaymentController::class, 'delete'])->name('payments.delete');
+
+    Route::get('cash', [CashController::class, 'index'])->name('cash.index');
+    Route::get('cash/datatable', [CashController::class, 'datatable'])->name('cash.datatable');
+    Route::post('cash/income', [CashController::class, 'incomeStore'])->name('cash.income.store');
+    Route::post('cash/income/delete', [CashController::class, 'incomeDestroy'])->name('cash.income.delete');
 
     Route::get('consultations/stats', [ConsultationController::class, 'stats'])->name('consultations.stats');
     Route::get('consultations/check-case', function(Request $request){

@@ -58,7 +58,9 @@ class ExpenseController extends Controller
             $expense = Expense::create([
 
                 'establishment_id' =>
-                    $case?->establishment_id,
+                    $case?->establishment_id
+                    ?? auth()->user()->employee?->establishment_id
+                    ?? auth()->user()->establishment_id,
 
                 'case_id' => $request->case_id,
 

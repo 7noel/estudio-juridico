@@ -35,6 +35,12 @@
 				<i class="bi bi-folder"></i> Casos
 			</a>
 		</li>
+		{{-- CAJA --}}
+		<li class="nav-item">
+			<a class="nav-link text-dark" href="{{ route('cash.index') }}">
+				<i class="bi bi-wallet2"></i> Caja
+			</a>
+		</li>
 		{{-- AGENDA --}}
 		<!-- <li class="nav-item">
 			<a class="nav-link text-dark" href="#">
