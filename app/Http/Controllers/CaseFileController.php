@@ -6,6 +6,7 @@ use App\Models\CaseFile;
 use App\Models\User;
 use App\Models\Client;
 use App\Models\LegalSpecialty;
+use App\Models\NotificationSetting;
 use Illuminate\Http\Request;
 
 class CaseFileController extends Controller
@@ -20,7 +21,10 @@ class CaseFileController extends Controller
 
     public function data(Request $request)
     {
-        $query = CaseFile::with(['client', 'lawyer', 'specialty', 'subject', 'consultation'])
+        $days = (int) NotificationSetting::get('inactive_client_days', 15);
+        $limitDate = now()->subDays($days);
+
+        $query = CaseFile::with(['client', 'lawyer', 'specialty', 'subject', 'consultation', 'lastCommunication'])
             ->forCurrentUser();
 
         // filtros
@@ -50,7 +54,25 @@ class CaseFileController extends Controller
 
         return datatables()->of($query)
 
-            ->addColumn('client', fn($r) => $r->client->full_name ?? '')
+            ->addColumn('client', function ($r) use ($limitDate, $days) {
+                $name = $r->client->full_name ?? '';
+
+                if ($name === '') {
+                    return $name;
+                }
+
+                $lastCommunication = $r->lastCommunication?->activity_at;
+
+                $isInactive = $lastCommunication
+                    ? $lastCommunication->lte($limitDate)
+                    : ($r->opened_at && $r->opened_at->lte($limitDate));
+
+                if ($isInactive) {
+                    return '<span class="text-danger fw-bold" title="Sin comunicación con el abogado hace más de ' . $days . ' días">' . e($name) . '</span>';
+                }
+
+                return e($name);
+            })
             ->addColumn('lawyer', fn($r) => $r->lawyer->name ?? '')
 
             ->addColumn('service_type', fn($r) =>
@@ -89,7 +111,7 @@ class CaseFileController extends Controller
                 return view('cases.partials.actions', compact('r'))->render();
             })
 
-            ->rawColumns(['status', 'actions', 'consultation_link'])
+            ->rawColumns(['status', 'actions', 'consultation_link', 'client'])
             ->make(true);
     }
 

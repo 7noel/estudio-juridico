@@ -98,6 +98,14 @@ class CaseFile extends Model implements Auditable
             ->latest('id');
     }
 
+    public function lastCommunication()
+    {
+        return $this->hasOne(CaseActivity::class, 'case_id')
+            ->where('type', 'communication')
+            ->latest('activity_at')
+            ->latest('id');
+    }
+
     public function establishment()
     {
         return $this->belongsTo(Establishment::class);
