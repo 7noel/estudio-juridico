@@ -31,10 +31,15 @@
         <x-form.input
         name="mobile"
         label="Celular"
-        maxlength="9"
-        inputmode="numeric"
+        type="tel"
+        inputmode="tel"
+        maxlength="16"
+        placeholder="999 123 456 · +34 612 345 678"
         :value="$user->mobile ?? ''"
         />
+        <div class="form-text text-muted small">
+            Perú: 9 dígitos (ej. 999 123 456). Extranjero: +código de país + número (ej. +34 612 345 678).
+        </div>
     </div>
     <div class="col-md-3">
         <x-form.input
@@ -54,3 +59,16 @@
         />
     </div>
 </div>
+
+@push('scripts')
+
+<script>
+$(document).on('input', '[name="mobile"]', function(){
+
+    // Solo dígitos y el signo + (espacios, guiones y paréntesis se eliminan solos)
+    this.value = this.value.replace(/[^\d+]/g, '');
+
+});
+</script>
+
+@endpush

@@ -12,6 +12,33 @@ class UserRequest extends FormRequest
         return true;
     }
 
+    /**
+     * Normalizar el celular antes de validar.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('mobile') && $this->get('mobile') !== null) {
+            $this->merge([
+                'mobile' => $this->normalizeMobile($this->get('mobile')),
+            ]);
+        }
+    }
+
+    protected function normalizeMobile(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = preg_replace('/[^\d+]/', '', $value);
+
+        if (str_starts_with($value, '00')) {
+            $value = '+'.substr($value, 2);
+        }
+
+        return $value;
+    }
+
     public function rules(): array
     {
         $userId = $this->route('user');
@@ -33,7 +60,8 @@ class UserRequest extends FormRequest
 
             'mobile' => [
                 'nullable',
-                'regex:/^9\d{8}$/'
+                'string',
+                'regex:'.config('options.mobile_regex')
             ],
             
             'role' => [
@@ -47,6 +75,14 @@ class UserRequest extends FormRequest
                 'min:6'
             ],
 
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'mobile.regex' =>
+                'El celular debe tener 9 dígitos (Perú) o incluir el código de país (ej. +34 612 345 678).',
         ];
     }
 }

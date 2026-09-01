@@ -492,7 +492,7 @@ Las notificaciones automáticas son uno de los pilares del sistema, porque permi
 ### Recomendaciones para que las notificaciones funcionen correctamente
 
 - **Verifique el número al momento de registrar**: tanto al crear un cliente como al crear un usuario, confirme el número de celular directamente con la persona.
-- **Use el formato correcto**: registre el número con su código de país si corresponde (por ejemplo, +51 999 999 999 para Perú). Esto evita problemas si el sistema envía mensajes internacionales.
+- **Use el formato correcto**: para celulares de Perú escriba solo los 9 dígitos (por ejemplo, 999 999 999); el sistema agrega el +51 automáticamente al enviar. Para celulares extranjeros escriba el número completo con su código de país (por ejemplo, +34 612 345 678). Espacios, guiones y paréntesis se limpian automáticamente, no es necesario escribirlos.
 - **Actualice los datos cuando cambien**: si un cliente o un abogado cambia de número de celular, actualice la información de inmediato en el sistema.
 - **No dependa solo del teléfono fijo**: los teléfonos fijos no reciben mensajes de texto ni notificaciones por WhatsApp. Asegúrese de registrar siempre un número de **celular**.
 - **Haga una prueba**: después de configurar una notificación, realice una prueba para confirmar que el mensaje llega correctamente al destinatario.
@@ -561,7 +561,7 @@ Las notificaciones dependen principalmente de que el número de celular del clie
 **Qué hacer:**
 
 1. Ingrese al módulo **Clientes** y abra la ficha del cliente.
-2. Verifique que el **Teléfono / Celular** esté bien escrito, incluya el código de país si corresponde (por ejemplo, +51 999 999 999 para Perú) y que sea un número de celular (los teléfonos fijos no reciben mensajes de texto ni avisos por WhatsApp).
+2. Verifique que el **Teléfono / Celular** esté bien escrito y que sea un número de celular (los teléfonos fijos no reciben mensajes de texto ni avisos por WhatsApp). Recuerde: para celulares de Perú bastan los 9 dígitos (ej. 999 999 999) y para celulares extranjeros debe incluir el código de país completo (ej. +34 612 345 678).
 3. Si el número estaba incorrecto, corríjalo y guarde los cambios.
 4. Verifique en **Administración → Notificaciones** que la notificación correspondiente esté creada y activa.
 5. Realice una prueba de envío para confirmar que la notificación llega correctamente.
