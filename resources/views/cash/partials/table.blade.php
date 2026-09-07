@@ -22,6 +22,8 @@
 
                     <th>Origen</th>
 
+                    <th>Usuario</th>
+
                     <th>Método</th>
 
                     <th>Concepto</th>

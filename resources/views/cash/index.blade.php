@@ -54,6 +54,8 @@
 
     @include('cash.partials.kpis')
 
+    @include('cash.partials.charts')
+
     @include('cash.partials.table')
 
 </div>

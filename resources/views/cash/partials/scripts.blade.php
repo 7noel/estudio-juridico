@@ -3,6 +3,7 @@
 <script>
 
 let cashTable;
+let cashChart = null;
 
 // =====================================================
 // INIT
@@ -177,6 +178,15 @@ function initDataTable()
                 }
             },
             { data: 'origin' },
+            {
+                data: 'user',
+                render: function(data){
+                    if(!data){
+                        return '<span class="text-muted">—</span>';
+                    }
+                    return escapeHtml(data);
+                }
+            },
             { data: 'payment_method' },
             {
                 data: 'concept',
@@ -231,6 +241,15 @@ function loadReport()
         },
         success: function(response){
             loadKpis(response.kpis);
+
+            if(response.methods){
+                loadMethodsTable(response.methods);
+            }
+
+            if(response.chart){
+                loadChart(response.chart);
+            }
+
             loadMovements(response.rows);
         },
         error: function(xhr){
@@ -249,6 +268,72 @@ function loadKpis(kpis)
     $('#kpi-expense').html('S/ ' + formatMoney(kpis.expense));
     $('#kpi-net').html('S/ ' + formatMoney(kpis.net));
     $('#kpi-count').html(kpis.movements_count);
+}
+
+// =====================================================
+// METHODS TABLE
+// =====================================================
+
+function loadMethodsTable(methods)
+{
+    let html = '';
+
+    methods.forEach(function(row){
+        html += `
+            <tr>
+                <td>${row.method}</td>
+                <td class="text-success text-end">${formatMoney(row.income)}</td>
+                <td class="text-danger text-end">${formatMoney(row.expense)}</td>
+                <td class="fw-bold text-end">${formatMoney(row.net)}</td>
+            </tr>
+        `;
+    });
+
+    $('#methodsTable tbody').html(html);
+}
+
+// =====================================================
+// CHART
+// =====================================================
+
+function loadChart(chart)
+{
+    if(cashChart){
+        cashChart.destroy();
+    }
+
+    let options = {
+        chart: {
+            type: 'bar',
+            height: 350
+        },
+        series: [
+            {
+                name: 'Ingresos',
+                data: chart.income
+            },
+            {
+                name: 'Gastos',
+                data: chart.expense
+            }
+        ],
+        xaxis: {
+            categories: chart.categories
+        },
+        dataLabels: {
+            enabled: false
+        },
+        legend: {
+            position: 'top'
+        }
+    };
+
+    cashChart = new ApexCharts(
+        document.querySelector('#cashChart'),
+        options
+    );
+
+    cashChart.render();
 }
 
 // =====================================================

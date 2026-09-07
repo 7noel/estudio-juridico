@@ -46,7 +46,7 @@ class CashController extends Controller
         */
 
         $payments = Payment::query()
-            ->with(['consultation.case', 'installment'])
+            ->with(['consultation.case', 'installment', 'user'])
             ->whereBetween('payment_date', [$from, $to]);
 
         /*
@@ -56,7 +56,7 @@ class CashController extends Controller
         */
 
         $expenses = Expense::query()
-            ->with('case')
+            ->with(['case', 'user'])
             ->whereBetween('expense_date', [$from, $to]);
 
         /*
@@ -82,6 +82,37 @@ class CashController extends Controller
 
         /*
         |--------------------------------------------------------------------------
+        | MÉTODOS DE PAGO (tabla "Métodos de Pago" y gráfico)
+        |--------------------------------------------------------------------------
+        */
+
+        $methods = [];
+
+        foreach (config('options.payment_methods') as $key => $label) {
+            $income = (clone $payments)
+                ->where('payment_method', $key)
+                ->sum('amount');
+
+            $expense = (clone $expenses)
+                ->where('payment_method', $key)
+                ->sum('amount');
+
+            $methods[] = [
+                'method' => $label,
+                'income' => $income,
+                'expense' => $expense,
+                'net' => $income - $expense,
+            ];
+        }
+
+        $chart = [
+            'categories' => collect($methods)->pluck('method')->values(),
+            'income' => collect($methods)->pluck('income')->values(),
+            'expense' => collect($methods)->pluck('expense')->values(),
+        ];
+
+        /*
+        |--------------------------------------------------------------------------
         | FILAS DE MOVIMIENTOS
         |--------------------------------------------------------------------------
         */
@@ -104,6 +135,7 @@ class CashController extends Controller
                     'type' => 'Ingreso',
                     'kind' => 'income',
                     'origin' => $origin,
+                    'user' => $payment->user?->name,
                     'payment_method' => config('options.payment_methods')[$payment->payment_method] ?? $payment->payment_method,
                     'concept' => $payment->description,
                     'reference' => $payment->reference,
@@ -128,6 +160,7 @@ class CashController extends Controller
                     'type' => 'Gasto',
                     'kind' => 'expense',
                     'origin' => $expense->case_id ? 'Caso ' . $expense->case_id : 'General',
+                    'user' => $expense->user?->name,
                     'payment_method' => config('options.payment_methods')[$expense->payment_method] ?? $expense->payment_method,
                     'concept' => $concept,
                     'reference' => $expense->reference,
@@ -152,6 +185,8 @@ class CashController extends Controller
                 'net' => round($netCash, 2),
                 'movements_count' => $movements->count(),
             ],
+            'methods' => $methods,
+            'chart' => $chart,
             'rows' => $movements,
         ]);
     }
