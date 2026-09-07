@@ -179,7 +179,7 @@ function initDataTable()
             },
             { data: 'origin' },
             {
-                data: 'user',
+                data: 'client',
                 render: function(data){
                     if(!data){
                         return '<span class="text-muted">—</span>';

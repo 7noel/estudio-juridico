@@ -73,12 +73,12 @@
 		                    Financiero Integral
 		                </a>
 		            </li>
-		            <li class="nav-item ms-3">
+		            <!-- <li class="nav-item ms-3">
 		                <a class="nav-link text-dark" href="{{ route('reports.cash') }}">
 		                    <i class="bi bi-cash-coin"></i>
 		                    Caja
 		                </a>
-		            </li>
+		            </li> -->
 		            <li class="nav-item ms-3">
 		                <a class="nav-link text-dark" href="{{ route('reports.profitability') }}">
 		                    <i class="bi bi-piggy-bank"></i>

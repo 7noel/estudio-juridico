@@ -22,7 +22,7 @@
 
                     <th>Origen</th>
 
-                    <th>Usuario</th>
+                    <th>Cliente</th>
 
                     <th>Método</th>
 

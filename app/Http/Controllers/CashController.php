@@ -46,7 +46,7 @@ class CashController extends Controller
         */
 
         $payments = Payment::query()
-            ->with(['consultation.case', 'installment', 'user'])
+            ->with(['consultation.case', 'consultation.client', 'installment'])
             ->whereBetween('payment_date', [$from, $to]);
 
         /*
@@ -56,7 +56,7 @@ class CashController extends Controller
         */
 
         $expenses = Expense::query()
-            ->with(['case', 'user'])
+            ->with(['case.client'])
             ->whereBetween('expense_date', [$from, $to]);
 
         /*
@@ -135,7 +135,7 @@ class CashController extends Controller
                     'type' => 'Ingreso',
                     'kind' => 'income',
                     'origin' => $origin,
-                    'user' => $payment->user?->name,
+                    'client' => optional($payment->consultation?->client)->full_name,
                     'payment_method' => config('options.payment_methods')[$payment->payment_method] ?? $payment->payment_method,
                     'concept' => $payment->description,
                     'reference' => $payment->reference,
@@ -160,7 +160,7 @@ class CashController extends Controller
                     'type' => 'Gasto',
                     'kind' => 'expense',
                     'origin' => $expense->case_id ? 'Caso ' . $expense->case_id : 'General',
-                    'user' => $expense->user?->name,
+                    'client' => optional($expense->case?->client)->full_name,
                     'payment_method' => config('options.payment_methods')[$expense->payment_method] ?? $expense->payment_method,
                     'concept' => $concept,
                     'reference' => $expense->reference,
