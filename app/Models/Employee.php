@@ -53,12 +53,12 @@ class Employee extends Model
 
     public function createdConsultations()
     {
-        return $this->hasMany(Consultation::class, 'created_by');
+        return $this->hasMany(Consultation::class, 'user_id');
     }
 
     public function createdCases()
     {
-        return $this->hasMany(CaseFile::class, 'created_by');
+        return $this->hasMany(CaseFile::class, 'user_id');
     }
 
 }

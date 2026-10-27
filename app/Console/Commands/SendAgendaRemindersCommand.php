@@ -132,7 +132,7 @@ class SendAgendaRemindersCommand extends Command
                 'users',
                 'users.id',
                 '=',
-                'agenda_events.created_by'
+                'agenda_events.user_id'
             )
 
             ->whereNull(
