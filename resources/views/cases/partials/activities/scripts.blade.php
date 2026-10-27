@@ -407,11 +407,12 @@ $(document).on(
     }
 );
 
-// =====================================================
-// GUARDAR
-// =====================================================
 
-activityForm.submit(function(e){
+ // =====================================================
+ // GUARDAR
+ // =====================================================
+
+activityForm.submit(function(e) {
 
     e.preventDefault();
 
@@ -426,35 +427,89 @@ activityForm.submit(function(e){
         : 'POST';
 
     // =====================================
-    // VALIDAR FECHAS
+    // DETERMINAR SI TIENE EVENTO DE AGENDA
     // =====================================
 
-    let start_datetime =
-        $('#activity_event_start_date').val()
-        + ' ' +
-        $('#activity_event_start_time').val();
+    let hasAgendaEvent = false;
 
-    let end_datetime =
-        $('#activity_event_end_date').val()
-        + ' ' +
-        $('#activity_event_end_time').val();
-
-    if(
-        (
-            $('#create_agenda_event').is(':checked')
-            ||
-            $('.btn-edit-activity').data('has-event')
-        )
-        &&
-        end_datetime <= start_datetime
-    ){
-
-        alert(
-            'La fecha fin debe ser mayor'
-        );
-
-        return;
+    if (id) {
+        hasAgendaEvent =
+            $('.btn-edit-activity[data-id="' + id + '"]')
+                .data('has-event') == 1;
     }
+
+    let createAgendaEvent =
+        $('#create_agenda_event').is(':checked');
+
+    let shouldSendAgenda =
+        createAgendaEvent || hasAgendaEvent;
+
+    // =====================================
+    // OBTENER FECHAS
+    // =====================================
+
+    let startDate = $('#activity_event_start_date').val();
+    let startTime = $('#activity_event_start_time').val();
+
+    let endDate = $('#activity_event_end_date').val();
+    let endTime = $('#activity_event_end_time').val();
+
+    // =====================================
+    // VALIDAR FECHAS SI CORRESPONDE
+    // =====================================
+
+    if (shouldSendAgenda) {
+
+        if (!startDate || !startTime || !endDate || !endTime) {
+            alert('Debes completar la fecha y hora de inicio y fin del evento.');
+            return;
+        }
+
+        // Formato compatible con MySQL y Laravel:
+        // YYYY-MM-DD HH:mm:ss
+
+        let start_datetime =
+            `${startDate} ${startTime}:00`;
+
+        let end_datetime =
+            `${endDate} ${endTime}:00`;
+
+        // Comparar fechas completas.
+        // Este formato ISO ordena correctamente año, mes, día y hora.
+
+        let startComparable =
+            `${startDate}T${startTime}:00`;
+
+        let endComparable =
+            `${endDate}T${endTime}:00`;
+
+        if (endComparable <= startComparable) {
+            alert('La fecha y hora de fin debe ser posterior a la fecha y hora de inicio.');
+            return;
+        }
+
+    }
+
+    // =====================================
+    // CONSTRUIR DATOS DE AGENDA
+    // =====================================
+
+    let startDateTime = null;
+    let endDateTime = null;
+
+    if (shouldSendAgenda) {
+
+        startDateTime =
+            `${startDate} ${startTime}:00`;
+
+        endDateTime =
+            `${endDate} ${endTime}:00`;
+
+    }
+
+    // =====================================
+    // ENVIAR AJAX
+    // =====================================
 
     $.ajax({
 
@@ -479,59 +534,73 @@ activityForm.submit(function(e){
                 $('[name="description"]').val(),
 
             activity_at:
-                $('[name="activity_at"]').val(),
+                $('[name="activity_at"]').val() || null,
 
             // =================================
             // AGENDA
             // =================================
 
             create_agenda_event:
-                $('#create_agenda_event')
-                    .is(':checked') ? 1 : 0,
+                createAgendaEvent ? 1 : 0,
 
             agenda_type:
-                $('#activity_event_type').val(),
+                shouldSendAgenda
+                    ? $('#activity_event_type').val() || null
+                    : null,
 
             agenda_title:
-                $('#activity_event_title').val(),
+                shouldSendAgenda
+                    ? $('#activity_event_title').val() || null
+                    : null,
 
             agenda_description:
-                $('#activity_event_description').val(),
+                shouldSendAgenda
+                    ? $('#activity_event_description').val() || null
+                    : null,
 
             agenda_start_datetime:
-                $('#activity_event_start_date').val()
-                + ' ' +
-                $('#activity_event_start_time').val()
-                + ':00',
+                startDateTime,
 
             agenda_end_datetime:
-                $('#activity_event_end_date').val()
-                + ' ' +
-                $('#activity_event_end_time').val()
-                + ':00',
+                endDateTime,
 
             agenda_location:
-                $('#activity_event_location').val(),
+                shouldSendAgenda
+                    ? $('#activity_event_location').val() || null
+                    : null,
 
         },
 
-        success: function(){
+        success: function() {
 
             location.reload();
 
         },
 
-        error: function(xhr){
+        error: function(xhr) {
 
-            console.log(xhr.responseText);
+            console.error('Error al guardar actividad:', xhr.responseJSON || xhr.responseText);
 
-            alert('Error al guardar');
+            if (xhr.status === 422 && xhr.responseJSON?.errors) {
+
+                let errors = Object.values(xhr.responseJSON.errors)
+                    .flat()
+                    .join('\n');
+
+                alert(errors);
+
+            } else {
+
+                alert('Error al guardar la actividad. Revisa la consola para más detalles.');
+
+            }
 
         }
 
     });
 
 });
+
 
 // =====================================================
 // ELIMINAR

@@ -14,25 +14,39 @@ class CaseActivityController extends Controller
         $this->authorize('update', $case);
 
         $request->validate([
-
             'type' => 'required|in:legal,judicial_progress,communication,note',
 
             'subtype' => 'nullable|string',
+
+            'title' => 'nullable|string|max:255',
 
             'description' => 'required|string',
 
             'activity_at' => 'nullable|date',
 
-            // agenda
-            'create_agenda_event' => 'nullable',
+            // Agenda
+            'create_agenda_event' => 'nullable|boolean',
 
-            'agenda_start_datetime' => 'nullable|date',
+            'agenda_type' => 'required_if:create_agenda_event,1|nullable|string',
 
-            'agenda_end_datetime' =>
-                'nullable|date|after:agenda_start_datetime',
+            'agenda_title' => 'required_if:create_agenda_event,1|nullable|string|max:255',
+
+            'agenda_description' => 'nullable|string',
+
+            'agenda_start_datetime' => [
+                'exclude_unless:create_agenda_event,1',
+                'required',
+                'date',
+            ],
+
+            'agenda_end_datetime' => [
+                'exclude_unless:create_agenda_event,1',
+                'required',
+                'date',
+                'after:agenda_start_datetime',
+            ],
 
             'agenda_location' => 'nullable|string|max:255',
-
         ]);
 
         DB::beginTransaction();
@@ -113,8 +127,7 @@ class CaseActivityController extends Controller
         $this->authorize('update', $activity);
 
         $request->validate([
-
-            'type' => 'required',
+            'type' => 'required|in:legal,judicial_progress,communication,note',
 
             'subtype' => 'nullable|string',
 
@@ -124,23 +137,29 @@ class CaseActivityController extends Controller
 
             'activity_at' => 'nullable|date',
 
-            // agenda
-            'create_agenda_event' => 'nullable',
+            // Agenda
+            'create_agenda_event' => 'nullable|boolean',
 
-            'agenda_type' => 'nullable|string',
+            'agenda_type' => 'required_if:create_agenda_event,1|nullable|string',
 
-            'agenda_title' => 'nullable|string|max:255',
+            'agenda_title' => 'required_if:create_agenda_event,1|nullable|string|max:255',
 
             'agenda_description' => 'nullable|string',
 
-            'agenda_start_datetime' => 'nullable|date',
+            'agenda_start_datetime' => [
+                'exclude_unless:create_agenda_event,1',
+                'required',
+                'date',
+            ],
 
-            'agenda_end_datetime' =>
-                'nullable|date|after:agenda_start_datetime',
+            'agenda_end_datetime' => [
+                'exclude_unless:create_agenda_event,1',
+                'required',
+                'date',
+                'after:agenda_start_datetime',
+            ],
 
-            'agenda_location' =>
-                'nullable|string|max:255',
-
+            'agenda_location' => 'nullable|string|max:255',
         ]);
 
         DB::beginTransaction();
