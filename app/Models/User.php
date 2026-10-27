@@ -10,11 +10,12 @@ use Illuminate\Notifications\Notifiable;
 use OwenIt\Auditing\Contracts\Auditable;
 use OwenIt\Auditing\Auditable as AuditableTrait;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements Auditable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasRoles, AuditableTrait;
+    use HasFactory, Notifiable, HasRoles, AuditableTrait, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
